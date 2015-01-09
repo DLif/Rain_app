@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<parameters>
+  <parameter name="MS_TableConnectionString-Web.config Connection String" description="MS_TableConnectionString Connection String used in web.config by the application to access the database." defaultValue="Data Source=(localdb)\v11.0;AttachDbFilename=|DataDirectory|\aspnet-pleaseWork-20150109120757.mdf;Initial Catalog=aspnet-pleaseWork-20150109120757;Integrated Security=True;MultipleActiveResultSets=True" tags="SqlConnectionString">
+    <parameterEntry kind="XmlFile" scope="c:\\users\\denis\\documents\\visual\ studio\ 2013\\Projects\\pleaseWork\\pleaseWork\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='MS_TableConnectionString']/@connectionString" />
+  </parameter>
+</parameters>
