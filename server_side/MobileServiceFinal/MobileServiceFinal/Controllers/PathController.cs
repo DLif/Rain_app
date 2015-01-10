@@ -23,7 +23,10 @@ namespace MobileServiceFinal.Controllers
         // GET tables/Path
         public IQueryable<Path> GetAllPath()
         {
-            return Query(); 
+            // Get the logged-in user.
+            var currentUser = User as ServiceUser;
+
+            return Query().Where(todo => todo.UserId == currentUser.Id);
         }
 
         // GET tables/Path/48D68C86-6EA6-4C25-AA33-223FC9A27959
@@ -41,6 +44,12 @@ namespace MobileServiceFinal.Controllers
         // POST tables/Path/48D68C86-6EA6-4C25-AA33-223FC9A27959
         public async Task<IHttpActionResult> PostPath(Path item)
         {
+            // Get the logged-in user.
+            var currentUser = User as ServiceUser;
+
+            // Set the user ID on the item.
+            item.UserId = currentUser.Id;
+
             Path current = await InsertAsync(item);
             return CreatedAtRoute("Tables", new { id = current.Id }, current);
         }

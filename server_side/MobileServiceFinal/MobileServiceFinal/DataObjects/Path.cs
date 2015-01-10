@@ -11,6 +11,6 @@ namespace MobileServiceFinal.DataObjects
 
         public byte[] PathClass { get; set; }
 
-        public int userId { get; set; }
+        public string UserId { get; set; }
     }
 }

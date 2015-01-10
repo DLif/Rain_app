@@ -17,13 +17,16 @@ namespace MobileServiceFinal.Controllers
         {
             base.Initialize(controllerContext);
             MobileServiceContext context = new MobileServiceContext();
-            DomainManager = new EntityDomainManager<PathGroup>(context, Request, Services);
+           DomainManager = new EntityDomainManager<PathGroup>(context, Request, Services);
         }
 
         // GET tables/PathGroup
         public IQueryable<PathGroup> GetAllPathGroup()
         {
-            return Query(); 
+                    // Get the logged-in user.
+        var currentUser = User as ServiceUser;
+
+        return Query().Where(todo => todo.UserId == currentUser.Id);
         }
 
         // GET tables/PathGroup/48D68C86-6EA6-4C25-AA33-223FC9A27959
@@ -41,6 +44,12 @@ namespace MobileServiceFinal.Controllers
         // POST tables/PathGroup/48D68C86-6EA6-4C25-AA33-223FC9A27959
         public async Task<IHttpActionResult> PostPathGroup(PathGroup item)
         {
+            // Get the logged-in user.
+            var currentUser = User as ServiceUser;
+
+            // Set the user ID on the item.
+            item.UserId = currentUser.Id;
+
             PathGroup current = await InsertAsync(item);
             return CreatedAtRoute("Tables", new { id = current.Id }, current);
         }
