@@ -10,9 +10,11 @@ using Microsoft.WindowsAzure.Mobile.Service.Security; /* for facebook authentica
 
 namespace MobileServiceFinal.Controllers
 {
+
+   
     public class PathController : TableController<Path>
     {
-        [AuthorizeLevel(AuthorizationLevel.User)] 
+        
         protected override void Initialize(HttpControllerContext controllerContext)
         {
             base.Initialize(controllerContext);
@@ -20,6 +22,8 @@ namespace MobileServiceFinal.Controllers
             DomainManager = new EntityDomainManager<Path>(context, Request, Services);
         }
 
+
+         [AuthorizeLevel(AuthorizationLevel.User)] 
         // GET tables/Path
         public IQueryable<Path> GetAllPath()
         {
@@ -41,6 +45,7 @@ namespace MobileServiceFinal.Controllers
              return UpdateAsync(id, patch);
         }
 
+         [AuthorizeLevel(AuthorizationLevel.User)] 
         // POST tables/Path/48D68C86-6EA6-4C25-AA33-223FC9A27959
         public async Task<IHttpActionResult> PostPath(Path item)
         {
@@ -54,6 +59,7 @@ namespace MobileServiceFinal.Controllers
             return CreatedAtRoute("Tables", new { id = current.Id }, current);
         }
 
+         [AuthorizeLevel(AuthorizationLevel.User)] 
         // DELETE tables/Path/48D68C86-6EA6-4C25-AA33-223FC9A27959
         public Task DeletePath(string id)
         {
