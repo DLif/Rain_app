@@ -21,7 +21,9 @@ using Windows.UI.Xaml.Controls.Maps;
 using Windows.UI;
 using Windows.UI.Xaml.Shapes;
 using Windows.UI.Xaml.Media.Imaging;
-using App8.DataModel;  
+using App8.DataModel;
+using Windows.Services.Maps;
+using System.Threading.Tasks;  
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
 
@@ -48,8 +50,8 @@ namespace App8
             /* navigate the map to israel */
             //Israel          34.282   29.000   35.667   33.286 
             //country        longmin   latmin  longmax   latmax
-            mapManager = new RadarMapManager();
-            mapManager.updateMaps();
+          //  mapManager = new RadarMapManager();
+          //  mapManager.updateMaps();
 
             
          
@@ -85,8 +87,46 @@ namespace App8
         /// <see cref="Frame.Navigate(Type, Object)"/> when this page was initially requested and
         /// a dictionary of state preserved by this page during an earlier
         /// session.  The state will be null the first time a page is visited.</param>
-        private void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
+        private async void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
+
+            // get the singleton
+            this.mapManager = RadarMapManager.getRadarMapManager();
+
+            ModalWindow temporaryDialog = new ModalWindow();
+            ContentDialog dialog = temporaryDialog.Dialog;
+            dialog.ShowAsync();
+
+            try
+            {
+                await this.mapManager.updateRadarMaps(true);
+               
+            }
+            catch
+            {
+
+                dialog.Hide();
+                MessageDialog diag = new MessageDialog("Oops, our servers are down! please try again later", "Oops");
+                hideBar.Begin();
+                diag.ShowAsync();
+
+                return;
+                // TODO:
+                // navigate back to main page (?)
+
+
+            }
+
+            dialog.Hide();
+
+            this.defaultViewModel["RadarMaps"] = mapManager.Maps;
+
+
+            this.slider_panel.Visibility = Visibility.Visible;
+            ShowSlider.Begin();
+            
+
+          
         }
 
         /// <summary>
@@ -189,13 +229,32 @@ namespace App8
         {
             ((TextBox)sender).Text = "";
         }
+        private DependencyObject getMyLocationPin()
+        {
+            //Creating a Grid element.
+            var myGrid = new Grid();
+            myGrid.RowDefinitions.Add(new RowDefinition());
+            myGrid.RowDefinitions.Add(new RowDefinition());
+            myGrid.Background = new SolidColorBrush(Colors.Transparent);
+            ImageBrush imgBrush = new ImageBrush();
+            imgBrush.ImageSource = new BitmapImage(new Uri("ms-appx:///Assets/radar/mappin.png"));
+            //Creating a Rectangle
+            var myRectangle = new Rectangle { Fill = imgBrush, Height = 35, Width = 20 };
+            myRectangle.SetValue(Grid.RowProperty, 0);
+            myRectangle.SetValue(Grid.ColumnProperty, 0);
 
+            //Adding the Rectangle to the Grid
+            myGrid.Children.Add(myRectangle);
+
+           
+            return myGrid;
+        }
 
         private int mapHeight;
         private int mapWidth;
         private double baseZoomLevel;
         private double baseScale;
-        private async void map_Loaded(object sender, RoutedEventArgs e)
+        private  void map_Loaded(object sender, RoutedEventArgs e)
         {
 
             // set bounds to israel
@@ -228,39 +287,113 @@ namespace App8
 
         }
 
+        // current location pin rectangle
+        private DependencyObject currentLocationPin = null;
+
+
         private async void AppBarButton_Click(object sender, RoutedEventArgs e)
         {
-            // locate me 
 
+
+            if(progressBar.Visibility == Visibility.Visible)
+            {
+                // other action is being done, wait till its over
+                return;
+            }
+
+            if(this.flyoutOpened)
+            {
+                // close the flyout
+                this.Flyout.Hide();
+                this.flyoutOpened = false;
+
+            }
+
+
+            progressBar.Visibility = Visibility.Visible;
+            progressBar.Opacity = 1;
+
+            // locate current location
             var locator = new Geolocator();
             locator.DesiredAccuracyInMeters = 50;
-            var myPosition = await locator.GetGeopositionAsync();
+            String  error = "Oops, could not locate you! try again later";
+            Boolean errorOccured = false;
 
-            var mapCenter = new BasicGeoposition() { Latitude = 32.006340, Longitude = 34.814471 };
+            try
+            {
 
-            Geopoint mapCenterPoint = new Geopoint(mapCenter);
+                var myPosition = await locator.GetGeopositionAsync(
+                    maximumAge: TimeSpan.FromSeconds(60),
+                    timeout: TimeSpan.FromSeconds(10)
+                    );
 
-           // MapIcon MapIcon1 = new MapIcon();
-           // MapIcon1.Location = new Geopoint(new BasicGeoposition()
-           // {
-           //     Latitude = myPosition.Coordinate.Point.Position.Latitude,
-           //     Longitude = myPosition.Coordinate.Point.Position.Longitude
-           // });
-           // MapIcon1.NormalizedAnchorPoint = new Point(0.5, 1.0);
-           // MapIcon1.Title = "Space Needle";
+                // navigate to location
 
-          // var pin = CreatePin();
-           var pin = getMapPin();
-          //  map.MapElements.Add(MapIcon1);
+                var geopoint = new Geopoint(new BasicGeoposition
+                {
+                    Latitude = myPosition.Coordinate.Latitude,
+                    Longitude = myPosition.Coordinate.Longitude
+                });
 
-            map.Children.Add(pin);
-            MapControl.SetLocation(pin, mapCenterPoint);
-            MapControl.SetNormalizedAnchorPoint(pin, new Point(0.5, 0.5));
+               
 
-          //  await map.TrySetViewAsync(myPosition.Coordinate.Point, 18D);
+                // draw a pin on the map
+                if (this.currentLocationPin == null)
+                {
+
+                   
+                    DependencyObject obj = getMyLocationPin();
+                    this.map.Children.Add(obj);
+                    // update location of pin on map
+                    MapControl.SetLocation(obj, geopoint);
+                    MapControl.SetNormalizedAnchorPoint(obj, new Point(0.5, 1));
+
+                    this.currentLocationPin = obj;
+                    
+                    
+
+                }
+                else
+                {
+                    // update location of pin on map
+                    MapControl.SetLocation(this.currentLocationPin, geopoint);
+                    MapControl.SetNormalizedAnchorPoint(this.currentLocationPin, new Point(0.5, 0.5));
+                }
+
+                Boolean success = await map.TrySetViewAsync(geopoint, 11D, 0, 0, MapAnimationKind.None);
+                if (!success)
+                {
+                    errorOccured = true;
+                }
+ 
+
+            }
+
+            catch (System.UnauthorizedAccessException)
+            {
+
+                // fatal error
+                errorOccured = true;
+
+            }
+            catch (TaskCanceledException)
+            {
+                // Cancelled or timed-out.
+                errorOccured = true;
+
+            }
+
+            progressBar.Visibility = Visibility.Collapsed;
+
+            if(errorOccured)
+            {
+                MessageDialog dialog = new MessageDialog(error);
+                dialog.ShowAsync();
+            }
+
         }
 
-        Rectangle myRect = null;
+    
 
         private DependencyObject getMapPin()
         {
@@ -276,13 +409,17 @@ namespace App8
             //Creating a Rectangle
           //  var myRectangle = new Rectangle { Fill = new SolidColorBrush(Colors.Black), Height = this.mapHeight, Width = 40 };
             ImageBrush imgBrush = new ImageBrush();
-            imgBrush.ImageSource = new BitmapImage(new Uri("ms-appx:///Assets/radar/baseImage.jpg"));
+          //  BitmapImage cloudImage = new BitmapImage(new Uri("ms-appx:///Assets/radar/prediction.jpg"));
 
-          //  imgBrush.ImageSource = mapManager.Maps[0].cropAndScale(currentBox, this.mapWidth, this.mapHeight);
+           // RadarMapManager.makeTransparentBackground(cloudImage);
+
+
+
+          //  imgBrush.ImageSource = mapManager.Maps[0].ImageSrc;
 
             
             var secRec = new Rectangle { Fill = imgBrush, Height = 512 , Width = 512  };
-            myRect = secRec;
+           // myRect = secRec;
 
         //    secRec.SetValue(Grid.RowProperty, 0);
          //   secRec.SetValue(Grid.ColumnProperty, 0);
@@ -308,6 +445,31 @@ namespace App8
             // myGrid.Children.Add(myPolygon);
             return myGrid;
 
+
+        }
+
+       
+
+        private Grid CreateMapPin()
+        {
+            //Creating a Grid element.
+            var myGrid = new Grid();
+            myGrid.RowDefinitions.Add(new RowDefinition());
+            //  myGrid.RowDefinitions.Add(new RowDefinition());
+            myGrid.Background = new SolidColorBrush(Colors.Transparent);
+
+            //Creating a Rectangle filled with an image
+           
+            ImageBrush imgBrush = new ImageBrush();
+            imgBrush.ImageSource = new BitmapImage(new Uri("ms-appx:///Assets/radar/mapping.png"));
+
+            var rec = new Rectangle { Fill = imgBrush, Height = 100, Width = 100 };
+
+            //rec.SetValue(Grid.RowProperty, 0);
+           // rec.SetValue(Grid.ColumnProperty, 0);
+            myGrid.Children.Add(rec);
+
+            return myGrid;
 
         }
 
@@ -375,6 +537,8 @@ namespace App8
               return MetersPerPixel;
         }
 
+
+        private int currentMapIndex = 0;
         private void timeSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
         {
 
@@ -403,31 +567,176 @@ namespace App8
 
 
 
-            double val = ((Slider)sender).Value;
+         //   double val = ((Slider)sender).Value;
             
-            double curr = map.ZoomLevel;
+          //  double curr = map.ZoomLevel;
 
-            if (this.baseZoomLevel + val > 20)
+          //  if (this.baseZoomLevel + val > 20)
+          //  {
+          //      map.ZoomLevel = 20;
+          //  }
+          //  else
+          //      map.ZoomLevel = this.baseZoomLevel + val;
+
+            double val = ((Slider)sender).Value;
+            int nextMapIndex = 0 ;
+            this.mapManager.Maps.ElementAt(currentMapIndex).setVisible(false);
+            if(val <= 5)
             {
-                map.ZoomLevel = 20;
+                nextMapIndex = 0;
             }
-            else
-                map.ZoomLevel = this.baseZoomLevel + val;
+            else if(val  <= 10)
+            {
+                nextMapIndex = 1;
+            }
+            else if(val <= 15)
+            {
+                nextMapIndex = 2;
+            }
+            else if(val <= 20)
+            {
+                nextMapIndex = 3;
+            }
+            this.mapManager.Maps.ElementAt(nextMapIndex).setVisible(true);
+            this.currentMapIndex = nextMapIndex;
 
-           
+            // resize the new map
+            this.map_ZoomLevelChanged(map, this);
 
         }
 
         private void map_ZoomLevelChanged(MapControl sender, object args)
         {
-            double currScale = getScale();
-            double resizeParam = this.baseScale / currScale;
 
-            if (this.myRect != null)
+            var maps = this.mapManager.Maps;
+
+            if (maps.Count > 0)
             {
-                this.myRect.Width = 512 * resizeParam;
-                this.myRect.Height = 512 * resizeParam;
+                double currScale = getScale();
+                double resizeParam = this.baseScale / currScale;
+                var currentMap = maps.ElementAt(currentMapIndex);
+
+                currentMap.Height = 512 * resizeParam;
+                currentMap.Width = 512 * resizeParam;
             }
+            
+        }
+
+        
+
+        private void Image_ImageOpened(object sender, RoutedEventArgs e)
+        {
+           
+            
+
+        }
+
+        private bool flyoutOpened = false;
+
+        private async void goButton_Click(object sender, RoutedEventArgs e)
+        {
+
+            // hide previous error message if was shown
+            this.errorText.Visibility = Visibility.Collapsed;
+
+            String address = this.location.Text;
+            if(address.Length == 0)
+            {
+                // empty text
+
+                this.errorText.Text = "Please enter an address/location";
+                this.errorText.Visibility = Visibility.Visible;
+            }
+
+            // show progress bar
+            locationFindBar.Visibility = Visibility.Visible;
+            locationFindBar.IsIndeterminate = true;
+            
+
+            try
+            {
+
+                MapLocationFinderResult result = await MapLocationFinder.FindLocationsAsync(address, RadarMapManager.center, 5);
+
+
+                if (!this.flyoutOpened)
+                {
+
+                    // ignore the result
+                    return;
+                }
+
+                if (result.Status == MapLocationFinderStatus.Success && result.Locations.Count > 0)
+                {
+
+                    MapLocation location = result.Locations.ElementAt(0);
+                    Geopoint point = location.Point;
+                    Boolean success = await map.TrySetViewAsync(point, 12D, 0, 0, MapAnimationKind.None);
+
+
+                    if (!success)
+                    {
+                        // failed
+                        this.errorText.Text = "Oops! failed to navigate to location";
+                        this.errorText.Visibility = Visibility.Visible;
+                        locationFindBar.Visibility = Visibility.Collapsed;
+
+                    }
+                    else
+                    {
+                        this.Flyout.Hide();
+                    }
+
+                }
+                else
+                {
+                    this.errorText.Text = "Location was not found, try again";
+                    this.errorText.Visibility = Visibility.Visible;
+                    locationFindBar.Visibility = Visibility.Collapsed;
+                }
+            }
+
+            catch(System.UnauthorizedAccessException)
+            {
+                // todo: critical error
+                // remember to implement this
+            }
+            catch (TaskCanceledException)
+            {
+                this.errorText.Text = "Location was not found, try again";
+                this.errorText.Visibility = Visibility.Visible;
+                locationFindBar.Visibility = Visibility.Collapsed;
+            }
+
+
+           
+        }
+
+        private void Flyout_Opening(object sender, object e)
+        {
+            this.errorText.Visibility = Visibility.Collapsed;
+            locationFindBar.Visibility = Visibility.Collapsed;
+
+            flyoutOpened = true;
+
+        }
+
+        private void Flyout_Closed(object sender, object e)
+        {
+            flyoutOpened = false;
+        }
+
+        private void AppBarButton_Click_1(object sender, RoutedEventArgs e)
+        {
+
+            
+            if(this.flyoutOpened)
+            {
+                flyoutOpened = false;
+                this.Flyout.Hide();
+            }
+         
+
         }
     }
 }

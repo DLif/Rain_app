@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
+using Windows.Devices.Geolocation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -17,6 +18,8 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
+using Microsoft.WindowsAzure.MobileServices; 
+
 
 // The Hub Application template is documented at http://go.microsoft.com/fwlink/?LinkId=391641
 
@@ -28,8 +31,10 @@ namespace App8
     public sealed partial class App : Application
     {
         private TransitionCollection transitions;
-       
 
+        public static Microsoft.WindowsAzure.MobileServices.IMobileServiceClient mobileClient;
+           
+                
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -39,7 +44,8 @@ namespace App8
         {
             this.InitializeComponent();
             this.Suspending += this.OnSuspending;
-           
+            mobileClient = new Microsoft.WindowsAzure.MobileServices.MobileServiceClient(
+                "https://rainappfinal.azure-mobile.net/", "whPXkDRNdDXrxVorqAVlRAFpgiGmlI26");
             
         }
 
@@ -109,7 +115,27 @@ namespace App8
                 // When the navigation stack isn't restored navigate to the first page,
                 // configuring the new page by passing required information as a navigation
                 // parameter.
-                if (!rootFrame.Navigate(typeof(HubPage), e.Arguments))
+
+                var src = new Geopoint(new BasicGeoposition
+                {
+                    Latitude = 31.9582,
+                    Longitude = 034.9423
+                });
+              //  var dest = new Geopoint(new BasicGeoposition
+              //      {
+              //          Latitude = 32.0168,
+              //          Longitude = 034.7438
+              //      }
+              //  );
+                var dest = new Geopoint(new BasicGeoposition
+                {
+                    Latitude = 30.5644,
+                    Longitude = 034.7392
+                }
+               );
+                PathBuilderNavigator argument = new PathBuilderNavigator(src, dest, null);
+
+                if (!rootFrame.Navigate(typeof(coolPage), argument))
                 {
                     throw new Exception("Failed to create initial page");
                 }
@@ -142,5 +168,26 @@ namespace App8
             await SuspensionManager.SaveAsync();
             deferral.Complete();
         }
+
+
+
+        protected override void OnActivated(IActivatedEventArgs args)
+        {
+            // Windows Phone 8.1 requires you to handle the respose from the WebAuthenticationBroker.
+
+            base.OnActivated(args);
+
+            if (args.Kind == ActivationKind.WebAuthenticationBrokerContinuation)
+            {
+                // Completes the sign-in process started by LoginAsync.
+                // Change 'MobileService' to the name of your MobileServiceClient instance. 
+                App.mobileClient.LoginComplete(args as WebAuthenticationBrokerContinuationEventArgs);
+               
+            }
+
+
+           // base.OnActivated(args);
+        }
+
     }
 }

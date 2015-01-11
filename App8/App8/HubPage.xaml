@@ -78,13 +78,13 @@
     </Page.BottomAppBar>
 
     <Grid x:Name="LayoutRoot">
+       
         <Hub x:Name="Hub" x:Uid="Hub" Header="Rain Man" Background="{ThemeResource HubBackgroundImageBrush}">
             <HubSection x:Uid="HubSection1" Header="Quick Prediction" DataContext="{Binding IconCollection}" HeaderTemplate="{ThemeResource HubSectionHeaderTemplate}">
                 <DataTemplate>
 
-                    <GridView
+                    <GridView x:Name="predictionGrid"
                       
-
                         ItemsSource="{Binding PredictionIcons}"
                         AutomationProperties.AutomationId="ItemGridView"
                         AutomationProperties.Name="Items In Group"
@@ -102,10 +102,6 @@
                             </ItemsPanelTemplate>
                         </GridView.ItemsPanel>
                     </GridView>
-
-
-
-
 
 
                 </DataTemplate>

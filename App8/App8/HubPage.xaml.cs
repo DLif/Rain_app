@@ -11,6 +11,7 @@ using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Graphics.Display;
 using Windows.UI.Core;
+using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -33,6 +34,8 @@ namespace App8
         private readonly NavigationHelper navigationHelper;
         private readonly ObservableDictionary defaultViewModel = new ObservableDictionary();
         private readonly ResourceLoader resourceLoader = ResourceLoader.GetForCurrentView("Resources");
+        private RadarMapManager mapManager; 
+
 
         public HubPage()
         {
@@ -67,7 +70,7 @@ namespace App8
 
 
 
-        private PredictionIcon[] prediction = new PredictionIcon[3];
+       
 
         /// <summary>
         /// Populates the page with content passed during navigation.  Any saved state is also
@@ -86,10 +89,35 @@ namespace App8
             var sampleDataGroups = await SampleDataSource.GetGroupsAsync();
             this.DefaultViewModel["Groups"] = sampleDataGroups;
 
-            // set icons
-            var icons = PredictionIconDataSource.getData();
-            
+
+            ModalWindow temporaryDialog = new ModalWindow();
+            this.mapManager = RadarMapManager.getRadarMapManager();
+
+            // get icons, will be awaited
+  
+            ContentDialog diag = temporaryDialog.Dialog;
+            diag.ShowAsync();
+
+            try
+            {
+                await mapManager.updateRadarMaps(false);
+            }
+            catch
+            {
+
+                diag.Hide();
+                MessageDialog errorDialog = new MessageDialog("could not connect to server, try again later", "Oops");
+                errorDialog.ShowAsync();
+                return;
+            }
+
+
+            var icons = await PredictionIconDataSource.getData(this.mapManager);
+
+            //when done, close the dialog
+            diag.Hide();
             this.defaultViewModel["IconCollection"] = icons;
+
            
 
         }

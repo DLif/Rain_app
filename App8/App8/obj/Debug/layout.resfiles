@@ -9,6 +9,12 @@ Assets\myImage.png
 Assets\radar\baseImage.gif
 Assets\radar\baseImage.jpg
 Assets\radar\baseImage.png
+Assets\radar\mappin.png
+Assets\radar\prediction0.png
+Assets\radar\prediction1.png
+Assets\radar\prediction2.png
+Assets\radar\prediction3.png
+Assets\radar\waypointpin.png
 Assets\rain\moon.png
 Assets\rain\moon_cloud.png
 Assets\rain\rain_max.png
@@ -23,9 +29,11 @@ Assets\StoreLogo.scale-240.png
 Assets\WideLogo.scale-240.png
 App.xbf
 App8.xr.xml
+coolPage.xbf
 HubPage.xbf
 ItemPage.xbf
 RadarMapPage.xbf
+RouteBuilder.xbf
 SectionPage.xbf
 Common\ReadMe.txt
 DataModel\SampleData.json

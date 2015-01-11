@@ -124,8 +124,8 @@ namespace App8.App8_XamlTypeInfo
 
         private void InitTypeTables()
         {
-            _typeNameTable = new string[11];
-            _typeNameTable[0] = "App8.RadarMapPage";
+            _typeNameTable = new string[14];
+            _typeNameTable[0] = "App8.coolPage";
             _typeNameTable[1] = "Windows.UI.Xaml.Controls.Page";
             _typeNameTable[2] = "Windows.UI.Xaml.Controls.UserControl";
             _typeNameTable[3] = "App8.Common.NavigationHelper";
@@ -133,12 +133,15 @@ namespace App8.App8_XamlTypeInfo
             _typeNameTable[5] = "App8.Common.ObservableDictionary";
             _typeNameTable[6] = "Object";
             _typeNameTable[7] = "String";
-            _typeNameTable[8] = "App8.HubPage";
-            _typeNameTable[9] = "App8.ItemPage";
-            _typeNameTable[10] = "App8.SectionPage";
+            _typeNameTable[8] = "System.Collections.Generic.IList`1<Windows.UI.Xaml.DependencyObject>";
+            _typeNameTable[9] = "App8.RadarMapPage";
+            _typeNameTable[10] = "App8.HubPage";
+            _typeNameTable[11] = "App8.ItemPage";
+            _typeNameTable[12] = "App8.RouteBuilder";
+            _typeNameTable[13] = "App8.SectionPage";
 
-            _typeTable = new global::System.Type[11];
-            _typeTable[0] = typeof(global::App8.RadarMapPage);
+            _typeTable = new global::System.Type[14];
+            _typeTable[0] = typeof(global::App8.coolPage);
             _typeTable[1] = typeof(global::Windows.UI.Xaml.Controls.Page);
             _typeTable[2] = typeof(global::Windows.UI.Xaml.Controls.UserControl);
             _typeTable[3] = typeof(global::App8.Common.NavigationHelper);
@@ -146,9 +149,12 @@ namespace App8.App8_XamlTypeInfo
             _typeTable[5] = typeof(global::App8.Common.ObservableDictionary);
             _typeTable[6] = typeof(global::System.Object);
             _typeTable[7] = typeof(global::System.String);
-            _typeTable[8] = typeof(global::App8.HubPage);
-            _typeTable[9] = typeof(global::App8.ItemPage);
-            _typeTable[10] = typeof(global::App8.SectionPage);
+            _typeTable[8] = typeof(global::System.Collections.Generic.IList<global::Windows.UI.Xaml.DependencyObject>);
+            _typeTable[9] = typeof(global::App8.RadarMapPage);
+            _typeTable[10] = typeof(global::App8.HubPage);
+            _typeTable[11] = typeof(global::App8.ItemPage);
+            _typeTable[12] = typeof(global::App8.RouteBuilder);
+            _typeTable[13] = typeof(global::App8.SectionPage);
         }
 
         private int LookupTypeIndexByName(string typeName)
@@ -183,17 +189,25 @@ namespace App8.App8_XamlTypeInfo
             return -1;
         }
 
-        private object Activate_0_RadarMapPage() { return new global::App8.RadarMapPage(); }
+        private object Activate_0_coolPage() { return new global::App8.coolPage(); }
         private object Activate_5_ObservableDictionary() { return new global::App8.Common.ObservableDictionary(); }
-        private object Activate_8_HubPage() { return new global::App8.HubPage(); }
-        private object Activate_9_ItemPage() { return new global::App8.ItemPage(); }
-        private object Activate_10_SectionPage() { return new global::App8.SectionPage(); }
+        private object Activate_9_RadarMapPage() { return new global::App8.RadarMapPage(); }
+        private object Activate_10_HubPage() { return new global::App8.HubPage(); }
+        private object Activate_11_ItemPage() { return new global::App8.ItemPage(); }
+        private object Activate_12_RouteBuilder() { return new global::App8.RouteBuilder(); }
+        private object Activate_13_SectionPage() { return new global::App8.SectionPage(); }
         private void MapAdd_5_ObservableDictionary(object instance, object key, object item)
         {
             var collection = (global::System.Collections.Generic.IDictionary<global::System.String, global::System.Object>)instance;
             var newKey = (global::System.String)key;
             var newItem = (global::System.Object)item;
             collection.Add(newKey, newItem);
+        }
+        private void VectorAdd_8_IList(object instance, object item)
+        {
+            var collection = (global::System.Collections.Generic.ICollection<global::Windows.UI.Xaml.DependencyObject>)instance;
+            var newItem = (global::Windows.UI.Xaml.DependencyObject)item;
+            collection.Add(newItem);
         }
 
         private global::Windows.UI.Xaml.Markup.IXamlType CreateXamlType(int typeIndex)
@@ -206,9 +220,9 @@ namespace App8.App8_XamlTypeInfo
             switch (typeIndex)
             {
 
-            case 0:   //  App8.RadarMapPage
+            case 0:   //  App8.coolPage
                 userType = new global::App8.App8_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Windows.UI.Xaml.Controls.Page"));
-                userType.Activator = Activate_0_RadarMapPage;
+                userType.Activator = Activate_0_coolPage;
                 userType.AddMemberName("NavigationHelper");
                 userType.AddMemberName("DefaultViewModel");
                 userType.SetIsLocalType();
@@ -250,27 +264,51 @@ namespace App8.App8_XamlTypeInfo
                 xamlType = new global::App8.App8_XamlTypeInfo.XamlSystemBaseType(typeName, type);
                 break;
 
-            case 8:   //  App8.HubPage
+            case 8:   //  System.Collections.Generic.IList`1<Windows.UI.Xaml.DependencyObject>
+                userType = new global::App8.App8_XamlTypeInfo.XamlUserType(this, typeName, type, null);
+                userType.CollectionAdd = VectorAdd_8_IList;
+                xamlType = userType;
+                break;
+
+            case 9:   //  App8.RadarMapPage
                 userType = new global::App8.App8_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Windows.UI.Xaml.Controls.Page"));
-                userType.Activator = Activate_8_HubPage;
+                userType.Activator = Activate_9_RadarMapPage;
                 userType.AddMemberName("NavigationHelper");
                 userType.AddMemberName("DefaultViewModel");
                 userType.SetIsLocalType();
                 xamlType = userType;
                 break;
 
-            case 9:   //  App8.ItemPage
+            case 10:   //  App8.HubPage
                 userType = new global::App8.App8_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Windows.UI.Xaml.Controls.Page"));
-                userType.Activator = Activate_9_ItemPage;
+                userType.Activator = Activate_10_HubPage;
                 userType.AddMemberName("NavigationHelper");
                 userType.AddMemberName("DefaultViewModel");
                 userType.SetIsLocalType();
                 xamlType = userType;
                 break;
 
-            case 10:   //  App8.SectionPage
+            case 11:   //  App8.ItemPage
                 userType = new global::App8.App8_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Windows.UI.Xaml.Controls.Page"));
-                userType.Activator = Activate_10_SectionPage;
+                userType.Activator = Activate_11_ItemPage;
+                userType.AddMemberName("NavigationHelper");
+                userType.AddMemberName("DefaultViewModel");
+                userType.SetIsLocalType();
+                xamlType = userType;
+                break;
+
+            case 12:   //  App8.RouteBuilder
+                userType = new global::App8.App8_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Windows.UI.Xaml.Controls.Page"));
+                userType.Activator = Activate_12_RouteBuilder;
+                userType.AddMemberName("NavigationHelper");
+                userType.AddMemberName("DefaultViewModel");
+                userType.SetIsLocalType();
+                xamlType = userType;
+                break;
+
+            case 13:   //  App8.SectionPage
+                userType = new global::App8.App8_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Windows.UI.Xaml.Controls.Page"));
+                userType.Activator = Activate_13_SectionPage;
                 userType.AddMemberName("NavigationHelper");
                 userType.AddMemberName("DefaultViewModel");
                 userType.SetIsLocalType();
@@ -281,42 +319,62 @@ namespace App8.App8_XamlTypeInfo
         }
 
 
-        private object get_0_RadarMapPage_NavigationHelper(object instance)
+        private object get_0_coolPage_NavigationHelper(object instance)
+        {
+            var that = (global::App8.coolPage)instance;
+            return that.NavigationHelper;
+        }
+        private object get_1_coolPage_DefaultViewModel(object instance)
+        {
+            var that = (global::App8.coolPage)instance;
+            return that.DefaultViewModel;
+        }
+        private object get_2_RadarMapPage_NavigationHelper(object instance)
         {
             var that = (global::App8.RadarMapPage)instance;
             return that.NavigationHelper;
         }
-        private object get_1_RadarMapPage_DefaultViewModel(object instance)
+        private object get_3_RadarMapPage_DefaultViewModel(object instance)
         {
             var that = (global::App8.RadarMapPage)instance;
             return that.DefaultViewModel;
         }
-        private object get_2_HubPage_NavigationHelper(object instance)
+        private object get_4_HubPage_NavigationHelper(object instance)
         {
             var that = (global::App8.HubPage)instance;
             return that.NavigationHelper;
         }
-        private object get_3_HubPage_DefaultViewModel(object instance)
+        private object get_5_HubPage_DefaultViewModel(object instance)
         {
             var that = (global::App8.HubPage)instance;
             return that.DefaultViewModel;
         }
-        private object get_4_ItemPage_NavigationHelper(object instance)
+        private object get_6_ItemPage_NavigationHelper(object instance)
         {
             var that = (global::App8.ItemPage)instance;
             return that.NavigationHelper;
         }
-        private object get_5_ItemPage_DefaultViewModel(object instance)
+        private object get_7_ItemPage_DefaultViewModel(object instance)
         {
             var that = (global::App8.ItemPage)instance;
             return that.DefaultViewModel;
         }
-        private object get_6_SectionPage_NavigationHelper(object instance)
+        private object get_8_RouteBuilder_NavigationHelper(object instance)
+        {
+            var that = (global::App8.RouteBuilder)instance;
+            return that.NavigationHelper;
+        }
+        private object get_9_RouteBuilder_DefaultViewModel(object instance)
+        {
+            var that = (global::App8.RouteBuilder)instance;
+            return that.DefaultViewModel;
+        }
+        private object get_10_SectionPage_NavigationHelper(object instance)
         {
             var that = (global::App8.SectionPage)instance;
             return that.NavigationHelper;
         }
-        private object get_7_SectionPage_DefaultViewModel(object instance)
+        private object get_11_SectionPage_DefaultViewModel(object instance)
         {
             var that = (global::App8.SectionPage)instance;
             return that.DefaultViewModel;
@@ -329,52 +387,76 @@ namespace App8.App8_XamlTypeInfo
 
             switch (longMemberName)
             {
+            case "App8.coolPage.NavigationHelper":
+                userType = (global::App8.App8_XamlTypeInfo.XamlUserType)GetXamlTypeByName("App8.coolPage");
+                xamlMember = new global::App8.App8_XamlTypeInfo.XamlMember(this, "NavigationHelper", "App8.Common.NavigationHelper");
+                xamlMember.Getter = get_0_coolPage_NavigationHelper;
+                xamlMember.SetIsReadOnly();
+                break;
+            case "App8.coolPage.DefaultViewModel":
+                userType = (global::App8.App8_XamlTypeInfo.XamlUserType)GetXamlTypeByName("App8.coolPage");
+                xamlMember = new global::App8.App8_XamlTypeInfo.XamlMember(this, "DefaultViewModel", "App8.Common.ObservableDictionary");
+                xamlMember.Getter = get_1_coolPage_DefaultViewModel;
+                xamlMember.SetIsReadOnly();
+                break;
             case "App8.RadarMapPage.NavigationHelper":
                 userType = (global::App8.App8_XamlTypeInfo.XamlUserType)GetXamlTypeByName("App8.RadarMapPage");
                 xamlMember = new global::App8.App8_XamlTypeInfo.XamlMember(this, "NavigationHelper", "App8.Common.NavigationHelper");
-                xamlMember.Getter = get_0_RadarMapPage_NavigationHelper;
+                xamlMember.Getter = get_2_RadarMapPage_NavigationHelper;
                 xamlMember.SetIsReadOnly();
                 break;
             case "App8.RadarMapPage.DefaultViewModel":
                 userType = (global::App8.App8_XamlTypeInfo.XamlUserType)GetXamlTypeByName("App8.RadarMapPage");
                 xamlMember = new global::App8.App8_XamlTypeInfo.XamlMember(this, "DefaultViewModel", "App8.Common.ObservableDictionary");
-                xamlMember.Getter = get_1_RadarMapPage_DefaultViewModel;
+                xamlMember.Getter = get_3_RadarMapPage_DefaultViewModel;
                 xamlMember.SetIsReadOnly();
                 break;
             case "App8.HubPage.NavigationHelper":
                 userType = (global::App8.App8_XamlTypeInfo.XamlUserType)GetXamlTypeByName("App8.HubPage");
                 xamlMember = new global::App8.App8_XamlTypeInfo.XamlMember(this, "NavigationHelper", "App8.Common.NavigationHelper");
-                xamlMember.Getter = get_2_HubPage_NavigationHelper;
+                xamlMember.Getter = get_4_HubPage_NavigationHelper;
                 xamlMember.SetIsReadOnly();
                 break;
             case "App8.HubPage.DefaultViewModel":
                 userType = (global::App8.App8_XamlTypeInfo.XamlUserType)GetXamlTypeByName("App8.HubPage");
                 xamlMember = new global::App8.App8_XamlTypeInfo.XamlMember(this, "DefaultViewModel", "App8.Common.ObservableDictionary");
-                xamlMember.Getter = get_3_HubPage_DefaultViewModel;
+                xamlMember.Getter = get_5_HubPage_DefaultViewModel;
                 xamlMember.SetIsReadOnly();
                 break;
             case "App8.ItemPage.NavigationHelper":
                 userType = (global::App8.App8_XamlTypeInfo.XamlUserType)GetXamlTypeByName("App8.ItemPage");
                 xamlMember = new global::App8.App8_XamlTypeInfo.XamlMember(this, "NavigationHelper", "App8.Common.NavigationHelper");
-                xamlMember.Getter = get_4_ItemPage_NavigationHelper;
+                xamlMember.Getter = get_6_ItemPage_NavigationHelper;
                 xamlMember.SetIsReadOnly();
                 break;
             case "App8.ItemPage.DefaultViewModel":
                 userType = (global::App8.App8_XamlTypeInfo.XamlUserType)GetXamlTypeByName("App8.ItemPage");
                 xamlMember = new global::App8.App8_XamlTypeInfo.XamlMember(this, "DefaultViewModel", "App8.Common.ObservableDictionary");
-                xamlMember.Getter = get_5_ItemPage_DefaultViewModel;
+                xamlMember.Getter = get_7_ItemPage_DefaultViewModel;
+                xamlMember.SetIsReadOnly();
+                break;
+            case "App8.RouteBuilder.NavigationHelper":
+                userType = (global::App8.App8_XamlTypeInfo.XamlUserType)GetXamlTypeByName("App8.RouteBuilder");
+                xamlMember = new global::App8.App8_XamlTypeInfo.XamlMember(this, "NavigationHelper", "App8.Common.NavigationHelper");
+                xamlMember.Getter = get_8_RouteBuilder_NavigationHelper;
+                xamlMember.SetIsReadOnly();
+                break;
+            case "App8.RouteBuilder.DefaultViewModel":
+                userType = (global::App8.App8_XamlTypeInfo.XamlUserType)GetXamlTypeByName("App8.RouteBuilder");
+                xamlMember = new global::App8.App8_XamlTypeInfo.XamlMember(this, "DefaultViewModel", "App8.Common.ObservableDictionary");
+                xamlMember.Getter = get_9_RouteBuilder_DefaultViewModel;
                 xamlMember.SetIsReadOnly();
                 break;
             case "App8.SectionPage.NavigationHelper":
                 userType = (global::App8.App8_XamlTypeInfo.XamlUserType)GetXamlTypeByName("App8.SectionPage");
                 xamlMember = new global::App8.App8_XamlTypeInfo.XamlMember(this, "NavigationHelper", "App8.Common.NavigationHelper");
-                xamlMember.Getter = get_6_SectionPage_NavigationHelper;
+                xamlMember.Getter = get_10_SectionPage_NavigationHelper;
                 xamlMember.SetIsReadOnly();
                 break;
             case "App8.SectionPage.DefaultViewModel":
                 userType = (global::App8.App8_XamlTypeInfo.XamlUserType)GetXamlTypeByName("App8.SectionPage");
                 xamlMember = new global::App8.App8_XamlTypeInfo.XamlMember(this, "DefaultViewModel", "App8.Common.ObservableDictionary");
-                xamlMember.Getter = get_7_SectionPage_DefaultViewModel;
+                xamlMember.Getter = get_11_SectionPage_DefaultViewModel;
                 xamlMember.SetIsReadOnly();
                 break;
             }

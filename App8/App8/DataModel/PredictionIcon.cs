@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Devices.Geolocation;
 
 namespace App8.DataModel
 {
@@ -20,9 +21,9 @@ namespace App8.DataModel
             Title = "Rain at " + timeIndex;
             InitImagePath(averageRain);
 
-
-
         }
+
+        
 
 
         private void InitImagePath(double averageRain)
@@ -97,15 +98,37 @@ namespace App8.DataModel
     {
         private static PredictionIconDataSource __dataSource = new PredictionIconDataSource();
 
-        public static PredictionCollection getData()
+        public static async Task<PredictionCollection> getData(RadarMapManager radarMapManager)
         {
 
-            return __dataSource.getPredictionCollection();
+            var res = await __dataSource.getPredictionCollection(radarMapManager);
+            return res;
         }
 
 
-        private PredictionCollection getPredictionCollection()
+        private async Task<PredictionCollection> getPredictionCollection(RadarMapManager radarMapManager)
         {
+
+            // get my current location
+            // locate current location
+            var locator = new Geolocator();
+            locator.DesiredAccuracyInMeters = 50;
+
+             var myPosition = await locator.GetGeopositionAsync(
+                   maximumAge: TimeSpan.FromMinutes(10),
+                  timeout: TimeSpan.FromSeconds(10)
+             );
+
+            var geopoint = new Geopoint(new BasicGeoposition
+            {
+                    Latitude = myPosition.Coordinate.Latitude,
+                    Longitude = myPosition.Coordinate.Longitude
+            });
+
+            // get predictions from each map...
+            // 
+            radarMapManager.Maps.ElementAt(0).getAverageRain(geopoint, 1);
+            
 
             double[] predictions = { 0.2, 0.3, 5, 1.5 };
             PredictionCollection collection = new PredictionCollection(predictions);
