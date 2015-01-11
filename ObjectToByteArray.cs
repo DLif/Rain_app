@@ -19,6 +19,7 @@ namespace MPSHouse.Tools
             formatter.Serialize(fs, obj);
             byte[] rval = fs.ToArray();
             fs.Close();
+            
             return rval;
         }
 
