@@ -10,6 +10,7 @@ using Microsoft.WindowsAzure.Mobile.Service.Security; /* for facebook authentica
 
 namespace MobileServiceFinal.Controllers
 {
+    [AuthorizeLevel(AuthorizationLevel.User)] 
     public class PathGroupController : TableController<PathGroup>
     {
         
@@ -30,19 +31,21 @@ namespace MobileServiceFinal.Controllers
         return Query().Where(todo => todo.UserId == currentUser.Id);
         }
 
+         [AuthorizeLevel(AuthorizationLevel.User)] 
         // GET tables/PathGroup/48D68C86-6EA6-4C25-AA33-223FC9A27959
         public SingleResult<PathGroup> GetPathGroup(string id)
         {
             return Lookup(id);
         }
 
+        [AuthorizeLevel(AuthorizationLevel.User)] 
         // PATCH tables/PathGroup/48D68C86-6EA6-4C25-AA33-223FC9A27959
         public Task<PathGroup> PatchPathGroup(string id, Delta<PathGroup> patch)
         {
              return UpdateAsync(id, patch);
         }
 
-         [AuthorizeLevel(AuthorizationLevel.User)] 
+        [AuthorizeLevel(AuthorizationLevel.User)] 
         // POST tables/PathGroup/48D68C86-6EA6-4C25-AA33-223FC9A27959
         public async Task<IHttpActionResult> PostPathGroup(PathGroup item)
         {
