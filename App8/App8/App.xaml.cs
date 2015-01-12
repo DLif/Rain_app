@@ -33,7 +33,8 @@ namespace App8
         private TransitionCollection transitions;
 
         public static Microsoft.WindowsAzure.MobileServices.IMobileServiceClient mobileClient;
-           
+        public static MobileServiceUser user = null;
+        public static RadarMapManager manager = null;
                 
 
         /// <summary>
@@ -135,7 +136,7 @@ namespace App8
                );
                 PathBuilderNavigator argument = new PathBuilderNavigator(src, dest, null);
 
-                if (!rootFrame.Navigate(typeof(coolPage), argument))
+                if (!rootFrame.Navigate(typeof(HubPage), argument))
                 {
                     throw new Exception("Failed to create initial page");
                 }

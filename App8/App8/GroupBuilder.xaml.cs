@@ -1,15 +1,18 @@
 ﻿using App8.Common;
 using App8.DataModel;
-using Microsoft.WindowsAzure.MobileServices;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
+using Windows.Devices.Geolocation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Graphics.Display;
 using Windows.Services.Maps;
+using Windows.System;
+using Windows.UI;
 using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
@@ -18,7 +21,9 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
+using Windows.UI.Xaml.Shapes;
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
 
@@ -27,52 +32,12 @@ namespace App8
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    /// 
-
-   
-
-
-   
-
-
-    public sealed partial class coolPage : Page
+    public sealed partial class GroupBuilder : Page
     {
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
 
-        private MobileServiceCollection<PathGroup, PathGroup> groupsTest;
-        private IMobileServiceTable<PathGroup> groupsTable = App.mobileClient.GetTable<PathGroup>();
-        private MobileServiceUser user;
-
-        private async System.Threading.Tasks.Task Authenticate()
-        {
-            while (user == null)
-            {
-                string message ="boom";
-                try
-                {
-                    user = await App.mobileClient
-                        .LoginAsync(MobileServiceAuthenticationProvider.Facebook);
-                    message =
-                        string.Format("You are now logged in - {0}", user.UserId);
-                }
-                  
-                catch (InvalidOperationException)
-                {
-                    message = "You must log in. Login Required";
-                }
-                catch
-                {
-
-                }
-
-               // MessageDialog dialog = new MessageDialog(message);
-              //  await dialog.ShowAsync();
-
-            }
-        }
-
-        public coolPage()
+        public GroupBuilder()
         {
             this.InitializeComponent();
 
@@ -111,6 +76,8 @@ namespace App8
         /// session.  The state will be null the first time a page is visited.</param>
         private void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
+            map.Center = RadarMapManager.center;
+            map.ZoomLevel = 10D;
         }
 
         /// <summary>
@@ -152,83 +119,118 @@ namespace App8
 
         #endregion
 
-        private async void Button_Click(object sender, RoutedEventArgs e)
+        private void acceptAppBar_Click(object sender, RoutedEventArgs e)
         {
-
-          // await AuthenticateAsync();
-
-
-            PathGroup pt = new PathGroup();
-
-            pt.GroupName = pathName.Text;
-            byte[] arr = new byte[4];
-            arr[0] = 17;
-            pt.DestinationPoint = arr;
-            pt.SourcePoint = arr;
-
-            await  groupsTable.InsertAsync(pt);
-
-            var result = await this.groupsTable.ToCollectionAsync();
-
-
-           
-
-            list.ItemsSource = result;
-            
 
         }
 
-        private async System.Threading.Tasks.Task AuthenticateAsync()
+        private void map_Loaded(object sender, RoutedEventArgs e)
         {
-            while (user == null)
+
+        }
+
+        private DependencyObject getWayPointPin(Geopoint point)
+        {
+
+            //Creating a Grid element.
+            var myGrid = new Grid();
+            myGrid.RowDefinitions.Add(new RowDefinition());
+            myGrid.RowDefinitions.Add(new RowDefinition());
+            myGrid.Background = new SolidColorBrush(Colors.Transparent);
+            ImageBrush imgBrush = new ImageBrush();
+            imgBrush.ImageSource = new BitmapImage(new Uri("ms-appx:///Assets/radar/waypointpin.png"));
+
+            //Creating a Rectangle
+            var myRectangle = new Rectangle { Fill = imgBrush, Height = 35, Width = 20 };
+            myRectangle.SetValue(Grid.RowProperty, 0);
+            myRectangle.SetValue(Grid.ColumnProperty, 0);
+
+            //Adding the Rectangle to the Grid
+            myGrid.Children.Add(myRectangle);
+
+            return myGrid;
+
+        }
+
+        private void enableAddress_Checked(object sender, RoutedEventArgs e)
+        {
+            this.addressGrid.Visibility = Visibility.Visible;
+        }
+
+        private void enableAddress_Unchecked(object sender, RoutedEventArgs e)
+        {
+            this.addressGrid.Visibility = Visibility.Collapsed;
+        }
+
+
+        private void addWayPoint(Geopoint point)
+        {
+            this.wayPoints.Add(point);
+            DependencyObject wayPointPin = getWayPointPin(point);
+            this.wayPointsPins.Add(wayPointPin);
+
+            // add pin to map
+            this.map.Children.Add(wayPointPin);
+
+            MapControl.SetLocation(wayPointPin, point);
+            MapControl.SetNormalizedAnchorPoint(wayPointPin, new Point(0.5, 1));
+        }
+
+        private async void addressTextBox_KeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            if (e.Key == VirtualKey.Enter)
             {
-                string message;
-                try
-                {
-                    user = await App.mobileClient
-                        .LoginAsync(MobileServiceAuthenticationProvider.Facebook);
-                    message =
-                        string.Format("You are now logged in - {0}", user.UserId);
-                }
-                catch (InvalidOperationException)
-                {
-                    message = "You must log in. Login Required";
-                }
+                this.Focus(FocusState.Programmatic);
 
-                var dialog = new MessageDialog(message);
-                dialog.Commands.Add(new UICommand("OK"));
-                await dialog.ShowAsync();
             }
-        }
+            else
+            {
+                return;
+            }
 
-        private async void Page_Loaded(object sender, RoutedEventArgs e)
-        {
-            
-               
-            
-        }
+            if (addressTextBox.Text == "")
+            {
+                return;
+            }
 
-        private void testBtn_Click(object sender, RoutedEventArgs e)
-        {
-            App8.DataModel.MapUtils.testClass temp = new App8.DataModel.MapUtils.testClass();
-            App8.DataModel.MapUtils.testClass temp2 = new App8.DataModel.MapUtils.testClass();
+            String address = addressTextBox.Text;
+            String errorText = "";
+            try
+            {
 
-            temp.Num = 5;
-            temp.Text = "lol";
-            temp2.Num = 16;
-            temp2.Text = "faf";
-
-            temp.Obj = temp2;
+                MapLocationFinderResult result = await MapLocationFinder.FindLocationsAsync(address, RadarMapManager.center, 5);
 
 
-            ObjectSerializer srz = new ObjectSerializer();
 
-            byte[] arr = srz.ObjectToByteArray(temp);
+                if (result.Status == MapLocationFinderStatus.Success && result.Locations.Count > 0)
+                {
 
-            App8.DataModel.MapUtils.testClass res = srz.ByteArrayToObject(arr);
+                    addWayPoint(result.Locations[0].Point);
+                    await map.TrySetViewAsync(result.Locations[0].Point);
 
-             
-           
+                }
+                else
+                {
+                    errorText = "Location was not found, try again";
+
+                }
+            }
+
+            catch (System.UnauthorizedAccessException)
+            {
+                // todo: critical error
+                // remember to implement this
+            }
+            catch (TaskCanceledException)
+            {
+                errorText = "Location was not found, try again";
+
+            }
+            if (errorText != "")
+            {
+                MessageDialog diag = new MessageDialog(errorText);
+                diag.ShowAsync();
+            }
 
         }
     }

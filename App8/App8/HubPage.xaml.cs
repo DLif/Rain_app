@@ -1,6 +1,7 @@
 ﻿using App8.Common;
 using App8.Data;
 using App8.DataModel;
+using Microsoft.WindowsAzure.MobileServices;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,6 +16,7 @@ using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Maps;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
@@ -26,6 +28,21 @@ using Windows.UI.Xaml.Navigation;
 
 namespace App8
 {
+
+
+
+
+    public class QuickRouteOptions
+    {
+
+        public Visibility LoggedIn { get; set; }
+
+        public Visibility MapVisibility { get; set; }
+        
+
+        public String TravelMethod { get; set; }
+    }
+
     /// <summary>
     /// A page that displays a grouped collection of items.
     /// </summary>
@@ -118,6 +135,14 @@ namespace App8
             diag.Hide();
             this.defaultViewModel["IconCollection"] = icons;
 
+
+            QuickRouteOptions quickRouteHubOptions = new QuickRouteOptions();
+            quickRouteHubOptions.LoggedIn = App.user != null ? Visibility.Visible : Visibility.Collapsed;
+            quickRouteHubOptions.MapVisibility = Visibility.Collapsed ;
+            quickRouteHubOptions.TravelMethod = "Not set";
+
+            this.defaultViewModel["QuickRouteOptions"] = quickRouteHubOptions;
+
            
 
         }
@@ -192,86 +217,76 @@ namespace App8
             Frame.Navigate(typeof(RadarMapPage));
         }
 
-     
+
+        private MapControl quickRouteMapControl = null;
+
+        private void MapControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            quickRouteMapControl = (MapControl)sender;
+        }
+
+        private async void loginButton_Click(object sender, RoutedEventArgs e)
+        {
+            await AuthenticateAsync();
+
+            if(App.user != null)
+            {
+                // user has logged in
+                loginButton.Visibility = Visibility.Collapsed;
+            }
+
+
+        }
+
+        private async System.Threading.Tasks.Task AuthenticateAsync()
+        {
+            while (App.user == null)
+            {
+                string message;
+                try
+                {
+                    App.user = await App.mobileClient
+                        .LoginAsync(MobileServiceAuthenticationProvider.Facebook);
+                    message =
+                        string.Format("You are now logged in - {0}", App.user.UserId);
+                }
+                catch (InvalidOperationException)
+                {
+                    message = "Login failed, try again later";
+                }
+
+                var dialog = new MessageDialog(message);
+                dialog.Commands.Add(new UICommand("OK"));
+                await dialog.ShowAsync();
+            }
+        }
+
+        private void Hub_SectionsInViewChanged(object sender, SectionsInViewChangedEventArgs e)
+        {
+           if(Hub.SectionsInView[0] == HubQuickRoute)
+           {
+               locationChangeButton.Visibility = Visibility.Collapsed;
+               mapAppButton.Visibility = Visibility.Visible;
+               mapAppButton.Label = "Map View";
+               return;
+           }
+
+           if(Hub.SectionsInView[0] == predictionHub)
+           {
+               locationChangeButton.Visibility = Visibility.Visible;
+               mapAppButton.Visibility = Visibility.Visible;
+               mapAppButton.Label = "Radar map";
+               return;
+           }
+           
+            
+        }
 
         /* first hub item icons */
 
 
-        //private Image prediction0Img;
-        //private TextBlock prediction0Title;
-        //private TextBlock prediction0Info;
-
-        //private Image prediction1Img;
-        //private TextBlock prediction1Title;
-        //private TextBlock prediction1Info;
-
-        //private Image prediction2Img;
-        //private TextBlock prediction2Title;
-        //private TextBlock prediction2Info;
-
-        //private Image prediction3Img;
-        //private TextBlock prediction3Title;
-        //private TextBlock prediction3Info;
 
 
-        //private void TextBlock_Loaded(object sender, RoutedEventArgs e)
-        //{
-        //    this.prediction0Title = (TextBlock)sender;
-        //}
-
-        //private void Image_Loaded(object sender, RoutedEventArgs e)
-        //{
-        //    this.prediction0Img = (Image)sender;
-        //}
-
-        //private void TextBlock_Loaded_1(object sender, RoutedEventArgs e)
-        //{
-        //    this.prediction0Info = (TextBlock)sender;
-        //}
-
-        //private void TextBlock_Loaded_2(object sender, RoutedEventArgs e)
-        //{
-        //    this.prediction1Title = (TextBlock)sender;
-        //}
-
-        //private void Image_Loaded_1(object sender, RoutedEventArgs e)
-        //{
-        //    this.prediction1Img = (Image)sender;
-        //}
-
-        //private void TextBlock_Loaded_3(object sender, RoutedEventArgs e)
-        //{
-        //    this.prediction1Info = (TextBlock)sender;
-        //}
-
-        //private void TextBlock_Loaded_4(object sender, RoutedEventArgs e)
-        //{
-        //    this.prediction2Title = (TextBlock)sender;
-        //}
-
-        //private void Image_Loaded_2(object sender, RoutedEventArgs e)
-        //{
-        //    this.prediction2Img = (Image)sender;
-        //}
-
-        //private void TextBlock_Loaded_5(object sender, RoutedEventArgs e)
-        //{
-        //    this.prediction2Info = (TextBlock)sender;
-        //}
-
-        //private void TextBlock_Loaded_6(object sender, RoutedEventArgs e)
-        //{
-        //    this.prediction3Title = (TextBlock)sender;
-        //}
-
-        //private void Image_Loaded_3(object sender, RoutedEventArgs e)
-        //{
-        //    this.prediction3Img = (Image)sender;
-        //}
-
-        //private void TextBlock_Loaded_7(object sender, RoutedEventArgs e)
-        //{
-        //    this.prediction3Info = (TextBlock)sender;
-        //}
+       
     }
 }
