@@ -191,6 +191,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\DefaultController.cs" />
     <Compile Include="Controllers\PathController.cs" />
     <Compile Include="Controllers\PathGroupController.cs" />
     <Compile Include="Controllers\TodoItemController.cs" />
@@ -221,8 +222,6 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Properties\PublishProfiles\mobile-RainAppFinal %282%29.pubxml" />
-    <None Include="Properties\PublishProfiles\mobile-RainAppFinal %283%29.pubxml" />
     <None Include="Properties\PublishProfiles\mobile-RainAppFinal.pubxml" />
   </ItemGroup>
   <PropertyGroup>
