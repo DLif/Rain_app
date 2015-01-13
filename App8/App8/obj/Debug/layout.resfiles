@@ -2,6 +2,9 @@ Assets\bg1.jpg
 Assets\DarkGray.png
 Assets\HubBackground.theme-dark.png
 Assets\HubBackground.theme-light.png
+Assets\icons\bike.png
+Assets\icons\car.png
+Assets\icons\walking.png
 Assets\LightGray.png
 Assets\Logo.scale-240.png
 Assets\MediumGray.png
@@ -30,6 +33,7 @@ Assets\WideLogo.scale-240.png
 App.xbf
 App8.xr.xml
 coolPage.xbf
+GroupBuilder.xbf
 HubPage.xbf
 ItemPage.xbf
 RadarMapPage.xbf

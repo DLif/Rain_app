@@ -6,12 +6,15 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:data="using:App8.Data"
     xmlns:Maps="using:Windows.UI.Xaml.Controls.Maps"
+    xmlns:UI="using:Microsoft.Advertising.Mobile.UI"
     x:Class="App8.HubPage"
     DataContext="{Binding DefaultViewModel, RelativeSource={RelativeSource Mode=Self}}"
     d:DataContext="{Binding Source={d:DesignData Source=/DataModel/SampleData.json, Type=data:SampleDataSource}}"
     mc:Ignorable="d">
 
     <Page.Resources>
+
+        
         <DataTemplate x:Key="HubSectionHeaderTemplate">
             <TextBlock Margin="0,0,0,-9.5" Text="{Binding}"/>
         </DataTemplate>
@@ -33,21 +36,7 @@
         </DataTemplate>
 
         <DataTemplate x:Key="StandardTripleLineItemTemplate">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-
-                <Border Background="{ThemeResource ListViewItemPlaceholderBackgroundThemeBrush}" Margin="0,9.5,0,0" Grid.Column="0" HorizontalAlignment="Left">
-                    <Image Source="{Binding ImagePath}" Stretch="UniformToFill" AutomationProperties.Name="{Binding Title}" Height="79" Width="79"/>
-                </Border>
-                <StackPanel Grid.Column="1" Margin="14.5,0,0,0">
-                    <TextBlock Text="{Binding Title}" Style="{ThemeResource ListViewItemTextBlockStyle}"/>
-                    <TextBlock Text="{Binding Description}" Style="{ThemeResource ListViewItemContentTextBlockStyle}" Foreground="{ThemeResource PhoneMidBrush}" />
-                    <TextBlock Text="{Binding Subtitle}" Style="{ThemeResource ListViewItemSubheaderTextBlockStyle}" />
-                </StackPanel>
-            </Grid>
+            <TextBlock Text="{Binding GroupName}" Foreground="Black" FontSize="20"/>
         </DataTemplate>
 
         <DataTemplate x:Key="StandardDoubleLineItemTemplate">
@@ -76,24 +65,26 @@
             </AppBarButton>
             <AppBarButton x:Name="locationChangeButton" Icon="MapPin" Label="Location" />
             <AppBarButton x:ConnectionId='2' x:Name="loginButton" Icon="Contact" Label="Log in" ToolTipService.ToolTip="Login with facebook"                          />
+            <AppBarButton x:Name="appRoutePrediction" Icon="Accept" Label="Predict" Visibility="Collapsed"/>
+            <AppBarButton x:ConnectionId='3' x:Name="addGroup" Icon="Add" Label="appbarbutton"                       />
         </CommandBar>
     </Page.BottomAppBar>
 
     <Grid x:Name="LayoutRoot">
 
-        <Hub x:ConnectionId='3' x:Name="Hub" x:Uid="Hub" Header="Rain Man" Background="{ThemeResource HubBackgroundImageBrush}"                                                  >
+        <Hub x:ConnectionId='4' x:Name="Hub" x:Uid="Hub" Header="Rain Man" Background="{ThemeResource HubBackgroundImageBrush}"                                                  >
             <HubSection x:Name="predictionHub" x:Uid="predictionHub" Header="Quick Prediction" DataContext="{Binding IconCollection}" HeaderTemplate="{ThemeResource HubSectionHeaderTemplate}">
                 <DataTemplate>
 
-                    <GridView x:ConnectionId='8' x:Name="predictionGrid"
+                    <GridView x:Name="predictionGrid"
                       
 						ItemsSource="{Binding PredictionIcons}"
 						AutomationProperties.AutomationId="ItemGridView"
 						AutomationProperties.Name="Items In Group"
 						ItemTemplate="{StaticResource IconTemplate}"
 						SelectionMode="None"
-						IsItemClickEnabled="True"
-						                              
+						IsItemClickEnabled="False"
+						
 						ContinuumNavigationTransitionInfo.ExitElementContainer="True"
 						HorizontalAlignment="Center"
 						VerticalAlignment="Center">
@@ -115,55 +106,164 @@
                     <Grid >
                         <Grid.RowDefinitions>
 
+                            <RowDefinition Height="2*"/>
                             <RowDefinition Height="1*"/>
-                            <RowDefinition Height="3*"/>
 
                         </Grid.RowDefinitions>
-                        <StackPanel Grid.Row="0" >
-                            <TextBlock HorizontalAlignment="Center" Text="Select source and destination points" FontSize="16" TextWrapping="WrapWholeWords"  Foreground="black" Grid.Row="0" VerticalAlignment="Top"/>
-                            <TextBlock HorizontalAlignment="Center" Text="Click on the map icon to manage the selection" FontSize="16" TextWrapping="WrapWholeWords"  Foreground="black" Grid.Row="0" VerticalAlignment="Top"/>
-                            <TextBlock HorizontalAlignment="Center" FontSize="16" TextWrapping="WrapWholeWords"  Foreground="black" Grid.Row="0" VerticalAlignment="Top"/>
-                            <StackPanel Grid.Row="0" Orientation="Horizontal" >
-                                <Button  Content="Select means of travel" Foreground="black" />
-                                <TextBlock Foreground="black" VerticalAlignment="Center" Margin="25, 0, 0, 0" FontSize="15" TextWrapping="Wrap" Text="{Binding TravelMethod}"/>
+
+
+                        <Grid Grid.Row="1">
+
+                            <Grid.RowDefinitions>
+
+                                <RowDefinition Height="40"/>
+                                <RowDefinition Height="*"/>
+
+
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Grid.Row="0" >
+                                <TextBlock HorizontalAlignment="Center" Text="Select source and destination points" FontSize="16" TextWrapping="WrapWholeWords"  Foreground="black" VerticalAlignment="Top"/>
+                                <TextBlock HorizontalAlignment="Center" Text="Click on the map icon to manage the selection" FontSize="16" TextWrapping="WrapWholeWords"  Foreground="black"  VerticalAlignment="Top"/>
+                                <TextBlock HorizontalAlignment="Center" FontSize="16" TextWrapping="WrapWholeWords"  Foreground="black" Grid.Row="0" VerticalAlignment="Top"/>
 
                             </StackPanel>
 
-                        </StackPanel>
+                            <StackPanel  Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="center">
+                                <StackPanel.Resources>
+
+                                    <Style x:Key="FlyoutTrasnparent" TargetType="FlyoutPresenter">
+                                        <Setter Property="Background"
+                                                                         Value="Transparent" />
+                                    </Style>
+
+                                </StackPanel.Resources>
+
+                                <Button x:ConnectionId='10' x:Name="transportButton" Width="30" Height="50" BorderThickness="0"                                 >
+                                    <Button.Background>
+                                        <ImageBrush x:ConnectionId='16' x:Name="transportImagebrush"  ImageSource="ms-appx:///Assets/icons/walking.png" Stretch="Uniform"                                     ></ImageBrush>
+                                    </Button.Background>
+                                    <Button.Flyout>
+
+                                        <MenuFlyout >
+                                            <MenuFlyoutItem x:ConnectionId='17' x:Name="walkFlyout"
+                                                        Text="Travel on foot" 
+                                                                                />
+                                            <MenuFlyoutSeparator/>
+                                            <MenuFlyoutItem x:ConnectionId='18' 
+                                                        Text="Bicycle" 
+                                                                                   
+                                                />
+                                            <MenuFlyoutSeparator/>
+                                            <MenuFlyoutItem x:ConnectionId='19' 
+                                                        x:Name="carFlyout"
+                                                        Text="Car" 
+                                                                              />
+
+                                        </MenuFlyout>
+
+                                    </Button.Flyout>
+
+                                </Button>
+                                <Button x:ConnectionId='11' x:Name="timeButton" Content="Maximum Stall: 30 minutes" Foreground="black"                           >
+
+                                    <Button.Flyout>
+
+                                        <MenuFlyout >
+                                            <MenuFlyoutItem x:ConnectionId='12' 
+                                                        x:Name="time0"
+                                                        Text="Leave now" 
+                                                                          />
+                                            <MenuFlyoutSeparator/>
+                                            <MenuFlyoutItem x:ConnectionId='13' 
+                                                    x:Name="time10"
+                                                        Text="10 minutes" 
+                                                                           
+                                                
+                                                />
+                                            <MenuFlyoutSeparator/>
+                                            <MenuFlyoutItem x:ConnectionId='14' 
+                                                       x:Name="time20"
+                                                        Text="20 minutes" 
+                                                                           />
+                                            <MenuFlyoutSeparator/>
+                                            <MenuFlyoutItem x:ConnectionId='15' 
+                                                       x:Name="time30"
+                                                        Text="30 minutes" 
+                                                                           />
+
+                                        </MenuFlyout>
+
+                                    </Button.Flyout>
+
+                                </Button>
+                              
+
+                              
+
+
+                            </StackPanel>
+
+                        </Grid>
+
+                        <Maps:MapControl x:ConnectionId='8' x:Name="quickMap" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Grid.Row="0" Visibility="{Binding MapVisibility}"                            >
+                            <Maps:MapItemsControl ItemsSource="{Binding Points}">
+
+                                <Maps:MapItemsControl.ItemTemplate>
+                                    <DataTemplate>
+
+                                        <Image Source="{Binding imagePath}" Height="{Binding Height}" Width="{Binding Width}"
+                          
+											Maps:MapControl.Location="{Binding Location}"
+											Maps:MapControl.NormalizedAnchorPoint="{Binding AnchorPoint}" />
+
+
+                                    </DataTemplate>
+                                </Maps:MapItemsControl.ItemTemplate>
+
+
+                            </Maps:MapItemsControl>
+                        </Maps:MapControl>
+
+                        <Grid x:ConnectionId='9' x:Name="MapOverlay" Grid.Row="0" HorizontalAlignment="Stretch" Background="Transparent" VerticalAlignment="Stretch"                            >
+
+
+                        </Grid>
+
+
                         
-                      
+                        
 
-
-                        <Maps:MapControl x:ConnectionId='7' HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Grid.Row="1" Visibility="{Binding MapVisibility}"                           />
-
-
+                        
 
 
 
                     </Grid>
-                    
+
                 </DataTemplate>
             </HubSection>
 
-            <HubSection x:Uid="HubSection3" Header="SECTION 3"
-				DataContext="{Binding Groups[1]}" HeaderTemplate="{ThemeResource HubSectionHeaderTemplate}">
+            <HubSection x:Name="Groups" x:Uid="Groups" Header="MY PATH GROUPS"
+				DataContext="{Binding PathGroups}" HeaderTemplate="{ThemeResource HubSectionHeaderTemplate}">
                 <DataTemplate>
-                    <ListView x:ConnectionId='6' 
-						AutomationProperties.AutomationId="ItemListViewSection3"
-						AutomationProperties.Name="Items In Group"
+                    <ListView x:ConnectionId='7' x:Name="groupList"
+						AutomationProperties.AutomationId="PathGroupItem"
+						AutomationProperties.Name="Paths in path group"
 						SelectionMode="None"
 						IsItemClickEnabled="True"
-						ItemsSource="{Binding Items}"
+						ItemsSource="{Binding}"
 						ItemTemplate="{StaticResource StandardTripleLineItemTemplate}"
-						                              
+						                               
 						ContinuumNavigationTransitionInfo.ExitElementContainer="True"/>
+                 
+                   
                 </DataTemplate>
             </HubSection>
 
-            <HubSection x:Uid="HubSection4" Header="SECTION 4"
+            <HubSection x:Name="TempHub" x:Uid="HubSection4" Header="SECTION 4"
 				DataContext="{Binding Groups[2]}" HeaderTemplate="{ThemeResource HubSectionHeaderTemplate}">
                 <DataTemplate>
-                    <ListView x:ConnectionId='5' 
+                    <ListView x:ConnectionId='6' 
 						AutomationProperties.AutomationId="ItemListViewSection4"
 						AutomationProperties.Name="Items In Group"
 						SelectionMode="None"
@@ -186,7 +286,7 @@
             <HubSection x:Uid="HubSection5" Header="SECTION 5"
 				DataContext="{Binding Groups[3]}" HeaderTemplate="{ThemeResource HubSectionHeaderTemplate}">
                 <DataTemplate>
-                    <ListView x:ConnectionId='4' 
+                    <ListView x:ConnectionId='5' 
 						AutomationProperties.AutomationId="ItemListViewSection5"
 						AutomationProperties.Name="Items In Group"
 						SelectionMode="None"
@@ -198,6 +298,7 @@
                 </DataTemplate>
             </HubSection>
         </Hub>
+        
     </Grid>
 </Page>
 

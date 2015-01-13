@@ -1,6 +1,9 @@
 <XamlCompilerSaveState>
   <ReferenceAssemblyList>
-    <LocalAssembly PathName="c:\users\denis\documents\visual studio 2013\projects\app8\app8\obj\debug\intermediatexaml\app8.exe" HashGuid="b48b392f-84b4-271b-cdc6-726d8d318c73" />
+    <LocalAssembly PathName="c:\users\denis\documents\visual studio 2013\projects\app8\app8\obj\debug\intermediatexaml\app8.exe" HashGuid="9892f67d-e5a4-84b3-4298-c03cbc272353" />
+    <ReferenceAssembly PathName="c:\program files (x86)\microsoft sdks\windowsphoneapp\v8.1\extensionsdks\microsoft.advertising.mobile.display\8.1\references\commonconfiguration\neutral\microsoft.advertising.mobile.common.winmd" HashGuid="67667542-2ed0-db4a-d191-3e7623df243e" />
+    <ReferenceAssembly PathName="c:\program files (x86)\microsoft sdks\windowsphoneapp\v8.1\extensionsdks\microsoft.advertising.mobile.display\8.1\references\commonconfiguration\neutral\microsoft.advertising.mobile.display.winmd" HashGuid="cc0fb2e7-7a64-f70e-2997-2ad4fbf1cad0" />
+    <ReferenceAssembly PathName="c:\program files (x86)\microsoft sdks\windowsphoneapp\v8.1\extensionsdks\microsoft.advertising.mobile.display\8.1\references\commonconfiguration\neutral\microsoft.advertising.mobile.ui.winmd" HashGuid="b3d8dc37-2e80-b28f-127b-3083e011fcaf" />
     <ReferenceAssembly PathName="c:\users\denis\documents\visual studio 2013\projects\app8\packages\microsoft.data.edm.5.6.2\lib\portable-net40+sl5+wp8+win8+wpa\microsoft.data.edm.dll" HashGuid="652859ac-63b5-9ab0-7a6b-0cb8dfcd265f" />
     <ReferenceAssembly PathName="c:\users\denis\documents\visual studio 2013\projects\app8\packages\microsoft.data.odata.5.6.2\lib\portable-net40+sl5+wp8+win8+wpa\microsoft.data.odata.dll" HashGuid="4e84b0db-d22a-61af-6343-dd7cc7f44046" />
     <ReferenceAssembly PathName="c:\users\denis\documents\visual studio 2013\projects\app8\packages\windowsazure.mobileservices.1.3.0\lib\wpa81\microsoft.windowsazure.mobile.dll" HashGuid="9ab4b265-fb21-8752-5898-094f17593689" />
