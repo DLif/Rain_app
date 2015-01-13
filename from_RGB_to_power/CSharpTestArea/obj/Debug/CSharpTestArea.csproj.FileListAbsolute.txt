@@ -4,3 +4,6 @@ c:\users\david\documents\visual studio 2013\Projects\CSharpTestArea\CSharpTestAr
 c:\users\david\documents\visual studio 2013\Projects\CSharpTestArea\CSharpTestArea\bin\Debug\CSharpTestArea.pdb
 c:\users\david\documents\visual studio 2013\Projects\CSharpTestArea\CSharpTestArea\obj\Debug\CSharpTestArea.exe
 c:\users\david\documents\visual studio 2013\Projects\CSharpTestArea\CSharpTestArea\obj\Debug\CSharpTestArea.pdb
+C:\Users\David\Documents\GitHub\Rain_app\from_RGB_to_power\CSharpTestArea\bin\Debug\CSharpTestArea.exe.config
+C:\Users\David\Documents\GitHub\Rain_app\from_RGB_to_power\CSharpTestArea\obj\Debug\CSharpTestArea.exe
+C:\Users\David\Documents\GitHub\Rain_app\from_RGB_to_power\CSharpTestArea\obj\Debug\CSharpTestArea.pdb

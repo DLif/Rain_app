@@ -24,8 +24,8 @@ namespace Project1
         static double center_lat = 32.006340;
         static double center_long = 34.814471;
 
-        static int pixel_X_num = 50;
-        static int pixel_Y_num = 51;
+        static int pixel_X_num = 512;
+        static int pixel_Y_num = 512;
 
         static int Main(string[] args)
         {
