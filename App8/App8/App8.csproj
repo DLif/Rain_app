@@ -130,6 +130,9 @@
   <ItemGroup>
     <Content Include="Assets\bg1.jpg" />
     <Content Include="Assets\DarkGray.png" />
+    <Content Include="Assets\icons\bike.png" />
+    <Content Include="Assets\icons\car.png" />
+    <Content Include="Assets\icons\walking.png" />
     <Content Include="Assets\LightGray.png" />
     <Content Include="Assets\MediumGray.png" />
     <Content Include="Assets\HubBackground.theme-dark.png" />
@@ -234,6 +237,11 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <SDKReference Include="Microsoft.Advertising.Mobile.Display, Version=8.1">
+      <Name>Microsoft.Advertising.Mobile.Display</Name>
+    </SDKReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>

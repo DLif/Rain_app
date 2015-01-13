@@ -22,6 +22,15 @@
     <AppxPackagedFile Include="C:\Users\Denis\documents\visual studio 2013\Projects\App8\App8\bin\Debug\App8.exe.config">
       <PackagePath>App8.exe.config</PackagePath>
     </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Program Files %28x86%29\Microsoft SDKs\WindowsPhoneApp\v8.1\ExtensionSDKs\Microsoft.Advertising.Mobile.Display\8.1\References\CommonConfiguration\neutral\Microsoft.Advertising.Mobile.Common.winmd">
+      <PackagePath>Microsoft.Advertising.Mobile.Common.winmd</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Program Files %28x86%29\Microsoft SDKs\WindowsPhoneApp\v8.1\ExtensionSDKs\Microsoft.Advertising.Mobile.Display\8.1\References\CommonConfiguration\neutral\Microsoft.Advertising.Mobile.Display.winmd">
+      <PackagePath>Microsoft.Advertising.Mobile.Display.winmd</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Program Files %28x86%29\Microsoft SDKs\WindowsPhoneApp\v8.1\ExtensionSDKs\Microsoft.Advertising.Mobile.Display\8.1\References\CommonConfiguration\neutral\Microsoft.Advertising.Mobile.UI.winmd">
+      <PackagePath>Microsoft.Advertising.Mobile.UI.winmd</PackagePath>
+    </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Denis\documents\visual studio 2013\Projects\App8\packages\Microsoft.Data.Edm.5.6.2\lib\portable-net40+sl5+wp8+win8+wpa\Microsoft.Data.Edm.dll">
       <PackagePath>Microsoft.Data.Edm.dll</PackagePath>
     </AppxPackagedFile>
@@ -133,6 +142,15 @@
     <AppxPackagedFile Include="C:\Users\Denis\documents\visual studio 2013\Projects\App8\packages\System.Spatial.5.6.2\lib\portable-net40+sl5+wp8+win8+wpa\zh-Hant\System.Spatial.resources.dll">
       <PackagePath>zh-Hant\System.Spatial.resources.dll</PackagePath>
     </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Program Files %28x86%29\Microsoft SDKs\WindowsPhoneApp\v8.1\ExtensionSDKs\Microsoft.Advertising.Mobile.Display\8.1\Redist\CommonConfiguration\neutral\Microsoft.Advertising.Mobile.UI\Web\bootstrap.html">
+      <PackagePath>Microsoft.Advertising.Mobile.UI\Web\bootstrap.html</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Program Files %28x86%29\Microsoft SDKs\WindowsPhoneApp\v8.1\ExtensionSDKs\Microsoft.Advertising.Mobile.Display\8.1\Redist\CommonConfiguration\neutral\Microsoft.Advertising.Mobile.UI\Themes\Generic.xbf">
+      <PackagePath>Microsoft.Advertising.Mobile.UI\Themes\Generic.xbf</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Program Files %28x86%29\Microsoft SDKs\WindowsPhoneApp\v8.1\ExtensionSDKs\Microsoft.Advertising.Mobile.Display\8.1\Redist\CommonConfiguration\neutral\Microsoft.Advertising.Mobile.UI\Web\Ormma.js">
+      <PackagePath>Microsoft.Advertising.Mobile.UI\Web\Ormma.js</PackagePath>
+    </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Denis\documents\visual studio 2013\Projects\App8\App8\Assets\bg1.jpg">
       <PackagePath>Assets\bg1.jpg</PackagePath>
     </AppxPackagedFile>
@@ -141,6 +159,15 @@
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Denis\documents\visual studio 2013\Projects\App8\App8\Assets\DarkGray.png">
       <PackagePath>Assets\DarkGray.png</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Denis\documents\visual studio 2013\Projects\App8\App8\Assets\icons\bike.png">
+      <PackagePath>Assets\icons\bike.png</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Denis\documents\visual studio 2013\Projects\App8\App8\Assets\icons\car.png">
+      <PackagePath>Assets\icons\car.png</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Denis\documents\visual studio 2013\Projects\App8\App8\Assets\icons\walking.png">
+      <PackagePath>Assets\icons\walking.png</PackagePath>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Denis\documents\visual studio 2013\Projects\App8\App8\Assets\LightGray.png">
       <PackagePath>Assets\LightGray.png</PackagePath>
@@ -237,6 +264,9 @@
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Denis\documents\visual studio 2013\Projects\App8\App8\bin\Debug\coolPage.xbf">
       <PackagePath>coolPage.xbf</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Denis\documents\visual studio 2013\Projects\App8\App8\bin\Debug\GroupBuilder.xbf">
+      <PackagePath>GroupBuilder.xbf</PackagePath>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Denis\documents\visual studio 2013\Projects\App8\App8\bin\Debug\RadarMapPage.xbf">
       <PackagePath>RadarMapPage.xbf</PackagePath>

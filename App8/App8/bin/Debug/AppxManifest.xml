@@ -33,6 +33,16 @@
     <Capability Name="internetClientServer" />
     <DeviceCapability Name="location" />
   </Capabilities>
+  <Extensions>
+    <Extension Category="windows.activatableClass.inProcessServer">
+      <InProcessServer>
+        <Path>CLRHost.dll</Path>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Mobile.Display.Key35MSSharedLib1024" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Mobile.UI.UI_XamlTypeInfo.XamlMetaDataProvider" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Mobile.UI.AdControl" ThreadingModel="both" />
+      </InProcessServer>
+    </Extension>
+  </Extensions>
   <build:Metadata>
     <build:Item Name="TargetFrameworkMoniker" Value="WindowsPhoneApp,Version=v8.1" />
     <build:Item Name="VisualStudio" Version="12.0" />
@@ -41,6 +51,7 @@
     <build:Item Name="Microsoft.Build.AppxPackage.dll" Version="12.0.31101.0" />
     <build:Item Name="ProjectGUID" Value="{A5133445-F389-43D1-8B52-94E7936C88E2}" />
     <build:Item Name="Microsoft.Windows.UI.Xaml.Build.Tasks.dll" Version="12.0.30501.0" />
+    <build:Item Name="Microsoft.Advertising.Mobile.Display" Version="8.1" />
     <build:Item Name="MakePri.exe" Version="6.3.9600.17298 (winblue.141024-1500)" />
   </build:Metadata>
 </Package>

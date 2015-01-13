@@ -1,5 +1,6 @@
 ﻿using App8.Common;
 using App8.DataModel;
+using Microsoft.WindowsAzure.MobileServices;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,6 +18,7 @@ using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Maps;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
@@ -36,6 +38,8 @@ namespace App8
     {
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
+        private Boolean shouldSaveName = false;
+        private IMobileServiceTable<PathGroup> groupsTable = App.mobileClient.GetTable<PathGroup>();
 
         public GroupBuilder()
         {
@@ -92,6 +96,8 @@ namespace App8
         {
         }
 
+        private GroupBuilderNavigator givenArgument = null;
+
         #region NavigationHelper registration
 
         /// <summary>
@@ -109,6 +115,12 @@ namespace App8
         /// handlers that cannot cancel the navigation request.</param>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
+
+            this.givenArgument = (GroupBuilderNavigator)e.Parameter;
+            
+            // request a path name only if the user wants to create a new a group and save it
+            this.shouldSaveName = givenArgument.IsUserGroup;
+           
             this.navigationHelper.OnNavigatedTo(e);
         }
 
@@ -121,8 +133,19 @@ namespace App8
 
         private void acceptAppBar_Click(object sender, RoutedEventArgs e)
         {
-
+            givenArgument.StartLocation = this.startingPoint;
+            givenArgument.EndLocation = this.endingPoint;
+            if(!this.shouldSaveName)
+            {
+                
+               
+                this.Frame.Navigate(typeof(HubPage), givenArgument);
+                
+            }
+         
         }
+
+        
 
         private void map_Loaded(object sender, RoutedEventArgs e)
         {
@@ -138,7 +161,14 @@ namespace App8
             myGrid.RowDefinitions.Add(new RowDefinition());
             myGrid.Background = new SolidColorBrush(Colors.Transparent);
             ImageBrush imgBrush = new ImageBrush();
-            imgBrush.ImageSource = new BitmapImage(new Uri("ms-appx:///Assets/radar/waypointpin.png"));
+            if (this.startingPoint == null)
+            {
+                imgBrush.ImageSource = new BitmapImage(new Uri("ms-appx:///Assets/radar/mappin.png"));
+            }
+            else
+            {
+                imgBrush.ImageSource = new BitmapImage(new Uri("ms-appx:///Assets/radar/waypointpin.png"));
+            }
 
             //Creating a Rectangle
             var myRectangle = new Rectangle { Fill = imgBrush, Height = 35, Width = 20 };
@@ -163,17 +193,22 @@ namespace App8
         }
 
 
+        private Geopoint startingPoint = null;
+        private DependencyObject startPin = null;
+        private Geopoint endingPoint = null;
+        private DependencyObject endingPin = null;
+
         private void addWayPoint(Geopoint point)
         {
-            this.wayPoints.Add(point);
+           // this.wayPoints.Add(point);
             DependencyObject wayPointPin = getWayPointPin(point);
-            this.wayPointsPins.Add(wayPointPin);
+           // this.wayPointsPins.Add(wayPointPin);
 
             // add pin to map
             this.map.Children.Add(wayPointPin);
 
-            MapControl.SetLocation(wayPointPin, point);
-            MapControl.SetNormalizedAnchorPoint(wayPointPin, new Point(0.5, 1));
+           // MapControl.SetLocation(wayPointPin, point);
+           // MapControl.SetNormalizedAnchorPoint(wayPointPin, new Point(0.5, 1));
         }
 
         private async void addressTextBox_KeyDown(object sender, KeyRoutedEventArgs e)
@@ -193,8 +228,12 @@ namespace App8
                 return;
             }
 
+            // trying to locate
+            this.locateAddressModalWindow.Dialog.ShowAsync();
+
             String address = addressTextBox.Text;
             String errorText = "";
+            Geopoint location = null;
             try
             {
 
@@ -205,7 +244,7 @@ namespace App8
                 if (result.Status == MapLocationFinderStatus.Success && result.Locations.Count > 0)
                 {
 
-                    addWayPoint(result.Locations[0].Point);
+                    location = result.Locations[0].Point;
                     await map.TrySetViewAsync(result.Locations[0].Point);
 
                 }
@@ -220,18 +259,224 @@ namespace App8
             {
                 // todo: critical error
                 // remember to implement this
+                errorText = "Map service is disabled!";
             }
             catch (TaskCanceledException)
             {
                 errorText = "Location was not found, try again";
 
             }
+
+            if(errorText == "")
+            {
+                this.handleNewPoint(location);
+            }
+
+            this.locateAddressModalWindow.Dialog.Hide();
             if (errorText != "")
             {
                 MessageDialog diag = new MessageDialog(errorText);
                 diag.ShowAsync();
             }
 
+        }
+
+        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            this.addressTextBox.Text = "";
+        }
+
+        private void map_MapTapped(Windows.UI.Xaml.Controls.Maps.MapControl sender, Windows.UI.Xaml.Controls.Maps.MapInputEventArgs args)
+        {
+            handleNewPoint(args.Location);
+        }
+
+
+        private void handleNewPoint(Geopoint location)
+        {
+            if (this.startingPoint != null && this.endingPoint != null)
+                return;
+
+            // show undo button
+            if (this.undoAppBar.Visibility == Visibility.Collapsed)
+                this.undoAppBar.Visibility = Visibility.Visible;
+
+            DependencyObject wayPointPin = getWayPointPin(location);
+            if (this.startingPoint == null)
+            {
+
+                // starting point not set
+                // get the pin
+                this.startingPoint = location;
+                this.startPin = wayPointPin;
+                this.messageText.Text = "Now, Select the target destination";
+
+            }
+            else
+            {
+                // ending point not set
+                this.endingPoint = location;
+                this.endingPin = wayPointPin;
+                this.messageText.Text = "Ready to go!";
+                this.acceptAppBar.Visibility = Visibility.Visible;
+
+                this.enableAddress.IsChecked = false;
+                this.enableAddress.Visibility = Visibility.Collapsed;
+                this.addressGrid.Visibility = Visibility.Collapsed;
+
+                this.locateMe.Visibility = Visibility.Collapsed;
+            }
+
+
+            // add pin to map
+            this.map.Children.Add(wayPointPin);
+            MapControl.SetLocation(wayPointPin, location);
+            MapControl.SetNormalizedAnchorPoint(wayPointPin, new Point(0.5, 1));
+        }
+
+        private void undoAppBar_Click(object sender, RoutedEventArgs e)
+        {
+            if(this.endingPoint != null)
+            {
+                // remove
+                this.map.Children.Remove(this.endingPin);
+                this.endingPin = null;
+                this.endingPoint = null;
+                this.messageText.Text = "Select the target destination";
+                this.acceptAppBar.Visibility = Visibility.Collapsed;
+                
+                this.enableAddress.Visibility = Visibility.Visible;
+                this.locateMe.Visibility = Visibility.Visible;
+
+
+                return;
+            }
+
+            if(this.startingPoint != null)
+            {
+                this.map.Children.Remove(this.startPin);
+                this.startPin = null;
+                this.startingPoint = null;
+                // hide undo bar
+                this.undoAppBar.Visibility = Visibility.Collapsed;
+                this.messageText.Text = "Select the starting position";
+                return;
+            }
+        }
+
+       
+        private ModalWindow locateMeModalWindow = new ModalWindow("Locating your position", "This may take a few seconds ... ", "");
+        private ModalWindow locateAddressModalWindow = new ModalWindow("Locating address", "This may take a few seconds ... ", "");
+
+        private async void locateMe_Click(object sender, RoutedEventArgs e)
+        {
+
+            if(this.enableAddress.IsChecked == true)
+            {
+                this.enableAddress.IsChecked = false;
+                this.addressGrid.Visibility = Visibility.Collapsed;
+            }
+
+            locateMeModalWindow.Dialog.ShowAsync();
+
+            // locate current location
+            var locator = new Geolocator();
+            locator.DesiredAccuracyInMeters = 50;
+            String  error = "Oops, could not locate you! try again later";
+            Boolean errorOccured = false;
+
+            Geopoint location = null;
+
+            try
+            {
+
+                var myPosition = await locator.GetGeopositionAsync(
+                    maximumAge: TimeSpan.FromSeconds(60),
+                    timeout: TimeSpan.FromSeconds(10)
+                    );
+
+                // navigate to location
+
+                location = new Geopoint(new BasicGeoposition
+                {
+                    Latitude = myPosition.Coordinate.Latitude,
+                    Longitude = myPosition.Coordinate.Longitude
+                });
+
+
+
+                Boolean success = await map.TrySetViewAsync(location, 11D, 0, 0, MapAnimationKind.None);
+                if (!success)
+                {
+                    errorOccured = true;
+                }
+            }
+            catch
+            {
+
+                errorOccured = true;
+
+            }
+            if(!errorOccured)
+            {
+                // add the pin, handle events
+                this.handleNewPoint(location);
+            }
+
+            locateMeModalWindow.Dialog.Hide();
+            if (errorOccured)
+            {
+                MessageDialog dialog = new MessageDialog(error);
+                dialog.ShowAsync();
+            }
+            
+           
+
+          
+
+
+        }
+
+        private async void goButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (name.Text == "")
+            {
+                name.Text = "Please enter a name!";
+                return;
+            
+            }
+            this.Flyout.Hide();
+            givenArgument.StartLocation = this.startingPoint;
+            givenArgument.EndLocation = this.endingPoint;
+            givenArgument.Name = name.Text;
+
+            ModalWindow modalWindow = new ModalWindow("Saving group " + givenArgument.Name, "Please wait...", "");
+             modalWindow.Dialog.ShowAsync();
+             PathGroup newGroup = givenArgument.toPathGroup();
+
+             // store group in cloud
+             await this.groupsTable.InsertAsync(newGroup);
+             modalWindow.Dialog.Hide();
+
+
+
+            this.Frame.Navigate(typeof(HubPage), givenArgument);
+        }
+
+        private void name_GotFocus(object sender, RoutedEventArgs e)
+        {
+            this.name.Text = "";
+        }
+
+        private void Flyout_Opening(object sender, object e)
+        {
+            
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            if(!this.shouldSaveName)
+                this.acceptAppBar.Flyout = null;
         }
     }
 }

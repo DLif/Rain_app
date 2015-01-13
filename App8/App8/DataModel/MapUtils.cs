@@ -4,6 +4,15 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Devices.Geolocation;
+using Windows.Foundation;
+using Windows.UI;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Maps;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
+using Windows.UI.Xaml.Shapes;
 
 namespace App8.DataModel
 {
@@ -56,7 +65,44 @@ namespace App8.DataModel
 
         }
 
+        // color options: Colors.red, Colors.blue
+        public static DependencyObject getMapPin(Geopoint point, Color color)
+        {
 
+            //Creating a Grid element.
+            var myGrid = new Grid();
+            myGrid.RowDefinitions.Add(new RowDefinition());
+            myGrid.RowDefinitions.Add(new RowDefinition());
+            myGrid.Background = new SolidColorBrush(Colors.Transparent);
+            ImageBrush imgBrush = new ImageBrush();
+            if (color == Colors.Red)
+            {
+                imgBrush.ImageSource = new BitmapImage(new Uri("ms-appx:///Assets/radar/mappin.png"));
+            }
+            else
+            {
+                imgBrush.ImageSource = new BitmapImage(new Uri("ms-appx:///Assets/radar/waypointpin.png"));
+            }
+
+            //Creating a Rectangle
+            var myRectangle = new Rectangle { Fill = imgBrush, Height = 35, Width = 20 };
+            myRectangle.SetValue(Grid.RowProperty, 0);
+            myRectangle.SetValue(Grid.ColumnProperty, 0);
+
+            //Adding the Rectangle to the Grid
+            myGrid.Children.Add(myRectangle);
+
+            return myGrid;
+
+        }
+
+        public static void addPinToMap(MapControl map, DependencyObject pin, Geopoint location)
+        {
+            // add pin to map
+            map.Children.Add(pin);
+            MapControl.SetLocation(pin, location);
+            MapControl.SetNormalizedAnchorPoint(pin, new Point(0.5, 1));
+        }
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

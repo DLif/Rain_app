@@ -135,6 +135,7 @@ namespace App8
                 }
                );
                 PathBuilderNavigator argument = new PathBuilderNavigator(src, dest, null);
+                
 
                 if (!rootFrame.Navigate(typeof(HubPage), argument))
                 {

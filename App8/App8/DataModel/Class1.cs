@@ -228,6 +228,16 @@ namespace App8.DataModel
             Maps = new ObservableCollection<RadarMap>();
 
 
+        
+       }
+
+        public Boolean NeedToUpdate()
+        {
+
+            if (this.isSet)
+                return false;
+            return true;
+
         }
 
         public static RadarMapManager getRadarMapManager()

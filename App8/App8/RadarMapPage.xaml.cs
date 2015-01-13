@@ -295,6 +295,8 @@ namespace App8
         {
 
 
+            
+
             if(progressBar.Visibility == Visibility.Visible)
             {
                 // other action is being done, wait till its over

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace App8.DataModel
 {
-    class PathGroup
+    public class PathGroup
     {
 
         /* note that an id for the entry will be created authmaticly */
