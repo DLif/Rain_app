@@ -1,0 +1,6 @@
+c:\users\david\documents\visual studio 2013\Projects\CSharpTestArea\CSharpTestArea\bin\Debug\CSharpTestArea.exe.config
+c:\users\david\documents\visual studio 2013\Projects\CSharpTestArea\CSharpTestArea\obj\Debug\CSharpTestArea.csprojResolveAssemblyReference.cache
+c:\users\david\documents\visual studio 2013\Projects\CSharpTestArea\CSharpTestArea\bin\Debug\CSharpTestArea.exe
+c:\users\david\documents\visual studio 2013\Projects\CSharpTestArea\CSharpTestArea\bin\Debug\CSharpTestArea.pdb
+c:\users\david\documents\visual studio 2013\Projects\CSharpTestArea\CSharpTestArea\obj\Debug\CSharpTestArea.exe
+c:\users\david\documents\visual studio 2013\Projects\CSharpTestArea\CSharpTestArea\obj\Debug\CSharpTestArea.pdb
