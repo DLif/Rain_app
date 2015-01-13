@@ -10,6 +10,12 @@ using System.Threading.Tasks;
  */
 namespace Project1
 {
+    /* TESTS
+     * 31.147623, 35.372394(south east) => pre_x = 59.404 , pre_y = 67.07 , (plus,plus)
+     * 32.777489, 35.528949(north east) => pre_x = 62.043 , pre_y = 34.67 ,(minus,plus)
+     * 32.799424, 33.949664(north west) => pre_x = 35.422 , pre_y = 34.234 ,(minus,minus)
+     * 31.216941, 34.294361(south west) => pre_x = 41.232 , pre_y = 65.692 ,(plus,minus)
+     * */
     class pointTranslation
     {
         static double maxDistFromCenter_X = 280.0;
@@ -23,8 +29,8 @@ namespace Project1
 
         static int Main(string[] args)
         {
-            double input_lat = center_lat;//34.52634;
-            double input_long = center_long;//31.84273;
+            double input_lat = 31.216941;
+            double input_long = 34.294361;
 
             int pixel = earthPoint_to_pixelPoint(input_lat, input_long);
 
@@ -54,7 +60,7 @@ namespace Project1
 
             //calc percentage from left corner side (easier to think that way)
             percentage_Y = center_to_topLeftCorner_Percentage(percentage_Y, from_center.Item1);
-            percentage_X = center_to_topLeftCorner_Percentage(percentage_X, from_center.Item1);
+            percentage_X = center_to_topLeftCorner_Percentage(percentage_X, from_center.Item2);
 
             return getPixel(percentage_X, percentage_Y);
         }
@@ -62,7 +68,7 @@ namespace Project1
         private static double center_to_topLeftCorner_Percentage(double center_percentage, derections direction_from_center)
         {
             if (direction_from_center != derections.MINUS) return (center_percentage / 2) + 50;
-            else return (center_percentage / 2);
+            else return 50-(center_percentage / 2);
         }
 
         //calc pixel num from percentage_X and percentage_Y
