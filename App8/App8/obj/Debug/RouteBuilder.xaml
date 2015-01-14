@@ -38,7 +38,7 @@
 
 
 
-        <Maps:MapControl x:ConnectionId='4'  x:Name="map" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"                                              />
+        <Maps:MapControl x:ConnectionId='4' MapServiceToken="BaBZ6ETOrg8G3L31STm8dg" x:Name="map" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"                                              />
 
         <Grid Grid.Row="2" x:Name="addressGrid" Visibility="Collapsed">
             <Grid.RowDefinitions>

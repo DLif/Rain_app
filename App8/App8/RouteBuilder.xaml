@@ -38,7 +38,7 @@
 
 
 
-        <Maps:MapControl  x:Name="map" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Loaded="map_Loaded" MapTapped="map_MapTapped"/>
+        <Maps:MapControl MapServiceToken="BaBZ6ETOrg8G3L31STm8dg" x:Name="map" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Loaded="map_Loaded" MapTapped="map_MapTapped"/>
 
         <Grid Grid.Row="2" x:Name="addressGrid" Visibility="Collapsed">
             <Grid.RowDefinitions>

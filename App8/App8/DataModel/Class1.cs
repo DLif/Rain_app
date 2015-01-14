@@ -28,8 +28,11 @@ namespace App8.DataModel
     public class RadarMap : INotifyPropertyChanged
     {
 
-        // image url
+        // image source objet for drawing onto map (.png) format
         public BitmapImage ImageSrc { get; set; }
+
+        // image source for pixel anaylsis
+        public WriteableBitmap ReadableImage { set; get; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -77,11 +80,12 @@ namespace App8.DataModel
         }
 
 
-        public RadarMap(DateTime time, BitmapImage imgSrc, Geopoint center)
+        public RadarMap(DateTime time, BitmapImage imgSrc, Geopoint center, WriteableBitmap writeableBitmap)
         {
             this.Time = time;
 
             this.ImageSrc = imgSrc;
+            this.ReadableImage = writeableBitmap;
             this.Visibile = Visibility.Collapsed ;
             this.Point = center;
             // default anchor point
@@ -119,7 +123,6 @@ namespace App8.DataModel
             BasicGeoposition northwest = bounds.NorthwestCorner;
             BasicGeoposition southeast = bounds.SoutheastCorner;
 
-           
 
             /* TO DO */
             
@@ -171,6 +174,43 @@ namespace App8.DataModel
         {
 
             int locationPixel = PointTranslation.locationToPixel(location.Position.Latitude, location.Position.Longitude);
+
+            int width = this.ReadableImage.PixelWidth;
+            int height = this.ReadableImage.PixelHeight;
+
+            using (var buffer = ReadableImage.PixelBuffer.AsStream())
+            {
+                Byte[] pixels = new Byte[4 * width * height];
+                buffer.Read(pixels, 0, pixels.Length);
+
+                for (int x = 0; x < width; x++)
+                {
+
+                    for (int y = 0; y < height; y++)
+                    {
+                        int index = ((y * width) + x) * 4;
+
+
+
+
+                        Byte b = pixels[index + 0];
+                        Byte g = pixels[index + 1];
+                        Byte r = pixels[index + 2];
+                        Byte a = pixels[index + 3];
+
+                        Color pixelColor = Color.FromArgb(a, r, g, b);
+
+
+                    }
+                }
+
+                //buffer.Position = 0;
+                //buffer.Write(pixels, 0, pixels.Length);
+
+            }
+            
+
+
 
             return 0;
 
@@ -273,21 +313,18 @@ namespace App8.DataModel
 
             // may need to update the maps every now and  then
                  
-
-            BitmapImage[] files = await fetchImages();
-            for (int i = 0; i < 4; ++i)
+            RadarMap[] files = await fetchMaps();
+            for (int i = 0; i < 4; ++i )
             {
-               
-                Maps.Add(new RadarMap(DateTime.Now, files[i], RadarMapManager.center));
-                if (i == 0)
-                    Maps.ElementAt(0).setVisible( true );
-            }
+                Maps.Add(files[i]);
 
+            }
+            Maps.ElementAt(0).setVisible(true);
             this.isSet = true;
         }
 
         // method connects to the blob and downloads the radar image streams
-        private async Task<BitmapImage[]> fetchImages()
+        private async Task<RadarMap[]> fetchMaps()
         {
 
             string accountName = "portalvhdszwvb89wr0jbcc";
@@ -297,30 +334,45 @@ namespace App8.DataModel
             CloudStorageAccount account = new CloudStorageAccount(creds, useHttps: true);
 
             CloudBlobClient client = account.CreateCloudBlobClient();
-            CloudBlobContainer predictionsContainer = client.GetContainerReference("denispics");
+            CloudBlobContainer predictionsContainer = client.GetContainerReference("predictions");
 
-            BitmapImage[] files = new BitmapImage[4];
+            RadarMap[] files = new RadarMap[4];
 
             for(int i = 0; i < 4; ++i )
             {
-                String fileName = String.Format("prediction{0}.png", i);
-                CloudBlockBlob blob = predictionsContainer.GetBlockBlobReference(fileName);
+                String pngFormatImage = String.Format("{0}.png", i);
+                CloudBlockBlob blob = predictionsContainer.GetBlockBlobReference(pngFormatImage);
+                String jpgFormatImage = String.Format("{0}.jpg", i);
 
-                var uri = new System.Uri("ms-appx:///Assets/radar/" + fileName);
-                // var file = await Windows.Storage.StorageFile.GetFileFromApplicationUriAsync(uri);
-
+                // download png image
                 var ms = new MemoryStream();
-                await blob.DownloadToStreamAsync(ms.AsOutputStream());
-
+                try
+                {
+                    await blob.DownloadToStreamAsync(ms.AsOutputStream());
+                }
+                catch(Exception e)
+                {
+                    String msg = e.Message;
+                }
                 IRandomAccessStream accessStream = ms.AsRandomAccessStream();
-
                 accessStream.Seek(0);
-
                 BitmapImage imageSource = new BitmapImage();
                 await imageSource.SetSourceAsync(accessStream);
 
+                // download jpg image
+                blob = predictionsContainer.GetBlockBlobReference(jpgFormatImage);
+                await blob.DownloadToStreamAsync(ms.AsOutputStream());
+                accessStream = ms.AsRandomAccessStream();
+                accessStream.Seek(0);
+                WriteableBitmap writeableImage = new WriteableBitmap(512, 512);
+                await writeableImage.SetSourceAsync(accessStream);
 
-                files[i] = imageSource;
+                DateTime time = DateTime.Now;
+               time = time.AddMinutes((-1) * (time.Minute % 10));
+                time = time.AddMinutes((-1) * 10 * i);
+
+
+                files[i] = new RadarMap(time, imageSource, RadarMapManager.center, writeableImage);
             }
 
             return files;
@@ -330,45 +382,6 @@ namespace App8.DataModel
     
         private static void makeTransparentBackground(WriteableBitmap image)
         {
-
-            int width = image.PixelWidth;
-            int height = image.PixelHeight;
-
-                using (var buffer = image.PixelBuffer.AsStream())
-                {
-                    Byte[] pixels = new Byte[4 * width * height];
-                    buffer.Read(pixels, 0, pixels.Length);
-
-                    for (int x = 0; x < width; x++)
-                    {
-
-                        for (int y = 0; y < height; y++)
-                        {
-                            int index = ((y * width) + x) * 4;
-
-
-                           
-
-                            Byte b = pixels[index + 0];
-                            Byte g = pixels[index + 1];
-                            Byte r = pixels[index + 2];
-                            Byte a = pixels[index + 3];
-
-                            Color pixelColor = Color.FromArgb(a, r, g, b);
-
-                            if(pixelColor == Colors.Black || (b < 25 && g < 25 && r < 25))
-                           {
-                                pixels[index + 3] = 0; // set transparent alpha
-                           }
-
-                        }
-                    }
-
-                    buffer.Position = 0;
-                    buffer.Write(pixels, 0, pixels.Length);
-
-                }
-            
 
 
 

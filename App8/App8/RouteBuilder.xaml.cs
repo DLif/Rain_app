@@ -221,8 +221,8 @@ namespace App8
         private async void map_Loaded(object sender, RoutedEventArgs e)
         {
 
-            
-            MapService.ServiceToken = "P4TC89D";
+
+            MapService.ServiceToken = "BaBZ6ETOrg8G3L31STm8dg";
 
             List<BasicGeoposition> basicPositions = new List<BasicGeoposition>();
             basicPositions.Add(source.Position);
@@ -307,47 +307,23 @@ namespace App8
 
         private async void acceptAppBar_Click(object sender, RoutedEventArgs e)
         {
-          //  List<Geopoint> actualWayPoints = new List<Geopoint>();
-          //  actualWayPoints.Add(this.source);
-         //   actualWayPoints.AddRange(this.wayPoints);
-         //   actualWayPoints.Add(this.destination);
+            List<Geopoint> actualWayPoints = new List<Geopoint>();
+            actualWayPoints.Add(this.source);
+          actualWayPoints.AddRange(this.wayPoints);
+          actualWayPoints.Add(this.destination);
 
             
             try
             {
-             //   MapRouteFinderResult routeResult =
-              //      await MapRouteFinder.GetDrivingRouteFromWaypointsAsync(
-              //          actualWayPoints,
-               //         MapRouteOptimization.Distance
-  //
-             //       );
-              //  MapRouteView routeView = new MapRouteView(routeResult.Route);
-             //   map.Routes.Add(routeView);
-              //  pathGenerated = true;
+               MapRouteFinderResult routeResult =
+                    await MapRouteFinder.GetDrivingRouteFromWaypointsAsync(
+                        actualWayPoints,
+                        MapRouteOptimization.Distance
+  
+                   );
+              
 
-                // Start at Microsoft in Redmond, Washington.
-                BasicGeoposition startLocation = new BasicGeoposition();
-                startLocation.Latitude = 47.643;
-                startLocation.Longitude = -122.131;
-                Geopoint startPoint = new Geopoint(startLocation);
-
-                // End at the city of Seattle, Washington.
-                BasicGeoposition endLocation = new BasicGeoposition();
-                endLocation.Latitude = 47.604;
-                endLocation.Longitude = -122.329;
-                Geopoint endPoint = new Geopoint(endLocation);
-
-                MapService.ServiceToken = "P4TC89D";
-                map.MapServiceToken = "P4TC89D";
-
-                // Get the route between the points.
-                MapRouteFinderResult routeResult =
-                    await MapRouteFinder.GetDrivingRouteAsync(
-                    startPoint,
-                    endPoint,
-                    MapRouteOptimization.Time,
-                    MapRouteRestrictions.None);
-               
+ 
 
                if( routeResult.Status == MapRouteFinderStatus.Success)
                {

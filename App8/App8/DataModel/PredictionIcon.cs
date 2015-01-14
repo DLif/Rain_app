@@ -15,16 +15,16 @@ namespace App8.DataModel
         public String Info { get; set;  }
         public String ImagePath { get; set; }
         
-        public PredictionIcon(double averageRain, int timeIndex)
+
+        public PredictionIcon(double averageRain, int timeIndex, DateTime time)
         {
 
-            Title = "Rain at " + timeIndex;
+            Title = time.ToString();
             InitImagePath(averageRain);
 
         }
 
-        
-
+   
 
         private void InitImagePath(double averageRain)
         {
@@ -78,15 +78,21 @@ namespace App8.DataModel
         public ObservableCollection<PredictionIcon> PredictionIcons { get; set; }
 
 
-        public PredictionCollection(double [] averageRain)
+        public PredictionCollection(RadarMapManager mapManager, Geopoint userLocation)
         {
 
-
+            // get predictions from each map...
+            // 
+            
             PredictionIcons = new ObservableCollection<PredictionIcon>();
-            PredictionIcons.Add(new PredictionIcon(averageRain[0], 0));
-            PredictionIcons.Add(new PredictionIcon(averageRain[1], 10));
-            PredictionIcons.Add(new PredictionIcon(averageRain[2], 20));
-            PredictionIcons.Add(new PredictionIcon(averageRain[3], 30));
+            double rainAvg;
+            for(int i = 0; i < 4; ++i)
+            {
+               //rainAvg = mapManager.Maps[i].getAverageRain(userLocation, 2);
+                rainAvg = 0.2;
+               PredictionIcons.Add(new PredictionIcon(rainAvg, i, mapManager.Maps[i].Time));
+            }
+             
         }
 
 
@@ -125,13 +131,9 @@ namespace App8.DataModel
                     Longitude = myPosition.Coordinate.Longitude
             });
 
-            // get predictions from each map...
-            // 
-            radarMapManager.Maps.ElementAt(0).getAverageRain(geopoint, 1);
-            
 
-            double[] predictions = { 0.2, 0.3, 5, 1.5 };
-            PredictionCollection collection = new PredictionCollection(predictions);
+
+            PredictionCollection collection = new PredictionCollection(radarMapManager, geopoint);
             return collection;
 
 

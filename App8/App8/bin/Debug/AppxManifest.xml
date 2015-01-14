@@ -8,7 +8,7 @@
     For more information on package manifest files, see http://go.microsoft.com/fwlink/?LinkID=241727
   -->
   <Identity Name="7eb5d866-4712-4942-a54f-7ff28552b7f4" Publisher="CN=Denis" Version="1.0.0.0" ProcessorArchitecture="neutral" />
-  <mp:PhoneIdentity PhoneProductId="7eb5d866-4712-4942-a54f-7ff28552b7f4" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
+  <mp:PhoneIdentity PhoneProductId="daa7e7c6-714d-450F-aa6a-179e66ff3b8d" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>App8</DisplayName>
     <PublisherDisplayName>Denis</PublisherDisplayName>
