@@ -87,6 +87,7 @@
       <DependentUpon>coolPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="DataModel\Class1.cs" />
+    <Compile Include="DataModel\ColorTranslator.cs" />
     <Compile Include="DataModel\DistanceOfEarthPoints.cs" />
     <Compile Include="DataModel\GroupBuilderNavigator.cs" />
     <Compile Include="DataModel\MapUtils.cs" />

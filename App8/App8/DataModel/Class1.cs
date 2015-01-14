@@ -172,47 +172,47 @@ namespace App8.DataModel
 
         public double getAverageRain(Geopoint location, int pixelRadius)
         {
+            int image_size_x = 512;
+            int image_size_y = 512;
 
             int locationPixel = PointTranslation.locationToPixel(location.Position.Latitude, location.Position.Longitude);
+            int x_pixel = locationPixel % image_size_x;
+            int y_pixel = (locationPixel - x_pixel) / image_size_x;
 
             int width = this.ReadableImage.PixelWidth;
             int height = this.ReadableImage.PixelHeight;
+
+            double power_sum = 0;
+            int num_pixels_in_radius = 0;
 
             using (var buffer = ReadableImage.PixelBuffer.AsStream())
             {
                 Byte[] pixels = new Byte[4 * width * height];
                 buffer.Read(pixels, 0, pixels.Length);
 
-                for (int x = 0; x < width; x++)
+                for (int x = x_pixel - pixelRadius; x <= x_pixel + pixelRadius; x++)
                 {
-
-                    for (int y = 0; y < height; y++)
+                    if (x > image_size_x || x < 0) continue;
+                    for (int y = y_pixel - pixelRadius; y <= y_pixel + pixelRadius; y++)
                     {
+                        if (y > image_size_y || y < 0) continue;
+
                         int index = ((y * width) + x) * 4;
-
-
-
 
                         Byte b = pixels[index + 0];
                         Byte g = pixels[index + 1];
                         Byte r = pixels[index + 2];
-                        Byte a = pixels[index + 3];
 
-                        Color pixelColor = Color.FromArgb(a, r, g, b);
+                        double power;
+                        if (r == 0 && g == 0 && b == 0) power = 0;
+                        else power = ColorTranslator.RBG_to_power(r, g, b);
 
-
+                        num_pixels_in_radius++;
+                        power_sum += power;
                     }
                 }
-
-                //buffer.Position = 0;
-                //buffer.Write(pixels, 0, pixels.Length);
-
             }
-            
-
-
-
-            return 0;
+            return power_sum / num_pixels_in_radius;
 
         }
 
