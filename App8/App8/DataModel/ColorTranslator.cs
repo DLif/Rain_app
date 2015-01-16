@@ -8,16 +8,20 @@ namespace App8.DataModel
 {
     class ColorTranslator
     {
+        //HUE ranges 0-230,290-360
+        //this array holds the intervals given in the site(they are very problematic)
+        static double[] lowerPart_intervals;
+        static double[] upperPart_intervals;
+
         //main clac function
         public static double RBG_to_power(int R, int G, int B)
         {
+            //init array in function, since c# doesn't allways initiallize it,even if this is global.
+            lowerPart_intervals = new double[15] { 50.0, 40.0, 30.0, 24.0, 18.0, 13.0, 9.0, 6.0, 4.0, 2.0, 1.2, 0.7, 0.2, 0.1, 0.0 };
+            upperPart_intervals = new double[4] { 250.0, 200.0, 100.0, 50.0 };
+
             return get_hue_power(RBG_to_HUE(R, G, B));
         }
-
-        //HUE ranges 0-230,290-360
-        //this array holds the intervals given in the site(they are very problematic)
-        static double[] lowerPart_intervals = new double[15] { 50.0, 40.0, 30.0, 24.0, 18.0, 13.0, 9.0, 6.0, 4.0, 2.0, 1.2, 0.7, 0.2, 0.1, 0.0 };
-        static double[] upperPart_intervals = new double[4] { 250.0, 200.0, 100.0, 50.0 };
 
         //assume linear between intervals
         public static double get_hue_power(float point)
@@ -25,7 +29,7 @@ namespace App8.DataModel
 
             //special cases-edges
             if (point == 0) return lowerPart_intervals[14];
-            else if (point == 300) return lowerPart_intervals[3];
+            else if (point == 290) return upperPart_intervals[3];
             //this is the normal cases calculation
 
             //lower part
@@ -70,6 +74,10 @@ namespace App8.DataModel
         //return hue between 0-360
         public static float RBG_to_HUE(int R, int G, int B)
         {
+            if(R == G && G == B){
+                return (float)0.0;//this is a shade of gray and it's hue is 0;
+            }
+
             float r = R / (float)255.0;
             float g = G / (float)255.0;
             float b = B / (float)255.0;

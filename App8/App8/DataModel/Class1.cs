@@ -208,6 +208,11 @@ namespace App8.DataModel
 
                         double power;
                         if (r == 0 && g == 0 && b == 0) power = 0;
+                        else if(r == b && b ==g)
+                            {
+                                if (pixelRadius < 3) return getAverageRain(location, pixelRadius);
+                                else continue;//if radius large enough, ignore point
+                            }
                         else power = ColorTranslator.RBG_to_power(r, g, b);
 
                         num_pixels_in_radius++;
