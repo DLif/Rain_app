@@ -1,0 +1,130 @@
+﻿<Page
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:App8"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:Maps="using:Windows.UI.Xaml.Controls.Maps"
+    DataContext="{Binding DefaultViewModel, RelativeSource={RelativeSource Self}}"
+    x:Class="App8.RadarMapPage"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Page.BottomAppBar>
+        <CommandBar>
+            <AppBarButton x:Name="locationAppButton" Icon="Map" Label="Location" Click="AppBarButton_Click_1">
+
+                <AppBarButton.Flyout>
+                    <Flyout x:Name="Flyout" Opening="Flyout_Opening" Closed="Flyout_Closed">
+
+                        <Grid Background="#FFE5E5E5" Height="220" HorizontalAlignment="Stretch">
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="50"/>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="50"/>
+                                <RowDefinition Height="50"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock HorizontalAlignment="Center" FontSize="16"   Grid.Column="1" VerticalAlignment="Center"  Grid.Row="1" TextWrapping="Wrap"  Foreground="Black" Text="Enter a location"/>
+                            <TextBox x:Name="location" HorizontalAlignment="Stretch" Margin="0,0,0,0" Grid.Row="2"  Grid.Column="1"  Text="Location" VerticalAlignment="Top" TextChanged="location_TextChanged" GotFocus="location_GotFocus" />
+                            <Button x:Name="goButton" Content="Go" Grid.Column="1" HorizontalAlignment="Center" Margin="0,0,0,0" Grid.Row="3" VerticalAlignment="Top" Click="goButton_Click"/>
+                            <TextBlock x:Name="errorText" Text="place holder for error" Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="16" Foreground="black" FontWeight="Medium" Visibility="Collapsed"/>
+                            <ProgressBar Grid.Column="1" Grid.Row="4" x:Name="locationFindBar" IsIndeterminate="True" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
+
+
+                        </Grid>
+                    </Flyout>
+                    
+                </AppBarButton.Flyout>
+            </AppBarButton>
+
+            <AppBarButton x:Name="MyLocationAppButton" Icon="MapPin" Label="My location" Click="AppBarButton_Click"/>
+        </CommandBar>
+    </Page.BottomAppBar>
+
+    <Grid x:Name="LayoutRoot">
+
+
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="4*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+
+
+
+        <!--TODO: Content should be placed within the following grid-->
+
+
+        <Maps:MapControl MapServiceToken="Atb6DOMKy2vjVrFbmzdlVxhq4mxAkyBPfCg2XDG2X-thzfgZuk-g-8MNwkuIcry9" x:Name="map" Grid.Row ="1" Grid.ColumnSpan="3" VerticalAlignment="Stretch"  HorizontalAlignment="Stretch" Loaded="map_Loaded" ZoomLevelChanged="map_ZoomLevelChanged" DataContext="{Binding RadarMaps}" ManipulationMode="TranslateInertia" ColorScheme="Dark" MapTapped="map_MapTapped" Tapped="map_Tapped">
+            <Maps:MapItemsControl ItemsSource="{Binding}">
+                
+                <Maps:MapItemsControl.ItemTemplate>
+                    <DataTemplate>
+
+                        <Image Source="{Binding ImageSrc}" Height="{Binding Height}" Width="{Binding Width}"
+                           Visibility="{Binding Visibile}"
+                           Maps:MapControl.Location="{Binding Point}"
+                           Maps:MapControl.NormalizedAnchorPoint="{Binding AnchorPoint}"
+                           ImageOpened="Image_ImageOpened">
+                            
+
+                        </Image>
+
+
+                    </DataTemplate>
+                </Maps:MapItemsControl.ItemTemplate>
+                
+                
+            </Maps:MapItemsControl>
+        </Maps:MapControl>
+
+        <StackPanel x:Name="slider_panel" Grid.Row="2" Grid.Column="1" Visibility="Collapsed">
+            <StackPanel.Resources>
+                <Storyboard x:Name="ShowSlider">
+                            <DoubleAnimation Storyboard.TargetName="timeSlider"
+                                             Storyboard.TargetProperty="Opacity"
+                                             From="0"
+                                             To="1"
+                                             Duration="0:0:1"
+                                             />
+                </Storyboard>
+
+            </StackPanel.Resources>
+            <Slider x:Name="timeSlider" Maximum="20" HorizontalAlignment="Stretch" ValueChanged="timeSlider_ValueChanged"/>
+        </StackPanel>
+
+
+        <ProgressBar IsIndeterminate="true" x:Name="progressBar"  Grid.Column="1"  Grid.Row ="0" HorizontalAlignment="Stretch"  VerticalAlignment="Center" Visibility="Collapsed"/>
+        
+        <Grid.Resources>
+            <Storyboard x:Name="hideBar">
+                <DoubleAnimation Storyboard.TargetName="progressBar"
+                                             Storyboard.TargetProperty="Opacity"
+                                             From="1"
+                                             To="0"
+                                             Duration="0:0:1"
+                                             />
+            </Storyboard>
+        </Grid.Resources>
+        
+       
+
+
+    </Grid>
+
+
+</Page>
