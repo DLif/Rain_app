@@ -18,7 +18,7 @@ namespace MobileServiceFinal.Controllers
         {
             base.Initialize(controllerContext);
             MobileServiceContext context = new MobileServiceContext();
-           DomainManager = new EntityDomainManager<PathGroup>(context, Request, Services);
+            DomainManager = new EntityDomainManager<PathGroup>(context, Request, Services);
         }
 
         // GET tables/PathGroup
