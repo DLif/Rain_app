@@ -10,6 +10,12 @@ using System.Threading.Tasks;
  */
 namespace App8.DataModel
 {
+    /* TESTS
+     * 31.147623, 35.372394(south east) => pre_x = 59.404 , pre_y = 67.07 , (plus,plus)
+     * 32.777489, 35.528949(north east) => pre_x = 62.043 , pre_y = 34.67 ,(minus,plus)
+     * 32.799424, 33.949664(north west) => pre_x = 35.422 , pre_y = 34.234 ,(minus,minus)
+     * 31.216941, 34.294361(south west) => pre_x = 41.232 , pre_y = 65.692 ,(plus,minus)
+     * */
     class PointTranslation
     {
         static double maxDistFromCenter_X = 280.0;
@@ -18,13 +24,9 @@ namespace App8.DataModel
         static double center_lat = 32.006340;
         static double center_long = 34.814471;
 
-        //static double center_lat = RadarMapManager.center.Position.Latitude;
-       // static double center_long = RadarMapManager.center.Position.Longitude;
-
         static int pixel_X_num = 512;
         static int pixel_Y_num = 512;
 
-     
         public static int locationToPixel(double input_lat, double input_long)
         {
 
@@ -48,7 +50,7 @@ namespace App8.DataModel
 
             //calc percentage from left corner side (easier to think that way)
             percentage_Y = center_to_topLeftCorner_Percentage(percentage_Y, from_center.Item1);
-            percentage_X = center_to_topLeftCorner_Percentage(percentage_X, from_center.Item1);
+            percentage_X = center_to_topLeftCorner_Percentage(percentage_X, from_center.Item2);
 
             return getPixel(percentage_X, percentage_Y);
         }
@@ -56,7 +58,7 @@ namespace App8.DataModel
         private static double center_to_topLeftCorner_Percentage(double center_percentage, derections direction_from_center)
         {
             if (direction_from_center != derections.MINUS) return (center_percentage / 2) + 50;
-            else return (center_percentage / 2);
+            else return 50 - (center_percentage / 2);
         }
 
         //calc pixel num from percentage_X and percentage_Y
@@ -64,11 +66,8 @@ namespace App8.DataModel
         {
             int x = (int)(pixel_X_num * (percentage_X / 100));//number of pixels right
             int y = (int)(pixel_Y_num * (percentage_Y / 100));//number of pixels down
-            return x + pixel_X_num*y;
+            return x + pixel_X_num * y;
         }
-
-      
-        
 
         //distance is absolute - we need to know the points direction compared to the senter -north west?,east?
         //This function return a tuple - the first one for x(West will be MINUS,East PLUS) the second for y(North will be MINUS,South PLUS)
@@ -89,7 +88,7 @@ namespace App8.DataModel
 
     enum derections
     {
-        CENTER,MINUS,PLUS
+        CENTER, MINUS, PLUS
     };
-        
+
 }
