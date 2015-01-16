@@ -10,9 +10,10 @@ using Microsoft.WindowsAzure.Mobile.Service.Security; /* for facebook authentica
 
 namespace MobileServiceFinal.Controllers
 {
+    [AuthorizeLevel(AuthorizationLevel.User)] 
     public class PathGroupController : TableController<PathGroup>
     {
-        [AuthorizeLevel(AuthorizationLevel.User)] 
+        
         protected override void Initialize(HttpControllerContext controllerContext)
         {
             base.Initialize(controllerContext);

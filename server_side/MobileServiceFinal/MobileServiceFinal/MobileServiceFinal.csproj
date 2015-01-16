@@ -222,6 +222,10 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Properties\PublishProfiles\mobile-RainAppFinal %284%29.pubxml" />
+    <None Include="Properties\PublishProfiles\mobile-RainAppFinal %285%29.pubxml" />
+    <None Include="Properties\PublishProfiles\mobile-RainAppFinal %286%29.pubxml" />
+    <None Include="Properties\PublishProfiles\mobile-RainAppFinal %287%29.pubxml" />
     <None Include="Properties\PublishProfiles\mobile-RainAppFinal.pubxml" />
   </ItemGroup>
   <PropertyGroup>

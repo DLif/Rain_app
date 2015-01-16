@@ -93,7 +93,7 @@ namespace MobileServiceFinal.Controllers
             try
             {
                 CloudBlobContainer sampleContainer = client.GetContainerReference(storageName);
-                CloudBlockBlob blob = sampleContainer.GetBlockBlobReference(fileName);
+                CloudBlockBlob blob = null;//sampleContainer.GetBlockBlobReference(fileName);
                 Stream fileStream = new MemoryStream();
                 blob.FetchAttributes();
                 long fileByteLength = blob.Properties.Length;
@@ -113,6 +113,8 @@ namespace MobileServiceFinal.Controllers
             {
                 Console.WriteLine(ex);
             }
+
+            return 0;
 
         }
         // method connects to the blob and downloads the radar image streams

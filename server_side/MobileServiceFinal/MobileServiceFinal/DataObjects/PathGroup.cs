@@ -11,6 +11,10 @@ namespace MobileServiceFinal.DataObjects
 
         public string GroupName { get; set; }
 
+        public string StartName { get; set; }
+
+        public string FinishName { get; set; }
+
         public string UserId { get; set; }
 
     }
