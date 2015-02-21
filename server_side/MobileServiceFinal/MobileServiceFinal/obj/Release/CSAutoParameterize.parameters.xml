@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <parameters>
   <parameter name="MS_TableConnectionString-Web.config Connection String" description="MS_TableConnectionString Connection String used in web.config by the application to access the database." defaultValue="Data Source=(localdb)\v11.0;AttachDbFilename=|DataDirectory|\aspnet-MobileServiceFinal-20150110082151.mdf;Initial Catalog=aspnet-MobileServiceFinal-20150110082151;Integrated Security=True;MultipleActiveResultSets=True" tags="SqlConnectionString">
-    <parameterEntry kind="XmlFile" scope="E:\\windows8git\\Rain_app\\server_side\\MobileServiceFinal\\MobileServiceFinal\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='MS_TableConnectionString']/@connectionString" />
+    <parameterEntry kind="XmlFile" scope="C:\\Users\\shacharpooyae\\Desktop\\server_side\\MobileServiceFinal\\MobileServiceFinal\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='MS_TableConnectionString']/@connectionString" />
   </parameter>
 </parameters>

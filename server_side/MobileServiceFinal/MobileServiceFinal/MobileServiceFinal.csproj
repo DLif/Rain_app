@@ -191,6 +191,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\RainAmountController.cs" />
     <Compile Include="Controllers\DefaultController.cs" />
     <Compile Include="Controllers\PathController.cs" />
     <Compile Include="Controllers\PathGroupController.cs" />
@@ -198,6 +199,8 @@
     <Compile Include="DataObjects\Path.cs" />
     <Compile Include="DataObjects\PathGroup.cs" />
     <Compile Include="DataObjects\TodoItem.cs" />
+    <Compile Include="Models\PixelsSeriallizer.cs" />
+    <Compile Include="Models\ColorTranslator.cs" />
     <Compile Include="Models\MobileServiceContext.cs" />
     <Compile Include="ScheduledJobs\GetRadarPicsJob.cs" />
     <Compile Include="Global.asax.cs">
@@ -226,6 +229,7 @@
     <None Include="Properties\PublishProfiles\mobile-RainAppFinal %285%29.pubxml" />
     <None Include="Properties\PublishProfiles\mobile-RainAppFinal %286%29.pubxml" />
     <None Include="Properties\PublishProfiles\mobile-RainAppFinal %287%29.pubxml" />
+    <None Include="Properties\PublishProfiles\mobile-RainAppFinal %288%29.pubxml" />
     <None Include="Properties\PublishProfiles\mobile-RainAppFinal.pubxml" />
   </ItemGroup>
   <PropertyGroup>
