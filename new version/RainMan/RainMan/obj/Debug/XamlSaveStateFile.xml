@@ -1,0 +1,14 @@
+<XamlCompilerSaveState>
+  <ReferenceAssemblyList>
+    <LocalAssembly PathName="c:\users\denis\documents\visual studio 2013\projects\rainman\rainman\obj\debug\intermediatexaml\rainman.exe" HashGuid="db1feb01-87f0-a21d-c0b0-593c17b1f86b" />
+    <ReferenceAssembly PathName="c:\users\denis\documents\visual studio 2013\projects\rainman\packages\microsoft.data.edm.5.6.2\lib\portable-net40+sl5+wp8+win8+wpa\microsoft.data.edm.dll" HashGuid="652859ac-63b5-9ab0-7a6b-0cb8dfcd265f" />
+    <ReferenceAssembly PathName="c:\users\denis\documents\visual studio 2013\projects\rainman\packages\microsoft.data.odata.5.6.2\lib\portable-net40+sl5+wp8+win8+wpa\microsoft.data.odata.dll" HashGuid="4e84b0db-d22a-61af-6343-dd7cc7f44046" />
+    <ReferenceAssembly PathName="c:\users\denis\documents\visual studio 2013\projects\rainman\packages\windowsazure.mobileservices.1.3.1\lib\wpa81\microsoft.windowsazure.mobile.dll" HashGuid="9ae27956-fc25-6346-a044-affad933acd5" />
+    <ReferenceAssembly PathName="c:\users\denis\documents\visual studio 2013\projects\rainman\packages\windowsazure.mobileservices.1.3.1\lib\wpa81\microsoft.windowsazure.mobile.ext.dll" HashGuid="d14f6c57-ffca-9ad1-126f-ce93487ab524" />
+    <ReferenceAssembly PathName="c:\users\denis\documents\visual studio 2013\projects\rainman\packages\windowsazure.storage.4.3.0\lib\wpa\microsoft.windowsazure.storage.dll" HashGuid="69d1254a-41d8-4cd8-9ab3-c7714bab061b" />
+    <ReferenceAssembly PathName="c:\users\denis\documents\visual studio 2013\projects\rainman\packages\newtonsoft.json.6.0.4\lib\portable-net45+wp80+win8+wpa81\newtonsoft.json.dll" HashGuid="02b12ba6-881e-6b8a-1687-5b2ee1851a11" />
+    <ReferenceAssembly PathName="c:\users\denis\documents\visual studio 2013\projects\rainman\packages\microsoft.net.http.2.2.28\lib\wpa81\system.net.http.extensions.dll" HashGuid="794366f8-cc6d-f0fa-3d07-33b45136e193" />
+    <ReferenceAssembly PathName="c:\users\denis\documents\visual studio 2013\projects\rainman\packages\microsoft.net.http.2.2.28\lib\wpa81\system.net.http.primitives.dll" HashGuid="7b71418d-e056-7613-c839-85fb8f6472a6" />
+    <ReferenceAssembly PathName="c:\users\denis\documents\visual studio 2013\projects\rainman\packages\system.spatial.5.6.2\lib\portable-net40+sl5+wp8+win8+wpa\system.spatial.dll" HashGuid="4e779b7f-3e1d-55d1-cac0-694ae2344f0d" />
+  </ReferenceAssemblyList>
+</XamlCompilerSaveState>
