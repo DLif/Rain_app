@@ -96,11 +96,17 @@
     <Compile Include="Main.xaml.cs">
       <DependentUpon>Main.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ManageGroup.xaml.cs">
+      <DependentUpon>ManageGroup.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Navigation\GroupBuilderNavigator.cs" />
     <Compile Include="Navigation\RoutePredictionArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RadarPage.xaml.cs">
       <DependentUpon>RadarPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="RouteBuilder.xaml.cs">
+      <DependentUpon>RouteBuilder.xaml</DependentUpon>
     </Compile>
     <Compile Include="RoutePredictions.xaml.cs">
       <DependentUpon>RoutePredictions.xaml</DependentUpon>
@@ -159,7 +165,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="ManageGroup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="RadarPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="RouteBuilder.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

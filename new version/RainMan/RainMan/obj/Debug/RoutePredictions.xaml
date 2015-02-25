@@ -38,7 +38,7 @@
     
     <Page.BottomAppBar >
         <CommandBar x:ConnectionId='1'                            Opacity="0.5">
-            <AppBarToggleButton x:ConnectionId='2' x:Name="appInfo" Icon="More" Label="Information"                                                        />
+            <AppBarToggleButton x:ConnectionId='2' x:Name="appInfo" Icon="Help" Label="Information"                                                        />
             <AppBarButton x:ConnectionId='3' x:Name="routesAppBar" Icon="ViewAll" Label="Routes"                            Visibility="Collapsed">
                
             </AppBarButton>

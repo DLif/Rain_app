@@ -1,6 +1,6 @@
 <XamlCompilerSaveState>
   <ReferenceAssemblyList>
-    <LocalAssembly PathName="c:\users\denis\documents\visual studio 2013\projects\rainman\rainman\obj\debug\intermediatexaml\rainman.exe" HashGuid="db1feb01-87f0-a21d-c0b0-593c17b1f86b" />
+    <LocalAssembly PathName="c:\users\denis\documents\visual studio 2013\projects\rainman\rainman\obj\debug\intermediatexaml\rainman.exe" HashGuid="1ab30582-655c-7c5d-7871-5b1cb08278e1" />
     <ReferenceAssembly PathName="c:\users\denis\documents\visual studio 2013\projects\rainman\packages\microsoft.data.edm.5.6.2\lib\portable-net40+sl5+wp8+win8+wpa\microsoft.data.edm.dll" HashGuid="652859ac-63b5-9ab0-7a6b-0cb8dfcd265f" />
     <ReferenceAssembly PathName="c:\users\denis\documents\visual studio 2013\projects\rainman\packages\microsoft.data.odata.5.6.2\lib\portable-net40+sl5+wp8+win8+wpa\microsoft.data.odata.dll" HashGuid="4e84b0db-d22a-61af-6343-dd7cc7f44046" />
     <ReferenceAssembly PathName="c:\users\denis\documents\visual studio 2013\projects\rainman\packages\windowsazure.mobileservices.1.3.1\lib\wpa81\microsoft.windowsazure.mobile.dll" HashGuid="9ae27956-fc25-6346-a044-affad933acd5" />

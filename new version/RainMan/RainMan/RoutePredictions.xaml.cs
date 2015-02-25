@@ -261,32 +261,39 @@ namespace RainMan
         }
 
 #endregion
-        
-        private void showPath(int pathIndex, int timeIndex)
+
+
+        private int previousPathIndex = -1;
+
+        private void showPath()
         {
 
-            List<MapRouteView> viewList = this.results.ElementAt(this.currentPathIndex).routesCollection;
-            // first, hide previous
-            foreach(MapRouteView mapRouteView in viewList)
+            List<MapRouteView> viewList;
+            if (previousPathIndex >= 0)
             {
-                mapRouteView.OutlineColor = Colors.Transparent;
-                mapRouteView.RouteColor = Colors.Transparent;
-            }
 
-            viewList = this.results.ElementAt(pathIndex).routesCollection;
+                viewList = this.results.ElementAt(this.previousPathIndex).routesCollection;
+                // first, hide previous
+                foreach (MapRouteView mapRouteView in viewList)
+                {
+                    mapRouteView.OutlineColor = Colors.Transparent;
+                    mapRouteView.RouteColor = Colors.Transparent;
+                }
+            }
+            viewList = this.results.ElementAt(currentPathIndex).routesCollection;
 
             // now, show current
             for(int i = 0; i < viewList.Count; ++i)
             {
                 MapRouteView curr = viewList.ElementAt(i);
-                Color currColor = this.results.ElementAt(pathIndex).routesPerStartingTime[timeIndex].ElementAt(i);
+                Color currColor = this.results.ElementAt(currentPathIndex).routesPerStartingTime[currentTimeIndex].ElementAt(i);
                 curr.OutlineColor = currColor;
                 curr.RouteColor = currColor;
             }
 
             // update current variables
-            this.currentPathIndex = pathIndex;
-            this.currentTimeIndex = timeIndex;
+            this.previousPathIndex = this.currentPathIndex;
+           
 
 
         }
@@ -296,8 +303,8 @@ namespace RainMan
         {
 
 
-            // draw best route
-            showPath(currentPathIndex, currentTimeIndex);
+            // draw current route
+            showPath();
 
             // set path info
 
@@ -580,7 +587,7 @@ namespace RainMan
             int index = item.Index;
 
 
-            if (this.currentTimeIndex == index)
+            if (this.currentPathIndex == index)
             {
              
                 this.fadeOutPaths.Begin(); 

@@ -17,15 +17,15 @@
                 <AppBarButton.Flyout>
                     <Flyout x:ConnectionId='7' x:Name="Flyout"                          >
 
-                        <Grid Background="#FFE5E5E5" Height="270" HorizontalAlignment="Stretch">
+                        <Grid Background="Black" Height="auto" HorizontalAlignment="Stretch">
 
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="50"/>
-                                <RowDefinition Height="30"/>
+                                
                                 <RowDefinition Height="auto"/>
                                 <RowDefinition Height="auto"/>
                                 <RowDefinition Height="auto"/>
-                                <RowDefinition Height="50"/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
 
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
@@ -34,11 +34,11 @@
                                 <ColumnDefinition Width="20"/>
                             </Grid.ColumnDefinitions>
 
-                            <TextBlock HorizontalAlignment="Center" FontSize="16"   Grid.Column="1" VerticalAlignment="Center"  Grid.Row="1" TextWrapping="Wrap"  Foreground="Black" Text="Enter new group details"/>
-                            <TextBox x:ConnectionId='8' x:Name="name" HorizontalAlignment="Stretch" Margin="0,0,0,0" Grid.Row="2"  Grid.Column="1"  Text="My routes to work" VerticalAlignment="Top"                         />
-                            <TextBox x:ConnectionId='9' x:Name="startDescription" HorizontalAlignment="Stretch" Margin="0,10,0,0" Grid.Row="3"  Grid.Column="1"  Text="Start point description/location" VerticalAlignment="Top"                                      />
-                            <TextBox x:ConnectionId='10' x:Name="endDescription" HorizontalAlignment="Stretch" Margin="0,10,0,0" Grid.Row="4"  Grid.Column="1"  Text="Destination point description/location" VerticalAlignment="Top"                                    />
-                            <Button x:ConnectionId='11' x:Name="goButton" Content="OK" Grid.Column="1" HorizontalAlignment="Center" Margin="0,0,0,0" Grid.Row="5" VerticalAlignment="Top"                       />
+                            <TextBlock HorizontalAlignment="Center"    Grid.Column="1" VerticalAlignment="Center"  Grid.Row="0" TextWrapping="Wrap" FontWeight="Medium" FontSize="20" Foreground="White" Margin="10"  Text="Enter new group details"/>
+                            <TextBox x:ConnectionId='8' x:Name="name" HorizontalAlignment="Stretch" Margin="0,0,0,0" Grid.Row="1"  Grid.Column="1"  Text="My routes to work" VerticalAlignment="Top"                         />
+                            <TextBox x:ConnectionId='9' x:Name="startDescription" HorizontalAlignment="Stretch" Margin="0,10,0,0" Grid.Row="2"  Grid.Column="1"  Text="Start point description/location" VerticalAlignment="Top"                                      />
+                            <TextBox x:ConnectionId='10' x:Name="endDescription" HorizontalAlignment="Stretch" Margin="0,10,0,0" Grid.Row="3"  Grid.Column="1"  Text="Destination point description/location" VerticalAlignment="Top"                                    />
+                            <Button x:ConnectionId='11' x:Name="goButton" Content="OK" Grid.Column="1" HorizontalAlignment="Center" Margin="0,0,0,0" Grid.Row="4" VerticalAlignment="Top"                       />
 
                         </Grid>
                     </Flyout>

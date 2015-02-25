@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Devices.Geolocation;
 
 namespace RainMan.DataModels
 {
@@ -40,6 +41,29 @@ namespace RainMan.DataModels
 
 
             return res;
+        }
+
+        public static List<List<Geopoint>> toGeopathList(List<Path> pathList)
+        {
+            List<List<Geopoint>> res = new List<List<Geopoint>>();
+
+            foreach(Path pt in pathList)
+            {
+                res.Add(PathSerializer.ByteArrayToObject(pt.PathClass));
+            }
+
+            return res;
+
+        }
+
+        public static List<String> toNameList(List<Path> pathList)
+        {
+            List<String> names = new List<string>();
+            foreach(Path pt in pathList)
+            {
+                names.Add(pt.PathName);
+            }
+            return names;
         }
     }
 

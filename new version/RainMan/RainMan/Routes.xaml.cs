@@ -522,7 +522,7 @@ namespace RainMan
 
             RoutePredictionArgs args = new RoutePredictionArgs(quickRouteHubOptions.StartPoint,
                                                                quickRouteHubOptions.DestinationPoint,
-                                                               paths, this.routeKind, this.maxStallTime, 10
+                                                               paths, this.routeKind, this.maxStallTime, this.numTimeSlots
                                                                );
             Frame.Navigate(typeof(RoutePredictions), args);
 
@@ -556,6 +556,45 @@ namespace RainMan
             numTimeSlots = (int)e.NewValue;
             if(this.sliderValueText != null)
                  this.sliderValueText.Text = numTimeSlots.ToString();
+        }
+
+        private void manageGroupAppBar_Click(object sender, RoutedEventArgs e)
+        {
+
+            // deselect previous
+            if (previousGroup != null)
+                previousGroup.Selected = false;
+
+            Frame.Navigate(typeof(ManageGroup), this.selectedGroup);
+        }
+
+        private IMobileServiceTable<DataModels.Path> pathTable = App.mobileClient.GetTable<DataModels.Path>();
+
+        private async void predictAppBarGroup_Click(object sender, RoutedEventArgs e)
+        {
+            // group prediction
+
+            // fetch start and destination points
+            Geopoint groupStartPoint = GeopointSerializer.ByteArrayToObject(this.selectedGroup.SourcePoint);
+            Geopoint groupDestPoint = GeopointSerializer.ByteArrayToObject(this.selectedGroup.DestinationPoint);
+
+            // fetch routes from cloud
+
+            var paths = await pathTable.Where(item => item.UserId == App.userId).ToCollectionAsync<DataModels.Path>();
+            var groupPaths = paths.Where(item => item.groupId == this.selectedGroup.Id).ToList();
+
+            var decodedPaths = PathGroup.toGeopathList(groupPaths);
+            var names = PathGroup.toNameList(groupPaths);
+           
+            RoutePredictionArgs args = new RoutePredictionArgs(groupStartPoint,
+                                                               groupDestPoint,
+                                                               decodedPaths, this.routeKind, this.maxStallTime, this.numTimeSlots, names
+                                                               );
+            Frame.Navigate(typeof(RoutePredictions), args);
+
+
+
+
         }
 
        

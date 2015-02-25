@@ -13,9 +13,9 @@
     <Page.BottomAppBar>
         <CommandBar Foreground="Black" Opacity="0">
             <AppBarButton x:Name="predictAppBar" Icon="Accept" Label="Predict Rain" Visibility="Collapsed" Click="predictAppBar_Click" />
-            <AppBarButton x:Name="manageGroupAppBar" Icon="Repair" Label="Manage" Visibility="Collapsed"/>   
-            <AppBarButton x:Name="predictAppBarGroup" Icon="Accept" Label="Predict Rain" Visibility="Collapsed"/>
-            <AppBarButton x:Name="addGroup" Icon="Add" Label="New" Visibility="Collapsed" Click="addGroup_Click"/>
+            <AppBarButton x:Name="manageGroupAppBar" Icon="Repair" Label="Manage" Visibility="Collapsed" Click="manageGroupAppBar_Click"/>   
+            <AppBarButton x:Name="predictAppBarGroup" Icon="Accept" Label="Predict Rain" Visibility="Collapsed" Click="predictAppBarGroup_Click"/>
+            <AppBarButton x:Name="addGroup" Icon="NewFolder" Label="New" Visibility="Collapsed" Click="addGroup_Click"/>
             <AppBarButton x:Name="settingsAppbar" Icon="Setting" Label="Settings" Click="settingsAppbar_Click"/>
 
         </CommandBar>

@@ -38,7 +38,7 @@
     
     <Page.BottomAppBar >
         <CommandBar Opened="CommandBar_Opened" Opacity="0.5">
-            <AppBarToggleButton x:Name="appInfo" Icon="More" Label="Information" Checked="appInfo_Checked" Unchecked="appInfo_Unchecked"/>
+            <AppBarToggleButton x:Name="appInfo" Icon="Help" Label="Information" Checked="appInfo_Checked" Unchecked="appInfo_Unchecked"/>
             <AppBarButton x:Name="routesAppBar" Icon="ViewAll" Label="Routes" Click="routesAppBar_Click" Visibility="Collapsed">
                
             </AppBarButton>

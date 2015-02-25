@@ -124,7 +124,7 @@ namespace RainMan.RainMan_XamlTypeInfo
 
         private void InitTypeTables()
         {
-            _typeNameTable = new string[24];
+            _typeNameTable = new string[26];
             _typeNameTable[0] = "RainMan.GroupBuilder";
             _typeNameTable[1] = "Windows.UI.Xaml.Controls.Page";
             _typeNameTable[2] = "Windows.UI.Xaml.Controls.UserControl";
@@ -136,21 +136,23 @@ namespace RainMan.RainMan_XamlTypeInfo
             _typeNameTable[8] = "RainMan.testConverter";
             _typeNameTable[9] = "RainMan.toColorConvertor";
             _typeNameTable[10] = "RainMan.Main";
-            _typeNameTable[11] = "RainMan.DataTimeConverter";
-            _typeNameTable[12] = "System.Collections.Generic.IList`1<Windows.UI.Xaml.DependencyObject>";
-            _typeNameTable[13] = "RainMan.RadarPage";
-            _typeNameTable[14] = "RainMan.NameSuggestionConverter";
-            _typeNameTable[15] = "RainMan.PathNameConverter";
-            _typeNameTable[16] = "RainMan.AvgRainConverter";
-            _typeNameTable[17] = "RainMan.EstimatedLengthConverter";
-            _typeNameTable[18] = "RainMan.EstimatedTimeConverter";
-            _typeNameTable[19] = "RainMan.RainToHeight";
-            _typeNameTable[20] = "RainMan.RoutePredictions";
-            _typeNameTable[21] = "RainMan.toColorBrushConverter";
-            _typeNameTable[22] = "RainMan.toTextSizeConverter";
-            _typeNameTable[23] = "RainMan.Routes";
+            _typeNameTable[11] = "RainMan.ManageGroup";
+            _typeNameTable[12] = "RainMan.DataTimeConverter";
+            _typeNameTable[13] = "System.Collections.Generic.IList`1<Windows.UI.Xaml.DependencyObject>";
+            _typeNameTable[14] = "RainMan.RadarPage";
+            _typeNameTable[15] = "RainMan.RouteBuilder";
+            _typeNameTable[16] = "RainMan.NameSuggestionConverter";
+            _typeNameTable[17] = "RainMan.PathNameConverter";
+            _typeNameTable[18] = "RainMan.AvgRainConverter";
+            _typeNameTable[19] = "RainMan.EstimatedLengthConverter";
+            _typeNameTable[20] = "RainMan.EstimatedTimeConverter";
+            _typeNameTable[21] = "RainMan.RainToHeight";
+            _typeNameTable[22] = "RainMan.RoutePredictions";
+            _typeNameTable[23] = "RainMan.toColorBrushConverter";
+            _typeNameTable[24] = "RainMan.toTextSizeConverter";
+            _typeNameTable[25] = "RainMan.Routes";
 
-            _typeTable = new global::System.Type[24];
+            _typeTable = new global::System.Type[26];
             _typeTable[0] = typeof(global::RainMan.GroupBuilder);
             _typeTable[1] = typeof(global::Windows.UI.Xaml.Controls.Page);
             _typeTable[2] = typeof(global::Windows.UI.Xaml.Controls.UserControl);
@@ -162,19 +164,21 @@ namespace RainMan.RainMan_XamlTypeInfo
             _typeTable[8] = typeof(global::RainMan.testConverter);
             _typeTable[9] = typeof(global::RainMan.toColorConvertor);
             _typeTable[10] = typeof(global::RainMan.Main);
-            _typeTable[11] = typeof(global::RainMan.DataTimeConverter);
-            _typeTable[12] = typeof(global::System.Collections.Generic.IList<global::Windows.UI.Xaml.DependencyObject>);
-            _typeTable[13] = typeof(global::RainMan.RadarPage);
-            _typeTable[14] = typeof(global::RainMan.NameSuggestionConverter);
-            _typeTable[15] = typeof(global::RainMan.PathNameConverter);
-            _typeTable[16] = typeof(global::RainMan.AvgRainConverter);
-            _typeTable[17] = typeof(global::RainMan.EstimatedLengthConverter);
-            _typeTable[18] = typeof(global::RainMan.EstimatedTimeConverter);
-            _typeTable[19] = typeof(global::RainMan.RainToHeight);
-            _typeTable[20] = typeof(global::RainMan.RoutePredictions);
-            _typeTable[21] = typeof(global::RainMan.toColorBrushConverter);
-            _typeTable[22] = typeof(global::RainMan.toTextSizeConverter);
-            _typeTable[23] = typeof(global::RainMan.Routes);
+            _typeTable[11] = typeof(global::RainMan.ManageGroup);
+            _typeTable[12] = typeof(global::RainMan.DataTimeConverter);
+            _typeTable[13] = typeof(global::System.Collections.Generic.IList<global::Windows.UI.Xaml.DependencyObject>);
+            _typeTable[14] = typeof(global::RainMan.RadarPage);
+            _typeTable[15] = typeof(global::RainMan.RouteBuilder);
+            _typeTable[16] = typeof(global::RainMan.NameSuggestionConverter);
+            _typeTable[17] = typeof(global::RainMan.PathNameConverter);
+            _typeTable[18] = typeof(global::RainMan.AvgRainConverter);
+            _typeTable[19] = typeof(global::RainMan.EstimatedLengthConverter);
+            _typeTable[20] = typeof(global::RainMan.EstimatedTimeConverter);
+            _typeTable[21] = typeof(global::RainMan.RainToHeight);
+            _typeTable[22] = typeof(global::RainMan.RoutePredictions);
+            _typeTable[23] = typeof(global::RainMan.toColorBrushConverter);
+            _typeTable[24] = typeof(global::RainMan.toTextSizeConverter);
+            _typeTable[25] = typeof(global::RainMan.Routes);
         }
 
         private int LookupTypeIndexByName(string typeName)
@@ -214,18 +218,20 @@ namespace RainMan.RainMan_XamlTypeInfo
         private object Activate_8_testConverter() { return new global::RainMan.testConverter(); }
         private object Activate_9_toColorConvertor() { return new global::RainMan.toColorConvertor(); }
         private object Activate_10_Main() { return new global::RainMan.Main(); }
-        private object Activate_11_DataTimeConverter() { return new global::RainMan.DataTimeConverter(); }
-        private object Activate_13_RadarPage() { return new global::RainMan.RadarPage(); }
-        private object Activate_14_NameSuggestionConverter() { return new global::RainMan.NameSuggestionConverter(); }
-        private object Activate_15_PathNameConverter() { return new global::RainMan.PathNameConverter(); }
-        private object Activate_16_AvgRainConverter() { return new global::RainMan.AvgRainConverter(); }
-        private object Activate_17_EstimatedLengthConverter() { return new global::RainMan.EstimatedLengthConverter(); }
-        private object Activate_18_EstimatedTimeConverter() { return new global::RainMan.EstimatedTimeConverter(); }
-        private object Activate_19_RainToHeight() { return new global::RainMan.RainToHeight(); }
-        private object Activate_20_RoutePredictions() { return new global::RainMan.RoutePredictions(); }
-        private object Activate_21_toColorBrushConverter() { return new global::RainMan.toColorBrushConverter(); }
-        private object Activate_22_toTextSizeConverter() { return new global::RainMan.toTextSizeConverter(); }
-        private object Activate_23_Routes() { return new global::RainMan.Routes(); }
+        private object Activate_11_ManageGroup() { return new global::RainMan.ManageGroup(); }
+        private object Activate_12_DataTimeConverter() { return new global::RainMan.DataTimeConverter(); }
+        private object Activate_14_RadarPage() { return new global::RainMan.RadarPage(); }
+        private object Activate_15_RouteBuilder() { return new global::RainMan.RouteBuilder(); }
+        private object Activate_16_NameSuggestionConverter() { return new global::RainMan.NameSuggestionConverter(); }
+        private object Activate_17_PathNameConverter() { return new global::RainMan.PathNameConverter(); }
+        private object Activate_18_AvgRainConverter() { return new global::RainMan.AvgRainConverter(); }
+        private object Activate_19_EstimatedLengthConverter() { return new global::RainMan.EstimatedLengthConverter(); }
+        private object Activate_20_EstimatedTimeConverter() { return new global::RainMan.EstimatedTimeConverter(); }
+        private object Activate_21_RainToHeight() { return new global::RainMan.RainToHeight(); }
+        private object Activate_22_RoutePredictions() { return new global::RainMan.RoutePredictions(); }
+        private object Activate_23_toColorBrushConverter() { return new global::RainMan.toColorBrushConverter(); }
+        private object Activate_24_toTextSizeConverter() { return new global::RainMan.toTextSizeConverter(); }
+        private object Activate_25_Routes() { return new global::RainMan.Routes(); }
         private void MapAdd_5_ObservableDictionary(object instance, object key, object item)
         {
             var collection = (global::System.Collections.Generic.IDictionary<global::System.String, global::System.Object>)instance;
@@ -233,7 +239,7 @@ namespace RainMan.RainMan_XamlTypeInfo
             var newItem = (global::System.Object)item;
             collection.Add(newKey, newItem);
         }
-        private void VectorAdd_12_IList(object instance, object item)
+        private void VectorAdd_13_IList(object instance, object item)
         {
             var collection = (global::System.Collections.Generic.ICollection<global::Windows.UI.Xaml.DependencyObject>)instance;
             var newItem = (global::Windows.UI.Xaml.DependencyObject)item;
@@ -317,96 +323,114 @@ namespace RainMan.RainMan_XamlTypeInfo
                 xamlType = userType;
                 break;
 
-            case 11:   //  RainMan.DataTimeConverter
-                userType = new global::RainMan.RainMan_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
-                userType.Activator = Activate_11_DataTimeConverter;
+            case 11:   //  RainMan.ManageGroup
+                userType = new global::RainMan.RainMan_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Windows.UI.Xaml.Controls.Page"));
+                userType.Activator = Activate_11_ManageGroup;
+                userType.AddMemberName("NavigationHelper");
+                userType.AddMemberName("DefaultViewModel");
                 userType.SetIsLocalType();
                 xamlType = userType;
                 break;
 
-            case 12:   //  System.Collections.Generic.IList`1<Windows.UI.Xaml.DependencyObject>
+            case 12:   //  RainMan.DataTimeConverter
+                userType = new global::RainMan.RainMan_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
+                userType.Activator = Activate_12_DataTimeConverter;
+                userType.SetIsLocalType();
+                xamlType = userType;
+                break;
+
+            case 13:   //  System.Collections.Generic.IList`1<Windows.UI.Xaml.DependencyObject>
                 userType = new global::RainMan.RainMan_XamlTypeInfo.XamlUserType(this, typeName, type, null);
-                userType.CollectionAdd = VectorAdd_12_IList;
+                userType.CollectionAdd = VectorAdd_13_IList;
                 xamlType = userType;
                 break;
 
-            case 13:   //  RainMan.RadarPage
+            case 14:   //  RainMan.RadarPage
                 userType = new global::RainMan.RainMan_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Windows.UI.Xaml.Controls.Page"));
-                userType.Activator = Activate_13_RadarPage;
+                userType.Activator = Activate_14_RadarPage;
                 userType.AddMemberName("NavigationHelper");
                 userType.AddMemberName("DefaultViewModel");
                 userType.SetIsLocalType();
                 xamlType = userType;
                 break;
 
-            case 14:   //  RainMan.NameSuggestionConverter
-                userType = new global::RainMan.RainMan_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
-                userType.Activator = Activate_14_NameSuggestionConverter;
-                userType.SetIsLocalType();
-                xamlType = userType;
-                break;
-
-            case 15:   //  RainMan.PathNameConverter
-                userType = new global::RainMan.RainMan_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
-                userType.Activator = Activate_15_PathNameConverter;
-                userType.SetIsLocalType();
-                xamlType = userType;
-                break;
-
-            case 16:   //  RainMan.AvgRainConverter
-                userType = new global::RainMan.RainMan_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
-                userType.Activator = Activate_16_AvgRainConverter;
-                userType.SetIsLocalType();
-                xamlType = userType;
-                break;
-
-            case 17:   //  RainMan.EstimatedLengthConverter
-                userType = new global::RainMan.RainMan_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
-                userType.Activator = Activate_17_EstimatedLengthConverter;
-                userType.SetIsLocalType();
-                xamlType = userType;
-                break;
-
-            case 18:   //  RainMan.EstimatedTimeConverter
-                userType = new global::RainMan.RainMan_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
-                userType.Activator = Activate_18_EstimatedTimeConverter;
-                userType.SetIsLocalType();
-                xamlType = userType;
-                break;
-
-            case 19:   //  RainMan.RainToHeight
-                userType = new global::RainMan.RainMan_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
-                userType.Activator = Activate_19_RainToHeight;
-                userType.SetIsLocalType();
-                xamlType = userType;
-                break;
-
-            case 20:   //  RainMan.RoutePredictions
+            case 15:   //  RainMan.RouteBuilder
                 userType = new global::RainMan.RainMan_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Windows.UI.Xaml.Controls.Page"));
-                userType.Activator = Activate_20_RoutePredictions;
+                userType.Activator = Activate_15_RouteBuilder;
                 userType.AddMemberName("NavigationHelper");
                 userType.AddMemberName("DefaultViewModel");
                 userType.SetIsLocalType();
                 xamlType = userType;
                 break;
 
-            case 21:   //  RainMan.toColorBrushConverter
+            case 16:   //  RainMan.NameSuggestionConverter
                 userType = new global::RainMan.RainMan_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
-                userType.Activator = Activate_21_toColorBrushConverter;
+                userType.Activator = Activate_16_NameSuggestionConverter;
                 userType.SetIsLocalType();
                 xamlType = userType;
                 break;
 
-            case 22:   //  RainMan.toTextSizeConverter
+            case 17:   //  RainMan.PathNameConverter
                 userType = new global::RainMan.RainMan_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
-                userType.Activator = Activate_22_toTextSizeConverter;
+                userType.Activator = Activate_17_PathNameConverter;
                 userType.SetIsLocalType();
                 xamlType = userType;
                 break;
 
-            case 23:   //  RainMan.Routes
+            case 18:   //  RainMan.AvgRainConverter
+                userType = new global::RainMan.RainMan_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
+                userType.Activator = Activate_18_AvgRainConverter;
+                userType.SetIsLocalType();
+                xamlType = userType;
+                break;
+
+            case 19:   //  RainMan.EstimatedLengthConverter
+                userType = new global::RainMan.RainMan_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
+                userType.Activator = Activate_19_EstimatedLengthConverter;
+                userType.SetIsLocalType();
+                xamlType = userType;
+                break;
+
+            case 20:   //  RainMan.EstimatedTimeConverter
+                userType = new global::RainMan.RainMan_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
+                userType.Activator = Activate_20_EstimatedTimeConverter;
+                userType.SetIsLocalType();
+                xamlType = userType;
+                break;
+
+            case 21:   //  RainMan.RainToHeight
+                userType = new global::RainMan.RainMan_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
+                userType.Activator = Activate_21_RainToHeight;
+                userType.SetIsLocalType();
+                xamlType = userType;
+                break;
+
+            case 22:   //  RainMan.RoutePredictions
                 userType = new global::RainMan.RainMan_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Windows.UI.Xaml.Controls.Page"));
-                userType.Activator = Activate_23_Routes;
+                userType.Activator = Activate_22_RoutePredictions;
+                userType.AddMemberName("NavigationHelper");
+                userType.AddMemberName("DefaultViewModel");
+                userType.SetIsLocalType();
+                xamlType = userType;
+                break;
+
+            case 23:   //  RainMan.toColorBrushConverter
+                userType = new global::RainMan.RainMan_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
+                userType.Activator = Activate_23_toColorBrushConverter;
+                userType.SetIsLocalType();
+                xamlType = userType;
+                break;
+
+            case 24:   //  RainMan.toTextSizeConverter
+                userType = new global::RainMan.RainMan_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
+                userType.Activator = Activate_24_toTextSizeConverter;
+                userType.SetIsLocalType();
+                xamlType = userType;
+                break;
+
+            case 25:   //  RainMan.Routes
+                userType = new global::RainMan.RainMan_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Windows.UI.Xaml.Controls.Page"));
+                userType.Activator = Activate_25_Routes;
                 userType.AddMemberName("NavigationHelper");
                 userType.AddMemberName("DefaultViewModel");
                 userType.SetIsLocalType();
@@ -437,32 +461,52 @@ namespace RainMan.RainMan_XamlTypeInfo
             var that = (global::RainMan.Main)instance;
             return that.DefaultViewModel;
         }
-        private object get_4_RadarPage_NavigationHelper(object instance)
+        private object get_4_ManageGroup_NavigationHelper(object instance)
+        {
+            var that = (global::RainMan.ManageGroup)instance;
+            return that.NavigationHelper;
+        }
+        private object get_5_ManageGroup_DefaultViewModel(object instance)
+        {
+            var that = (global::RainMan.ManageGroup)instance;
+            return that.DefaultViewModel;
+        }
+        private object get_6_RadarPage_NavigationHelper(object instance)
         {
             var that = (global::RainMan.RadarPage)instance;
             return that.NavigationHelper;
         }
-        private object get_5_RadarPage_DefaultViewModel(object instance)
+        private object get_7_RadarPage_DefaultViewModel(object instance)
         {
             var that = (global::RainMan.RadarPage)instance;
             return that.DefaultViewModel;
         }
-        private object get_6_RoutePredictions_NavigationHelper(object instance)
+        private object get_8_RouteBuilder_NavigationHelper(object instance)
+        {
+            var that = (global::RainMan.RouteBuilder)instance;
+            return that.NavigationHelper;
+        }
+        private object get_9_RouteBuilder_DefaultViewModel(object instance)
+        {
+            var that = (global::RainMan.RouteBuilder)instance;
+            return that.DefaultViewModel;
+        }
+        private object get_10_RoutePredictions_NavigationHelper(object instance)
         {
             var that = (global::RainMan.RoutePredictions)instance;
             return that.NavigationHelper;
         }
-        private object get_7_RoutePredictions_DefaultViewModel(object instance)
+        private object get_11_RoutePredictions_DefaultViewModel(object instance)
         {
             var that = (global::RainMan.RoutePredictions)instance;
             return that.DefaultViewModel;
         }
-        private object get_8_Routes_NavigationHelper(object instance)
+        private object get_12_Routes_NavigationHelper(object instance)
         {
             var that = (global::RainMan.Routes)instance;
             return that.NavigationHelper;
         }
-        private object get_9_Routes_DefaultViewModel(object instance)
+        private object get_13_Routes_DefaultViewModel(object instance)
         {
             var that = (global::RainMan.Routes)instance;
             return that.DefaultViewModel;
@@ -499,40 +543,64 @@ namespace RainMan.RainMan_XamlTypeInfo
                 xamlMember.Getter = get_3_Main_DefaultViewModel;
                 xamlMember.SetIsReadOnly();
                 break;
+            case "RainMan.ManageGroup.NavigationHelper":
+                userType = (global::RainMan.RainMan_XamlTypeInfo.XamlUserType)GetXamlTypeByName("RainMan.ManageGroup");
+                xamlMember = new global::RainMan.RainMan_XamlTypeInfo.XamlMember(this, "NavigationHelper", "RainMan.Common.NavigationHelper");
+                xamlMember.Getter = get_4_ManageGroup_NavigationHelper;
+                xamlMember.SetIsReadOnly();
+                break;
+            case "RainMan.ManageGroup.DefaultViewModel":
+                userType = (global::RainMan.RainMan_XamlTypeInfo.XamlUserType)GetXamlTypeByName("RainMan.ManageGroup");
+                xamlMember = new global::RainMan.RainMan_XamlTypeInfo.XamlMember(this, "DefaultViewModel", "RainMan.Common.ObservableDictionary");
+                xamlMember.Getter = get_5_ManageGroup_DefaultViewModel;
+                xamlMember.SetIsReadOnly();
+                break;
             case "RainMan.RadarPage.NavigationHelper":
                 userType = (global::RainMan.RainMan_XamlTypeInfo.XamlUserType)GetXamlTypeByName("RainMan.RadarPage");
                 xamlMember = new global::RainMan.RainMan_XamlTypeInfo.XamlMember(this, "NavigationHelper", "RainMan.Common.NavigationHelper");
-                xamlMember.Getter = get_4_RadarPage_NavigationHelper;
+                xamlMember.Getter = get_6_RadarPage_NavigationHelper;
                 xamlMember.SetIsReadOnly();
                 break;
             case "RainMan.RadarPage.DefaultViewModel":
                 userType = (global::RainMan.RainMan_XamlTypeInfo.XamlUserType)GetXamlTypeByName("RainMan.RadarPage");
                 xamlMember = new global::RainMan.RainMan_XamlTypeInfo.XamlMember(this, "DefaultViewModel", "RainMan.Common.ObservableDictionary");
-                xamlMember.Getter = get_5_RadarPage_DefaultViewModel;
+                xamlMember.Getter = get_7_RadarPage_DefaultViewModel;
+                xamlMember.SetIsReadOnly();
+                break;
+            case "RainMan.RouteBuilder.NavigationHelper":
+                userType = (global::RainMan.RainMan_XamlTypeInfo.XamlUserType)GetXamlTypeByName("RainMan.RouteBuilder");
+                xamlMember = new global::RainMan.RainMan_XamlTypeInfo.XamlMember(this, "NavigationHelper", "RainMan.Common.NavigationHelper");
+                xamlMember.Getter = get_8_RouteBuilder_NavigationHelper;
+                xamlMember.SetIsReadOnly();
+                break;
+            case "RainMan.RouteBuilder.DefaultViewModel":
+                userType = (global::RainMan.RainMan_XamlTypeInfo.XamlUserType)GetXamlTypeByName("RainMan.RouteBuilder");
+                xamlMember = new global::RainMan.RainMan_XamlTypeInfo.XamlMember(this, "DefaultViewModel", "RainMan.Common.ObservableDictionary");
+                xamlMember.Getter = get_9_RouteBuilder_DefaultViewModel;
                 xamlMember.SetIsReadOnly();
                 break;
             case "RainMan.RoutePredictions.NavigationHelper":
                 userType = (global::RainMan.RainMan_XamlTypeInfo.XamlUserType)GetXamlTypeByName("RainMan.RoutePredictions");
                 xamlMember = new global::RainMan.RainMan_XamlTypeInfo.XamlMember(this, "NavigationHelper", "RainMan.Common.NavigationHelper");
-                xamlMember.Getter = get_6_RoutePredictions_NavigationHelper;
+                xamlMember.Getter = get_10_RoutePredictions_NavigationHelper;
                 xamlMember.SetIsReadOnly();
                 break;
             case "RainMan.RoutePredictions.DefaultViewModel":
                 userType = (global::RainMan.RainMan_XamlTypeInfo.XamlUserType)GetXamlTypeByName("RainMan.RoutePredictions");
                 xamlMember = new global::RainMan.RainMan_XamlTypeInfo.XamlMember(this, "DefaultViewModel", "RainMan.Common.ObservableDictionary");
-                xamlMember.Getter = get_7_RoutePredictions_DefaultViewModel;
+                xamlMember.Getter = get_11_RoutePredictions_DefaultViewModel;
                 xamlMember.SetIsReadOnly();
                 break;
             case "RainMan.Routes.NavigationHelper":
                 userType = (global::RainMan.RainMan_XamlTypeInfo.XamlUserType)GetXamlTypeByName("RainMan.Routes");
                 xamlMember = new global::RainMan.RainMan_XamlTypeInfo.XamlMember(this, "NavigationHelper", "RainMan.Common.NavigationHelper");
-                xamlMember.Getter = get_8_Routes_NavigationHelper;
+                xamlMember.Getter = get_12_Routes_NavigationHelper;
                 xamlMember.SetIsReadOnly();
                 break;
             case "RainMan.Routes.DefaultViewModel":
                 userType = (global::RainMan.RainMan_XamlTypeInfo.XamlUserType)GetXamlTypeByName("RainMan.Routes");
                 xamlMember = new global::RainMan.RainMan_XamlTypeInfo.XamlMember(this, "DefaultViewModel", "RainMan.Common.ObservableDictionary");
-                xamlMember.Getter = get_9_Routes_DefaultViewModel;
+                xamlMember.Getter = get_13_Routes_DefaultViewModel;
                 xamlMember.SetIsReadOnly();
                 break;
             }
