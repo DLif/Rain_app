@@ -89,6 +89,7 @@
     <Compile Include="DataModels\ObjectSerializer.cs" />
     <Compile Include="DataModels\Path.cs" />
     <Compile Include="DataModels\PathGroup.cs" />
+    <Compile Include="DataModels\PixelSerializer.cs" />
     <Compile Include="DataTimeConverter.cs" />
     <Compile Include="GroupBuilder.xaml.cs">
       <DependentUpon>GroupBuilder.xaml</DependentUpon>
@@ -105,6 +106,9 @@
     <Compile Include="RadarPage.xaml.cs">
       <DependentUpon>RadarPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="RainAmount.xaml.cs">
+      <DependentUpon>RainAmount.xaml</DependentUpon>
+    </Compile>
     <Compile Include="RouteBuilder.xaml.cs">
       <DependentUpon>RouteBuilder.xaml</DependentUpon>
     </Compile>
@@ -115,6 +119,7 @@
     <Compile Include="Routes.xaml.cs">
       <DependentUpon>Routes.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tasks\PolygonComputations.cs" />
     <Compile Include="Tasks\RadarMaps.cs" />
     <Compile Include="Tasks\ColorTranslator.cs" />
     <Compile Include="Tasks\DistanceOfEathPoints.cs" />
@@ -170,6 +175,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="RadarPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="RainAmount.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

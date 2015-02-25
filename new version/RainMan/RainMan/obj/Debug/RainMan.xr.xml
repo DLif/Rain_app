@@ -144,6 +144,7 @@
       <RootProperty Name="Inlines" />
       <RootProperty Name="FontFamily" />
       <RootProperty Name="Visibility" />
+      <RootProperty Name="TextAlignment" />
       <RootProperty Name="TextTrimming" />
     </RootType>
     <RootType FullName="Windows.UI.Xaml.Controls.TextBox">
@@ -326,6 +327,15 @@
       <RootProperty Name="ItemTemplate" />
     </RootType>
     <RootType FullName="RainMan.RadarPage" />
+    <RootType FullName="Windows.UI.Xaml.Controls.DatePicker">
+      <RootProperty Name="Margin" />
+    </RootType>
+    <RootType FullName="Windows.UI.Xaml.Controls.ProgressRing">
+      <RootProperty Name="Visibility" />
+      <RootProperty Name="HorizontalAlignment" />
+      <RootProperty Name="VerticalAlignment" />
+    </RootType>
+    <RootType FullName="RainMan.RainAmount" />
     <RootType FullName="RainMan.RouteBuilder" />
     <RootType FullName="RainMan.NameSuggestionConverter" />
     <RootType FullName="RainMan.PathNameConverter" />

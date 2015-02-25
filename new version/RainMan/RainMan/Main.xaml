@@ -90,13 +90,13 @@
     </Page.Resources>
 
     <Page.BottomAppBar>
-        <CommandBar x:Name="commandBar" Foreground="Black" Opacity="0" Background="White">
+        <CommandBar x:Name="commandBar" Foreground="Black" Opacity="0" Background="White" Opened="commandBar_Opened">
             <AppBarButton x:Name="mapAppButton" Label="Radar Map" Click="mapAppButton_Click" >
                 <AppBarButton.Icon>
                     <SymbolIcon x:Name="RadarMapButton" Symbol="Map"/>
                 </AppBarButton.Icon>
             </AppBarButton>
-            <AppBarButton x:Name="locationChangeButton" Icon="MapPin" Label="Location" />
+            <AppBarButton x:Name="rainAreas" Icon="MapPin" Label="Areas" Click="rainAreas_Click" />
             <AppBarButton x:Name="routesAppBar" Label="Routes" Click="routesAppBar_Click">
                 <AppBarButton.Icon>
                     <SymbolIcon Height="40" Symbol="Directions" VerticalAlignment="Bottom"/>

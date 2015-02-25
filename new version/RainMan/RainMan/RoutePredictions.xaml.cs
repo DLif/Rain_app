@@ -314,7 +314,7 @@ namespace RainMan
             pathInfo.EstimatedTime = this.estimatedPathDuration.ElementAt(currentPathIndex);
             pathInfo.EstimatedLength = this.estimatedPathLength.ElementAt(currentPathIndex);
             pathInfo.AvgRain = this.results.ElementAt(currentPathIndex).averages[currentTimeIndex];           // mm/hour
-            pathInfo.EndTime = manager.Maps.ElementAt(RadarMapManager.totalNumMaps - 1).Time;
+            pathInfo.EndTime = manager.Maps.ElementAt(RadarMapManager.totalNumMaps - 2).Time;                 // remember to handle this
             pathInfo.StartTime = manager.Maps.ElementAt(RadarMapManager.totalOldMaps).Time;
             pathInfo.PathTime = manager.Maps.ElementAt(currentTimeIndex + RadarMapManager.totalOldMaps).Time;
 
@@ -397,7 +397,7 @@ namespace RainMan
 
             // set current path
             this.currentPathIndex = minPathIndex;
-            this.currentTimeIndex = minIndices[minPathIndex];
+            this.currentTimeIndex = minIndices.ElementAt(minPathIndex);
 
             // load all paths onto map control
             loadAllPaths();

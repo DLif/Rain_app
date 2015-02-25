@@ -88,7 +88,7 @@ namespace RainMan
         {
             double avgRain = (double)value;
 
-            return avgRain.ToString() + " MM\\Hour";
+            return String.Format("{0:0.00}",avgRain) + " MM\\Hour";
 
         }
 

@@ -208,6 +208,9 @@
     <AppxPackagedFile Include="C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\bin\Debug\RadarPage.xbf">
       <PackagePath>RadarPage.xbf</PackagePath>
     </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\bin\Debug\RainAmount.xbf">
+      <PackagePath>RainAmount.xbf</PackagePath>
+    </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\bin\Debug\RouteBuilder.xbf">
       <PackagePath>RouteBuilder.xbf</PackagePath>
     </AppxPackagedFile>

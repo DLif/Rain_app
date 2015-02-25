@@ -35,6 +35,7 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using RainMan.DataModels;
 
 namespace MobileServiceFinal.Controllers
 {
@@ -66,7 +67,7 @@ namespace MobileServiceFinal.Controllers
 
 
         // GET api/Default
-        public string GetRainAmount(String places , String picturesNum)
+        public string GetRainAmount(String places, String picturesNum)
         {
             double sum = 0;
             initializeBlobClient();
@@ -74,10 +75,10 @@ namespace MobileServiceFinal.Controllers
             int max = getMaxIndex();
             int num = int.Parse(picturesNum);
             String currentName;
-        //    String places = RainApiSerializer.demorun();
+            //    String places = RainApiSerializer.demorun();
             List<PixelRep> placesList = RainApiSerializer.DeserializeRequest(places).Pixels;
             int[] RBGArray;
-            for (int i = 0; i < 4 /*FIx me after david inserts new pic     num */ ; i++)
+            for (int i = 0; i < num ; i++)
             {
                 currentName = String.Format("{0}.jpg", (max - i));
                 //byte[] file = GetByteImage(currentName);
@@ -85,7 +86,7 @@ namespace MobileServiceFinal.Controllers
                 foreach (PixelRep pixel in placesList)
                 {
                     RBGArray = RGBFromImageBitmap(file, pixel);
-                    sum += ColorTranslatorModule.RBG_to_power(RBGArray[0], RBGArray[1], RBGArray[2]);
+                    sum += Models.ColorTranslator.RBG_to_power(RBGArray[0], RBGArray[1], RBGArray[2]);
                 }
 
             }

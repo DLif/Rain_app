@@ -737,20 +737,20 @@ namespace RainMan
         private async void map_MapTapped(MapControl sender, MapInputEventArgs args)
         {
 
-            if (flag)
-            {
-                this.mapManager.Maps.ElementAt(currentMapIndex).setVisible(true);
-                return;
+         //   if (flag)
+        //    {
+        //        this.mapManager.Maps.ElementAt(currentMapIndex).setVisible(true);
+         //       return;
 
-            }
+         //   }
 
-            PredictionIconDataSource.CurrentLocation = args.Location;
-            int locationPixel = PointTranslation.locationToPixel(args.Location.Position.Latitude, args.Location.Position.Longitude);
-            int x_pixel = locationPixel % 512;
-            int y_pixel = (locationPixel - x_pixel) / 512;
-            MessageDialog diaga = new MessageDialog(String.Format("[ {0} , {1} ]", x_pixel, y_pixel));
-            await diaga.ShowAsync();
-            flag = true;
+         //   PredictionIconDataSource.CurrentLocation = args.Location;
+         //   int locationPixel = PointTranslation.locationToPixel(args.Location.Position.Latitude, args.Location.Position.Longitude);
+         //   int x_pixel = locationPixel % 512;
+         //   int y_pixel = (locationPixel - x_pixel) / 512;
+         //   MessageDialog diaga = new MessageDialog(String.Format("[ {0} , {1} ]", x_pixel, y_pixel));
+          //  await diaga.ShowAsync();
+          //  flag = true;
 
         }
 
@@ -759,9 +759,9 @@ namespace RainMan
 
             if (this.mapManager.Maps.ElementAt(currentMapIndex).Visibile == Visibility.Visible)
             {
-                this.mapManager.Maps.ElementAt(currentMapIndex).setVisible(false);
-                flag = false;
-                return;
+               // this.mapManager.Maps.ElementAt(currentMapIndex).setVisible(false);
+              //  flag = false;
+               // return;
             }
         }
 

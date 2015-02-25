@@ -1,21 +1,86 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace MobileServiceFinal.Models
 {
-    class ColorTranslatorModule
+    class ColorTranslator
     {
-        //HUE ranges 0-230,290-360
+
+        static int image_size_x = 512;
+        static int image_size_y = 512;
+
+        // HUE ranges 0-230,290-360
         //this array holds the intervals given in the site(they are very problematic)
         static double[] lowerPart_intervals;
         static double[] upperPart_intervals;
+
+        //This function calculates power sum for the given "picture arry" to the given x and y and radius
+        //The array pixels shold be of the size 4 * width * height
+        //The array pixels should be fed "ReadableImage.PixelBuffer.AsStream()" before using this function
+
+        /*example use:
+         * static int image_size_x = 512;
+         * static int image_size_y = 512;
+         * public double getAverageRain(Geopoint location, int pixelRadius)
+         * {
+         *  double power = 0;
+         *  int locationPixel = PointTranslation.locationToPixel(location.Position.Latitude, location.Position.Longitude);
+         *  int x_pixel = locationPixel % image_size_x;
+         *  int y_pixel = (locationPixel - x_pixel) / image_size_x;
+         *  
+         *  using (var buffer = this.ReadableImage.PixelBuffer.AsStream())
+         *  {
+         *       Byte[] pixels = new Byte[4 * width * height];
+         *       buffer.Read(pixels, 0, pixels.Length);
+         *       power = ColorTranslator.power_to_radius(pixels,x_pixel,y_pixel,pixelRadius,this.ReadableImage.PixelWidth);
+         *  }
+         *  return power;
+         * }
+        */
+        public static double power_to_radius(Byte[] pixels, int x_pixel, int y_pixel, int pixelRadius, int width)
+        {
+            double power_sum = 0;
+            int num_pixels_in_radius = 0;
+            //itterate on radius-run on x
+            for (int x = x_pixel - pixelRadius; x <= x_pixel + pixelRadius; x++)
+            {
+                //if this pixels location out of bounds-don't try to add it to calculations
+                if (x > image_size_x || x < 0) continue;
+
+                //itterate on radius-run on y
+                for (int y = y_pixel - pixelRadius; y <= y_pixel + pixelRadius; y++)
+                {
+                    //if this pixels location out of bounds-don't try to add it to calculations
+                    if (y > image_size_y || y < 0) continue;
+
+                    //index is the pixel's trio(RBG) location in the array
+                    int index = ((y * width) + x) * 4;
+
+                    Byte b = pixels[index + 0];
+                    Byte g = pixels[index + 1];
+                    Byte r = pixels[index + 2];
+
+                    double power;
+                    //for black pixel- give 
+                    if (r == 0 && g == 0 && b == 0) power = 0;
+                    //the case in whitch r==b==g is problematic for hue calculation
+                    else if (r == b && b == g)
+                    {
+                        if (pixelRadius < 3) return power_to_radius(pixels, x_pixel, y_pixel, 3, width);
+                        else continue;//if radius large enough, ignore point 
+                    }
+                    else power = ColorTranslator.RBG_to_power(r, g, b);
+
+                    num_pixels_in_radius++;
+                    power_sum += power;
+                }
+            }
+            return power_sum / num_pixels_in_radius;
+        }
 
         //main clac function
         public static double RBG_to_power(int R, int G, int B)
@@ -70,6 +135,8 @@ namespace MobileServiceFinal.Models
                     return subpart;
                 }
             }
+            if (point == ending) return 0;
+            if ((point > ending + (num_parts - 1 + 1) * subpart_size) && (point <= begining)) return num_parts - 1;
             //should never get here
             return -1;
         }
@@ -94,7 +161,8 @@ namespace MobileServiceFinal.Models
 
             float base_hue;
 
-            if (max == r) base_hue = ((g - b) / (max - min));
+            if (r == g && g == b) return 0.0F;
+            else if (max == r) return ((g - b) / (max - min));
             else if (max == g) base_hue = (float)2.0 + ((b - r) / (max - min));
             else base_hue = (float)4.0 + ((r - g) / (max - min)); //max == b
 
@@ -104,6 +172,8 @@ namespace MobileServiceFinal.Models
             if (base_hue < 0) base_hue = base_hue + 360;
             return base_hue;
         }
+
+
 
         private static float Max(float r, float g, float b)
         {
@@ -120,5 +190,8 @@ namespace MobileServiceFinal.Models
             if (b < min) min = b;
             return min;
         }
+
+    
+        
     }
 }

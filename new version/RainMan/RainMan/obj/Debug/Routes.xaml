@@ -30,7 +30,7 @@
     <Grid x:Name="LayoutRoot" DataContext="{Binding}" >
         <Grid.Resources>
             <DataTemplate x:Key="StandardTripleLineItemTemplate">
-                <Grid HorizontalAlignment="Stretch">
+                <Grid HorizontalAlignment="Stretch" Margin="10">
                    
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto">
@@ -52,12 +52,12 @@
 
                     <TextBlock Grid.Row="0" Text="{Binding GroupName}" Foreground="{Binding Selected,Converter={StaticResource toColorBrush}}" FontSize="{Binding Selected, Converter={StaticResource toTextSize}}" TextTrimming="CharacterEllipsis"/>
 
-                    <TextBlock Grid.Row="1" Text="From: " FontSize="18" Margin="10, 0, 0, 0"/>
-                    <TextBlock Grid.Row="2" Text="{Binding StartName}" FontSize="18"  Margin="20, 0, 0, 0" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Grid.Row="1" FontWeight="Medium" Text="From: " FontSize="18" Margin="10, 0, 0, 0"/>
+                    <TextBlock Grid.Row="2" Text="{Binding StartName}" FontSize="18"  Margin="25, 0, 0, 0" TextTrimming="CharacterEllipsis"/>
 
 
-                    <TextBlock  Grid.Row="3"  Text="To: " FontSize="18" Margin="10, 0, 0, 0"/>
-                    <TextBlock  Grid.Row="4" Text="{Binding FinishName}"  FontSize="18" Margin="20, 0, 0, 0" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock  Grid.Row="3" FontWeight="Medium"  Text="To: " FontSize="18" Margin="10, 0, 0, 0"/>
+                    <TextBlock  Grid.Row="4" Text="{Binding FinishName}"  FontSize="18" Margin="25, 0, 0, 0" TextTrimming="CharacterEllipsis"/>
 
                 </Grid>
 

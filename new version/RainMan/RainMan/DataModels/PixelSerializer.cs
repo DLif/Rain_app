@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -33,14 +33,6 @@ namespace RainMan.DataModels
         }
 
 
-        public static String demorun()
-        {
-            List<PixelRep> a = new List<PixelRep>();
-            a.Add(new PixelRep(6, 7));
-            a.Add(new PixelRep(8, 9));
-            APIRequest x = new APIRequest(a);
-            return SerializeRequest(x);
-        }
     }
     [DataContract]
 

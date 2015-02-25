@@ -613,10 +613,10 @@ namespace RainMan
 
             if (selected)
             {
-                return new SolidColorBrush(Colors.DarkCyan);
+                return new SolidColorBrush(Colors.Blue);
             }
             else
-                return new SolidColorBrush(Colors.White);
+                return new SolidColorBrush(Colors.Black);
 
         }
 
@@ -634,7 +634,7 @@ namespace RainMan
 
             if (selected)
             {
-                return 25;
+                return 30;
             }
             else
                 return 20;

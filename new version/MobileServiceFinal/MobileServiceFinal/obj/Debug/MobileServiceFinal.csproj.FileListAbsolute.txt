@@ -346,6 +346,5 @@ C:\Users\Denis\Desktop\MobileServiceFinal\MobileServiceFinal\bin\ko\System.Spati
 C:\Users\Denis\Desktop\MobileServiceFinal\MobileServiceFinal\bin\ru\System.Spatial.resources.dll
 C:\Users\Denis\Desktop\MobileServiceFinal\MobileServiceFinal\bin\zh-Hans\System.Spatial.resources.dll
 C:\Users\Denis\Desktop\MobileServiceFinal\MobileServiceFinal\bin\zh-Hant\System.Spatial.resources.dll
-C:\Users\Denis\Desktop\MobileServiceFinal\MobileServiceFinal\obj\Debug\MobileServiceFinal.csprojResolveAssemblyReference.cache
 C:\Users\Denis\Desktop\MobileServiceFinal\MobileServiceFinal\obj\Debug\MobileServiceFinal.dll
 C:\Users\Denis\Desktop\MobileServiceFinal\MobileServiceFinal\obj\Debug\MobileServiceFinal.pdb

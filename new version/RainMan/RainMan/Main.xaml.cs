@@ -220,6 +220,16 @@ namespace RainMan
             Frame.Navigate(typeof(Routes));
         }
 
+        private void rainAreas_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(RainAmount));
+        }
+
+        private void commandBar_Opened(object sender, object e)
+        {
+
+        }
+
        
       
     }
