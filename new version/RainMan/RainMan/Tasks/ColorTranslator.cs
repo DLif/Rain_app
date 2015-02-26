@@ -109,9 +109,9 @@ namespace RainMan.Tasks
             //lower part
             else if (point <= 240)
             {
-                int subpart_of_point = get_point_part(point, 0, 230, 14);
+                int subpart_of_point = get_point_part(point, 0, 240, 14);
                 double stratched_point = point * 14;//instad of / num_parts 
-                double fraction = (stratched_point - subpart_of_point * 230) / 230;//equals : (point - subpart_of_point * (240 / 14)) / ((240 / 14));
+                double fraction = (stratched_point - subpart_of_point * 240) / 240;//equals : (point - subpart_of_point * (240 / 14)) / ((240 / 14));
                 return lowerPart_intervals[subpart_of_point + 1] + (1 - fraction) * (lowerPart_intervals[subpart_of_point] - lowerPart_intervals[subpart_of_point + 1]);
             }
 
