@@ -88,12 +88,17 @@ namespace RainMan.Tasks
             //init array in function, since c# doesn't allways initiallize it,even if this is global.
             lowerPart_intervals = new double[15] { 50.0, 40.0, 30.0, 24.0, 18.0, 13.0, 9.0, 6.0, 4.0, 2.0, 1.2, 0.7, 0.2, 0.1, 0.0 };
             upperPart_intervals = new double[4] { 250.0, 200.0, 100.0, 50.0 };
-
-            return get_hue_power(RBG_to_HUE(R, G, B));
+            double hue = RBG_to_HUE(R, G, B);
+            if (hue > 240 && hue < 290)
+            {//this hue should not exsist in the bar. fake nearest one
+                if (hue <= 265) hue = 240;
+                else hue = 290;
+            }
+            return get_hue_power(hue);
         }
 
         //assume linear between intervals
-        public static double get_hue_power(float point)
+        public static double get_hue_power(double point)
         {
 
             //special cases-edges
@@ -105,8 +110,8 @@ namespace RainMan.Tasks
             else if (point <= 240)
             {
                 int subpart_of_point = get_point_part(point, 0, 230, 14);
-                float stratched_point = point * 14;//instad of / num_parts 
-                float fraction = (stratched_point - subpart_of_point * 230) / 230;//equals : (point - subpart_of_point * (240 / 14)) / ((240 / 14));
+                double stratched_point = point * 14;//instad of / num_parts 
+                double fraction = (stratched_point - subpart_of_point * 230) / 230;//equals : (point - subpart_of_point * (240 / 14)) / ((240 / 14));
                 return lowerPart_intervals[subpart_of_point + 1] + (1 - fraction) * (lowerPart_intervals[subpart_of_point] - lowerPart_intervals[subpart_of_point + 1]);
             }
 
@@ -114,19 +119,19 @@ namespace RainMan.Tasks
             else
             {
                 int subpart_of_point = get_point_part(point - 290, 290 - 290, 360 - 290, 3);//swift by 290.this does not change 
-                float stratched_point = point * 3;//instad of / num_parts 
-                float fraction = (stratched_point - 3 * 290 - subpart_of_point * (360 - 290)) / (360 - 290);//equals : (point - 290 - subpart_of_point * (70 / 3)) / ((70 / 3));
+                double stratched_point = point * 3;//instad of / num_parts 
+                double fraction = (stratched_point - 3 * 290 - subpart_of_point * (360 - 290)) / (360 - 290);//equals : (point - 290 - subpart_of_point * (70 / 3)) / ((70 / 3));
                 return upperPart_intervals[subpart_of_point + 1] + (1 - fraction) * (upperPart_intervals[subpart_of_point] - upperPart_intervals[subpart_of_point + 1]);
             }
         }
 
         //we devide the range between begining and ending to num_parts parts, and we wish to find from which of this parts comes point
         //we do this in order to find between which two intervals lies owr point 
-        private static int get_point_part(float point, int begining, int ending, int num_parts)
+        private static int get_point_part(double point, int begining, int ending, int num_parts)
         {
             int subpart = num_parts - 1;
-            float subpart_size = (ending - begining);//instad of / num_parts 
-            float point_in_extended_parts = point * (num_parts);
+            double subpart_size = (ending - begining);//instad of / num_parts 
+            double point_in_extended_parts = point * (num_parts);
 
             for (subpart = num_parts - 1; subpart >= 0; subpart--)
             {
@@ -143,28 +148,28 @@ namespace RainMan.Tasks
 
         //R,B,G sould be between 0-255
         //return hue between 0-360
-        public static float RBG_to_HUE(int R, int G, int B)
+        public static double RBG_to_HUE(int R, int G, int B)
         {
             if (R == G && G == B)
             {
-                return (float)0.0;//this is a shade of gray and it's hue is 0;
+                return (double)0.0;//this is a shade of gray and it's hue is 0;
             }
 
-            float r = R / (float)255.0;
-            float g = G / (float)255.0;
-            float b = B / (float)255.0;
+            double r = R / (double)255.0;
+            double g = G / (double)255.0;
+            double b = B / (double)255.0;
 
             //calc max
-            float max = Max(r, g, b);
+            double max = Max(r, g, b);
             //calc min
-            float min = Min(r, g, b);
+            double min = Min(r, g, b);
 
-            float base_hue;
+            double base_hue;
 
-            if (r == g && g == b) return 0.0F;
-            else if (max == r) return ((g - b) / (max - min));
-            else if (max == g) base_hue = (float)2.0 + ((b - r) / (max - min));
-            else base_hue = (float)4.0 + ((r - g) / (max - min)); //max == b
+            if (r == g && g == b) return 0.0;
+            else if (max == r) base_hue = ((g - b) / (max - min));
+            else if (max == g) base_hue = (double)2.0 + ((b - r) / (max - min));
+            else base_hue = (double)4.0 + ((r - g) / (max - min)); //max == b
 
             //convert for hue circle(range 0 to 360)
             base_hue = base_hue * 60;
@@ -175,17 +180,17 @@ namespace RainMan.Tasks
 
 
 
-        private static float Max(float r, float g, float b)
+        private static double Max(double r, double g, double b)
         {
-            float max = r;
+            double max = r;
             if (g > max) max = g;
             if (b > max) max = b;
             return max;
         }
 
-        private static float Min(float r, float g, float b)
+        private static double Min(double r, double g, double b)
         {
-            float min = r;
+            double min = r;
             if (g < min) min = g;
             if (b < min) min = b;
             return min;
