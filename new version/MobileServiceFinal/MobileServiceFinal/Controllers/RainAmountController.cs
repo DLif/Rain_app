@@ -75,18 +75,38 @@ namespace MobileServiceFinal.Controllers
             int max = getMaxIndex();
             int num = int.Parse(picturesNum);
             String currentName;
-            //    String places = RainApiSerializer.demorun();
-            List<PixelRep> placesList = RainApiSerializer.DeserializeRequest(places).Pixels;
+          //  String places = RainApiSerializer.demorun();
+   
+            List<PixelRep> polygonPoints = RainApiSerializer.DeserializeRequest(places).Pixels;
+            Polygon polygon_from_user = new Polygon(polygonPoints.Count, polygonPoints);
+            List<PixelRep> placesList = PolygonPixels.getAllPointsInsidePolygon(polygon_from_user);
             int[] RBGArray;
             for (int i = 0; i < num ; i++)
             {
                 currentName = String.Format("{0}.jpg", (max - i));
                 //byte[] file = GetByteImage(currentName);
                 Bitmap file = new Bitmap(GetStreamImage(currentName));
+
+                /* bug in the picture */
+                if (file.Height == 1 )
+                {
+                    continue;
+                    
+                }
                 foreach (PixelRep pixel in placesList)
                 {
-                    RBGArray = RGBFromImageBitmap(file, pixel);
-                    sum += Models.ColorTranslator.RBG_to_power(RBGArray[0], RBGArray[1], RBGArray[2]);
+                    try
+                    {
+                        Color RGB = file.GetPixel(pixel.X, pixel.Y);
+                        sum += Models.ColorTranslator.RBG_to_power(RGB.R, RGB.G, RGB.B);
+                      //  RBGArray = RGBFromImageBitmap(file, pixel);
+                      //  sum += Models.ColorTranslator.RBG_to_power(RBGArray[0], RBGArray[1], RBGArray[2]);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex);
+                        return "0"; /* Fix me before we handle the project - continue.. */
+                    }
                 }
 
             }

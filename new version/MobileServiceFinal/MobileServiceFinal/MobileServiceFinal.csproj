@@ -202,6 +202,7 @@
     <Compile Include="Models\PixelsSeriallizer.cs" />
     <Compile Include="Models\ColorTranslator.cs" />
     <Compile Include="Models\MobileServiceContext.cs" />
+    <Compile Include="Models\Polygon.cs" />
     <Compile Include="ScheduledJobs\GetRadarPicsJob.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

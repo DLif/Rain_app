@@ -36,8 +36,10 @@ namespace RainMan.DataModels
         public static String demorun()
         {
             List<PixelRep> a = new List<PixelRep>();
-            a.Add(new PixelRep(6, 7));
-            a.Add(new PixelRep(8, 9));
+            a.Add(new PixelRep(101, 101));
+            a.Add(new PixelRep(101, 103));
+            a.Add(new PixelRep(103, 103));
+            a.Add(new PixelRep(103, 101));
             APIRequest x = new APIRequest(a);
             return SerializeRequest(x);
         }
