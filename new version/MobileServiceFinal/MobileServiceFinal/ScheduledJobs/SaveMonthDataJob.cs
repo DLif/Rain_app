@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Web.Http;
-using Microsoft.WindowsAzure.Mobile.Service;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Web.Http;
 using Microsoft.WindowsAzure.Mobile.Service;
 using System;
@@ -17,32 +10,30 @@ using System.IO;
 using System.Drawing;
 using Microsoft.WindowsAzure;
 using MobileServiceFinal.Models;
-//using MobileServiceFinal.Models.PixelsSeriallizer;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Blob;
 using System.Threading.Tasks;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.IO;
-using Microsoft.WindowsAzure.Storage.Auth;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+using MobileServiceFinal.Controllers;
 using RainMan.DataModels;
-using MobileServiceFinal.ScheduledJobs;
 
-namespace MobileServiceFinal.Controllers
+namespace MobileServiceFinal.ScheduledJobs
 {
-    public class RainAmountController : ApiController
+    // A simple scheduled job which can be invoked manually by submitting an HTTP
+    // POST request to the path "/jobs/sample".
+
+    public class GetRadarPicsJob : ScheduledJob
     {
-        public ApiServices Services { get; set; }
+
+
+        public override Task ExecuteAsync()
+        {
+         
+           
+            return Task.FromResult(true);
+        }
+   
+         
         string accountName = "portalvhdszwvb89wr0jbcc";
         string accountKey = "zsXophkQ+1RoQGRX6DRiu0ASxkmI0Db8prRIVdsBfzEW8O+5Hk3NI4M17uXv+fMd+EMIhPZHYwBBCIQPDpmZ3g==";
         String storageName = "noclouds";
@@ -68,30 +59,26 @@ namespace MobileServiceFinal.Controllers
 
 
         // GET api/Default
-        public string GetRainAmount(String places,String numDaysString)
+        public double[][] GetRainAmountPeriod(int pageFirst, int pageLast)
         {
             double sum = 0;
             initializeBlobClient();
-            Services.Log.Info("Trying to get the amount of rain");
-            int max = getMaxIndex();
-          //  int numMinutes = int.Parse(picturesNum);
-
-            int numMinutes = DateTime.Now.Minute / 10 + DateTime.Now.Hour * 6;
-            int numDays = int.Parse(numDaysString);
+          //  int max = getMaxIndex();
+          //  int num = int.Parse(picturesNum);
             String currentName;
             //String places = RainApiSerializer.demorun();
 
-         //   bool x = (places.Equals( "<APIRequest xmlns=\"http://schemas.datacontract.org/2004/07/RainMan.DataModels\" xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\"><Pixels><PixelRep><X>101</X><Y>101</Y></PixelRep><PixelRep><X>101</X><Y>103</Y></PixelRep><PixelRep><X>103</X><Y>103</Y></PixelRep><PixelRep><X>103</X><Y>101</Y></PixelRep></Pixels></APIRequest>"));
+       //     bool x = (places.Equals( "<APIRequest xmlns=\"http://schemas.datacontract.org/2004/07/RainMan.DataModels\" xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\"><Pixels><PixelRep><X>101</X><Y>101</Y></PixelRep><PixelRep><X>101</X><Y>103</Y></PixelRep><PixelRep><X>103</X><Y>103</Y></PixelRep><PixelRep><X>103</X><Y>101</Y></PixelRep></Pixels></APIRequest>"));
 
    
-            List<PixelRep> polygonPoints = RainApiSerializer.DeserializeRequest(places).Pixels;
-            Polygon polygon_from_user = new Polygon(polygonPoints.Count, polygonPoints);
-            List<PixelRep> placesList = PolygonPixels.getAllPointsInsidePolygon(polygon_from_user);
+        //    List<PixelRep> polygonPoints = RainApiSerializer.DeserializeRequest(places).Pixels;
+       //     Polygon polygon_from_user = new Polygon(polygonPoints.Count, polygonPoints);
+       //     List<PixelRep> placesList = PolygonPixels.getAllPointsInsidePolygon(polygon_from_user);
             int[] RBGArray;
 
 
             //threads....
-           Parallel.For(0, numMinutes, i =>
+           Parallel.For(0, num, i =>
         //    for (int i = 0; i < num ; i++)
             {
                 currentName = String.Format("{0}.jpg", (max - i));
@@ -123,25 +110,6 @@ namespace MobileServiceFinal.Controllers
 
        //     }
             }); // Parallel.For
-
-
-           currentName = String.Format("{0}.jpg", numDays-1);
-           UpdateDailyRainJob job = new UpdateDailyRainJob();
-           double[,] sumDays = job.GetDoubleArray(currentName);
-           foreach (PixelRep pixel in placesList)
-          {
-              try
-              {
-
-                  sum += sumDays[pixel.X, pixel.Y];
-                  //  RBGArray = RGBFromImageBitmap(file, pixel);
-                  //  sum += Models.ColorTranslator.RBG_to_power(RBGArray[0], RBGArray[1], RBGArray[2]);
-              }
-              catch (Exception ex)
-              {
-                  Console.WriteLine(ex);
-              }
-            }
 
             return sum.ToString();
 
@@ -275,5 +243,22 @@ namespace MobileServiceFinal.Controllers
 
             return null;
         }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
 }
