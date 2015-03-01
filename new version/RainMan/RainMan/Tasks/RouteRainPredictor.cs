@@ -2,8 +2,10 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Geolocation;
@@ -51,6 +53,16 @@ namespace RainMan.Tasks
             this.CurrentRouteIndex = -1;
         }
 
+        public List<Annotation> getAllAnnotations()
+        {
+            List<Annotation> all = new List<Annotation>();
+            foreach(SingleRouteAnnotations single in this.routeAnnotations)
+            {
+                all.AddRange(single.Annotations);
+            }
+            return all;
+        }
+
         public async Task InitRouteGroupsPredictions(RouteKind kind, int timeSlots)
         {
 
@@ -77,7 +89,6 @@ namespace RainMan.Tasks
                 // initialize predictions and annotations for current route in group
                 await annotation.routeToAnnotations(route, kind, timeSlots, Maps);
 
-               
 
             }
             //await Task.WhenAll(tasks);
@@ -132,18 +143,6 @@ namespace RainMan.Tasks
 
             }
 
-            // add all annotations
-            foreach(var prediction in this.routeAnnotations)
-            {
-                foreach(LegAnnotation annot in prediction.LegAnnotations)
-                {
-
-                    MapControl.SetLocation(annot.Pushpin, annot.Location);
-                    MapControl.SetNormalizedAnchorPoint(annot.Pushpin, new Point(0.5, 1));
-                    annot.Pushpin.SetValue(Grid.VisibilityProperty, Visibility.Collapsed);
-                    this.Map.Children.Add(annot.Pushpin);
-                }
-            }
 
         }
         public void changeTimeIndex(int timeIndex)
@@ -190,16 +189,16 @@ namespace RainMan.Tasks
             {
                 // hide previous pushpins
                 SingleRouteAnnotations prev = this.routeAnnotations.ElementAt(CurrentRouteIndex);
-                foreach(LegAnnotation annotation in prev.LegAnnotations)
+                foreach(Annotation annotation in prev.Annotations)
                 {
-                    annotation.Pushpin.SetValue(Grid.VisibilityProperty, Visibility.Collapsed);
+                    annotation.Visible = Visibility.Collapsed;
                 }
             }
 
             // add current pushpins
-            foreach(LegAnnotation annotation in result.LegAnnotations)
+            foreach(Annotation annotation in result.Annotations)
             {
-                annotation.Pushpin.SetValue(Grid.VisibilityProperty, Visibility.Visible);                     
+                annotation.Visible = Visibility.Visible;              
                 
             }
 
@@ -239,7 +238,7 @@ namespace RainMan.Tasks
         public double[] Averages = new double[4];
 
         // list of leg annotations
-        public List<LegAnnotation> LegAnnotations = new List<LegAnnotation>();
+        public List<Annotation> Annotations = new List<Annotation>();
 
         private int bestTime;
 
@@ -275,10 +274,10 @@ namespace RainMan.Tasks
             currentTimeIndex = timeIndex;
             List<Color> currentColors = this.Colors[timeIndex];
             int k = 0;
-            foreach (LegAnnotation anno in LegAnnotations)
+            foreach (Annotation anno in Annotations)
             {
                 // update the annotation color
-                anno.colorRectangle.Fill = new SolidColorBrush(currentColors.ElementAt(k));
+                anno.RainColor = currentColors.ElementAt(k);
                 ++k;
             }
 
@@ -326,10 +325,8 @@ namespace RainMan.Tasks
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
-            double[][] results = new double[numTimeSlots + 1][];
-
-            
-            int numIterations = (int)Math.Floor(path.Path.Positions.Count / (double)(slotSize -1));
+            int numIterations = (int)Math.Ceiling((path.Path.Positions.Count -1) / (double)(slotSize -1));
+            double[][] results = new double[numIterations][];
 
             var seq = Enumerable.Range(0, numIterations);
 
@@ -349,38 +346,17 @@ namespace RainMan.Tasks
            await Task.WhenAll(tasks);
 
            
-
-           // int count = path.Path.Positions.Count;
-
-          //  ParallelOptions options = new ParallelOptions();
-
-          //  options.MaxDegreeOfParallelism = 1;
-
-           // Parallel.For(0, numIterations,options, (j) =>
-           //     {
-           //         i = 1 + (slotSize - 1) * j;
-           //        int startIndex = i - 1;
-            //       int lastIndex = Math.Min(i + slotSize - 2, count - 1);
-             //       Geopoint startPoint = new Geopoint(path.Path.Positions.ElementAt(startIndex));
-            //        Geopoint endPoint = new Geopoint(path.Path.Positions.ElementAt(lastIndex));
-
-                   // Task<double[]> awaitingTask = LocationsToEstimations.getTimeAndDistance(startPoint, endPoint, kind);
-                    
-                   // results[j] = awaitingTask.Result;
-
-         //    });
-//
             sw.Stop();
             var x = sw.Elapsed;
-   
-            for (i = 1, k = 0; i < path.Path.Positions.Count; i = i + slotSize - 1, ++k)
+            int index;
+            for (i = 1, index = 0; i < path.Path.Positions.Count; i = i + slotSize - 1, ++index)
             {
 
                 int startIndex = i -1;
                 int lastIndex = Math.Min(i + slotSize - 2, path.Path.Positions.Count -1);
 
-                LegAnnotation annot = new LegAnnotation(new Geopoint(path.Path.Positions.ElementAt((int)(0.5 * startIndex + 0.5 * lastIndex))));
-                this.LegAnnotations.Add(annot);
+                Annotation annot = new Annotation(new Geopoint(path.Path.Positions.ElementAt((int)(0.5 * startIndex + 0.5 * lastIndex))));
+                this.Annotations.Add(annot);
 
                 
                // Geopoint startPoint = new Geopoint(path.Path.Positions.ElementAt(startIndex));
@@ -388,7 +364,7 @@ namespace RainMan.Tasks
 
                // double[] estimations  = await LocationsToEstimations.getTimeAndDistance(startPoint, endPoint, kind);
 
-                double[] estimations = results[k];
+                double[] estimations = results[index];
                 
                 double estimatedTime = estimations[1];
                 double estimatedLength = estimations[0];
@@ -530,9 +506,12 @@ namespace RainMan.Tasks
 
     }
 
+    // represents a pin on the map
     #region
-    public class Annotation
+    public class Annotation : INotifyPropertyChanged
     {
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         // location of the annotation
         public Geopoint Location { get; set; }
@@ -540,60 +519,59 @@ namespace RainMan.Tasks
         // anchor point
         public Point AnchorPoint { get; set; }
 
-        // the pushpin it self
-        public DependencyObject Pushpin { get; set; }
 
+        private Visibility visible;
+        public Visibility Visible
+        {
+
+            get
+            {
+                return this.visible;
+            }
+            set
+            {
+                this.visible = value;
+                NotifyPropertyChanged("Visible");
+            }
+        }
+
+        private Color rainColor;
+
+        public Color RainColor
+        {
+
+            get
+            {
+                return this.rainColor;
+            }
+            set
+            {
+                this.rainColor = value;
+                NotifyPropertyChanged("RainColor");
+                
+            }
+
+        }
+
+
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
 
         public Annotation(Geopoint location)
         {
             this.Location = location;
             this.AnchorPoint = new Point(0.0, 1.0);
+            this.rainColor = Colors.Red;
+            this.visible = Visibility.Collapsed;
 
         }
     }
 
-    public class TimeMark : Annotation
-    {
 
-        // time mark of 10, 20 or 30 minutes radar map
-        public int Time { get; set; }
-
-
-        public TimeMark(int timeMark, Geopoint location)
-            : base(location)
-        {
-
-            this.Time = timeMark;
-            // create the map push pin
-            this.Pushpin = MapUtils.getTimeAnnotation(timeMark);
-        }
-
-    }
-
-    public class LegAnnotation : Annotation
-    {
-
-        // map pushpin
-        public DependencyObject Pushpin { get; set; }
-
-        // Color rectangle
-        public Rectangle colorRectangle { get; set; }
-
-
-        public LegAnnotation(Geopoint location)
-            : base(location)
-        {
-
-            Rectangle tempRect;
-
-            // initialize the pushpin (with default colour), fetch the rect that holds the color fill
-            this.Pushpin = MapUtils.getRouteRainPushPin(0, out tempRect);
-
-            this.colorRectangle = tempRect;
-
-
-        }
-
-    }
     #endregion
 }

@@ -150,6 +150,7 @@ namespace RainMan
             this.InitializeComponent();
             DisplayInformation.AutoRotationPreferences = DisplayOrientations.Portrait;
             this.NavigationCacheMode = NavigationCacheMode.Required;
+            //this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Disabled;
             this.navigationHelper = new NavigationHelper(this);
             this.navigationHelper.LoadState += this.NavigationHelper_LoadState;
             this.navigationHelper.SaveState += this.NavigationHelper_SaveState;

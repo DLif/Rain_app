@@ -41,13 +41,16 @@
     <RootPropertyPathName Name="AvgRain" />
     <RootPropertyPathName Name="EstimatedLength" />
     <RootPropertyPathName Name="EstimatedTime" />
+    <RootPropertyPathName Name="Pins" />
+    <RootPropertyPathName Name="Location" />
+    <RootPropertyPathName Name="Visible" />
+    <RootPropertyPathName Name="RainColor" />
     <RootPropertyPathName Name="Selected" />
     <RootPropertyPathName Name="PathGroups" />
     <RootPropertyPathName Name="QuickRouteOptions" />
     <RootPropertyPathName Name="OverlayVisibile" />
     <RootPropertyPathName Name="Points" />
     <RootPropertyPathName Name="imagePath" />
-    <RootPropertyPathName Name="Location" />
   </Roots.PropertyPathNames>
   <Roots.RootTypes>
     <RootType FullName="Windows.UI.Xaml.Application">
@@ -345,6 +348,19 @@
     <RootType FullName="RainMan.RainToHeight" />
     <RootType FullName="Windows.UI.Xaml.Media.Animation.ColorAnimation">
       <RootProperty Name="Duration" />
+    </RootType>
+    <RootType FullName="Microsoft.Xaml.Interactivity.Interaction">
+      <RootMethod Name="GetBehaviors" />
+      <RootMethod Name="SetBehaviors" />
+    </RootType>
+    <RootType FullName="Tasks.Behaviors.PushpinCollectionBehavior">
+      <RootProperty Name="ItemsSource" />
+      <RootProperty Name="ItemTemplate" />
+    </RootType>
+    <RootType FullName="Windows.UI.Xaml.Shapes.Polygon">
+      <RootProperty Name="Points" />
+      <RootProperty Name="Stroke" />
+      <RootProperty Name="Fill" />
     </RootType>
     <RootType FullName="RainMan.RoutePredictions" />
     <RootType FullName="RainMan.toColorBrushConverter" />

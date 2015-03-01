@@ -1,6 +1,8 @@
 <XamlCompilerSaveState>
   <ReferenceAssemblyList>
-    <LocalAssembly PathName="c:\users\denis\documents\visual studio 2013\projects\rainman\rainman\obj\debug\intermediatexaml\rainman.exe" HashGuid="f2e4a242-000c-a626-af9c-485e32395f79" />
+    <LocalAssembly PathName="c:\users\denis\documents\visual studio 2013\projects\rainman\rainman\obj\debug\intermediatexaml\rainman.exe" HashGuid="d995f1c1-b2f1-05bf-1be8-e503621e38cc" />
+    <ReferenceAssembly PathName="c:\program files (x86)\microsoft sdks\windowsphoneapp\v8.1\extensionsdks\behaviorsxamlsdkmanaged\12.0\references\commonconfiguration\neutral\microsoft.xaml.interactions.dll" HashGuid="95a94f94-3917-d473-4f7c-18c4bd437046" />
+    <ReferenceAssembly PathName="c:\program files (x86)\microsoft sdks\windowsphoneapp\v8.1\extensionsdks\behaviorsxamlsdkmanaged\12.0\references\commonconfiguration\neutral\microsoft.xaml.interactivity.dll" HashGuid="d25f59e6-dd81-900a-0dfc-55b39f6898ef" />
     <ReferenceAssembly PathName="c:\users\denis\documents\visual studio 2013\projects\rainman\packages\microsoft.data.edm.5.6.2\lib\portable-net40+sl5+wp8+win8+wpa\microsoft.data.edm.dll" HashGuid="652859ac-63b5-9ab0-7a6b-0cb8dfcd265f" />
     <ReferenceAssembly PathName="c:\users\denis\documents\visual studio 2013\projects\rainman\packages\microsoft.data.odata.5.6.2\lib\portable-net40+sl5+wp8+win8+wpa\microsoft.data.odata.dll" HashGuid="4e84b0db-d22a-61af-6343-dd7cc7f44046" />
     <ReferenceAssembly PathName="c:\users\denis\documents\visual studio 2013\projects\rainman\packages\windowsazure.mobileservices.1.3.1\lib\wpa81\microsoft.windowsazure.mobile.dll" HashGuid="9ae27956-fc25-6346-a044-affad933acd5" />

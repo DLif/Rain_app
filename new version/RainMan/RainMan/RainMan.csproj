@@ -119,6 +119,7 @@
     <Compile Include="Routes.xaml.cs">
       <DependentUpon>Routes.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tasks\Behavior.cs" />
     <Compile Include="Tasks\LocationsToEstimations.cs" />
     <Compile Include="Tasks\PolygonComputations.cs" />
     <Compile Include="Tasks\RadarMaps.cs" />
@@ -235,6 +236,11 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="RoutePredictorConverter\" />
+  </ItemGroup>
+  <ItemGroup>
+    <SDKReference Include="BehaviorsXamlSDKManaged, Version=12.0">
+      <Name>Behaviors SDK %28XAML%29</Name>
+    </SDKReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>

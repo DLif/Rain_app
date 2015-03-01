@@ -124,7 +124,7 @@ namespace RainMan.RainMan_XamlTypeInfo
 
         private void InitTypeTables()
         {
-            _typeNameTable = new string[27];
+            _typeNameTable = new string[32];
             _typeNameTable[0] = "RainMan.GroupBuilder";
             _typeNameTable[1] = "Windows.UI.Xaml.Controls.Page";
             _typeNameTable[2] = "Windows.UI.Xaml.Controls.UserControl";
@@ -148,12 +148,17 @@ namespace RainMan.RainMan_XamlTypeInfo
             _typeNameTable[20] = "RainMan.EstimatedLengthConverter";
             _typeNameTable[21] = "RainMan.EstimatedTimeConverter";
             _typeNameTable[22] = "RainMan.RainToHeight";
-            _typeNameTable[23] = "RainMan.RoutePredictions";
-            _typeNameTable[24] = "RainMan.toColorBrushConverter";
-            _typeNameTable[25] = "RainMan.toTextSizeConverter";
-            _typeNameTable[26] = "RainMan.Routes";
+            _typeNameTable[23] = "Microsoft.Xaml.Interactivity.Interaction";
+            _typeNameTable[24] = "Microsoft.Xaml.Interactivity.BehaviorCollection";
+            _typeNameTable[25] = "Windows.UI.Xaml.DependencyObjectCollection";
+            _typeNameTable[26] = "Tasks.Behaviors.PushpinCollectionBehavior";
+            _typeNameTable[27] = "Windows.UI.Xaml.DataTemplate";
+            _typeNameTable[28] = "RainMan.RoutePredictions";
+            _typeNameTable[29] = "RainMan.toColorBrushConverter";
+            _typeNameTable[30] = "RainMan.toTextSizeConverter";
+            _typeNameTable[31] = "RainMan.Routes";
 
-            _typeTable = new global::System.Type[27];
+            _typeTable = new global::System.Type[32];
             _typeTable[0] = typeof(global::RainMan.GroupBuilder);
             _typeTable[1] = typeof(global::Windows.UI.Xaml.Controls.Page);
             _typeTable[2] = typeof(global::Windows.UI.Xaml.Controls.UserControl);
@@ -177,10 +182,15 @@ namespace RainMan.RainMan_XamlTypeInfo
             _typeTable[20] = typeof(global::RainMan.EstimatedLengthConverter);
             _typeTable[21] = typeof(global::RainMan.EstimatedTimeConverter);
             _typeTable[22] = typeof(global::RainMan.RainToHeight);
-            _typeTable[23] = typeof(global::RainMan.RoutePredictions);
-            _typeTable[24] = typeof(global::RainMan.toColorBrushConverter);
-            _typeTable[25] = typeof(global::RainMan.toTextSizeConverter);
-            _typeTable[26] = typeof(global::RainMan.Routes);
+            _typeTable[23] = typeof(global::Microsoft.Xaml.Interactivity.Interaction);
+            _typeTable[24] = typeof(global::Microsoft.Xaml.Interactivity.BehaviorCollection);
+            _typeTable[25] = typeof(global::Windows.UI.Xaml.DependencyObjectCollection);
+            _typeTable[26] = typeof(global::Tasks.Behaviors.PushpinCollectionBehavior);
+            _typeTable[27] = typeof(global::Windows.UI.Xaml.DataTemplate);
+            _typeTable[28] = typeof(global::RainMan.RoutePredictions);
+            _typeTable[29] = typeof(global::RainMan.toColorBrushConverter);
+            _typeTable[30] = typeof(global::RainMan.toTextSizeConverter);
+            _typeTable[31] = typeof(global::RainMan.Routes);
         }
 
         private int LookupTypeIndexByName(string typeName)
@@ -231,10 +241,12 @@ namespace RainMan.RainMan_XamlTypeInfo
         private object Activate_20_EstimatedLengthConverter() { return new global::RainMan.EstimatedLengthConverter(); }
         private object Activate_21_EstimatedTimeConverter() { return new global::RainMan.EstimatedTimeConverter(); }
         private object Activate_22_RainToHeight() { return new global::RainMan.RainToHeight(); }
-        private object Activate_23_RoutePredictions() { return new global::RainMan.RoutePredictions(); }
-        private object Activate_24_toColorBrushConverter() { return new global::RainMan.toColorBrushConverter(); }
-        private object Activate_25_toTextSizeConverter() { return new global::RainMan.toTextSizeConverter(); }
-        private object Activate_26_Routes() { return new global::RainMan.Routes(); }
+        private object Activate_24_BehaviorCollection() { return new global::Microsoft.Xaml.Interactivity.BehaviorCollection(); }
+        private object Activate_26_PushpinCollectionBehavior() { return new global::Tasks.Behaviors.PushpinCollectionBehavior(); }
+        private object Activate_28_RoutePredictions() { return new global::RainMan.RoutePredictions(); }
+        private object Activate_29_toColorBrushConverter() { return new global::RainMan.toColorBrushConverter(); }
+        private object Activate_30_toTextSizeConverter() { return new global::RainMan.toTextSizeConverter(); }
+        private object Activate_31_Routes() { return new global::RainMan.Routes(); }
         private void MapAdd_5_ObservableDictionary(object instance, object key, object item)
         {
             var collection = (global::System.Collections.Generic.IDictionary<global::System.String, global::System.Object>)instance;
@@ -243,6 +255,12 @@ namespace RainMan.RainMan_XamlTypeInfo
             collection.Add(newKey, newItem);
         }
         private void VectorAdd_13_IList(object instance, object item)
+        {
+            var collection = (global::System.Collections.Generic.ICollection<global::Windows.UI.Xaml.DependencyObject>)instance;
+            var newItem = (global::Windows.UI.Xaml.DependencyObject)item;
+            collection.Add(newItem);
+        }
+        private void VectorAdd_24_BehaviorCollection(object instance, object item)
         {
             var collection = (global::System.Collections.Generic.ICollection<global::Windows.UI.Xaml.DependencyObject>)instance;
             var newItem = (global::Windows.UI.Xaml.DependencyObject)item;
@@ -417,32 +435,63 @@ namespace RainMan.RainMan_XamlTypeInfo
                 xamlType = userType;
                 break;
 
-            case 23:   //  RainMan.RoutePredictions
+            case 23:   //  Microsoft.Xaml.Interactivity.Interaction
+                userType = new global::RainMan.RainMan_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
+                userType.AddMemberName("Behaviors");
+                xamlType = userType;
+                break;
+
+            case 24:   //  Microsoft.Xaml.Interactivity.BehaviorCollection
+                userType = new global::RainMan.RainMan_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Windows.UI.Xaml.DependencyObjectCollection"));
+                userType.CollectionAdd = VectorAdd_24_BehaviorCollection;
+                userType.SetIsReturnTypeStub();
+                xamlType = userType;
+                break;
+
+            case 25:   //  Windows.UI.Xaml.DependencyObjectCollection
+                xamlType = new global::RainMan.RainMan_XamlTypeInfo.XamlSystemBaseType(typeName, type);
+                break;
+
+            case 26:   //  Tasks.Behaviors.PushpinCollectionBehavior
+                userType = new global::RainMan.RainMan_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Windows.UI.Xaml.DependencyObject"));
+                userType.Activator = Activate_26_PushpinCollectionBehavior;
+                userType.AddMemberName("ItemsSource");
+                userType.AddMemberName("ItemTemplate");
+                userType.AddMemberName("AssociatedObject");
+                userType.SetIsLocalType();
+                xamlType = userType;
+                break;
+
+            case 27:   //  Windows.UI.Xaml.DataTemplate
+                xamlType = new global::RainMan.RainMan_XamlTypeInfo.XamlSystemBaseType(typeName, type);
+                break;
+
+            case 28:   //  RainMan.RoutePredictions
                 userType = new global::RainMan.RainMan_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Windows.UI.Xaml.Controls.Page"));
-                userType.Activator = Activate_23_RoutePredictions;
+                userType.Activator = Activate_28_RoutePredictions;
                 userType.AddMemberName("NavigationHelper");
                 userType.AddMemberName("DefaultViewModel");
                 userType.SetIsLocalType();
                 xamlType = userType;
                 break;
 
-            case 24:   //  RainMan.toColorBrushConverter
+            case 29:   //  RainMan.toColorBrushConverter
                 userType = new global::RainMan.RainMan_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
-                userType.Activator = Activate_24_toColorBrushConverter;
+                userType.Activator = Activate_29_toColorBrushConverter;
                 userType.SetIsLocalType();
                 xamlType = userType;
                 break;
 
-            case 25:   //  RainMan.toTextSizeConverter
+            case 30:   //  RainMan.toTextSizeConverter
                 userType = new global::RainMan.RainMan_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
-                userType.Activator = Activate_25_toTextSizeConverter;
+                userType.Activator = Activate_30_toTextSizeConverter;
                 userType.SetIsLocalType();
                 xamlType = userType;
                 break;
 
-            case 26:   //  RainMan.Routes
+            case 31:   //  RainMan.Routes
                 userType = new global::RainMan.RainMan_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Windows.UI.Xaml.Controls.Page"));
-                userType.Activator = Activate_26_Routes;
+                userType.Activator = Activate_31_Routes;
                 userType.AddMemberName("NavigationHelper");
                 userType.AddMemberName("DefaultViewModel");
                 userType.SetIsLocalType();
@@ -513,22 +562,55 @@ namespace RainMan.RainMan_XamlTypeInfo
             var that = (global::RainMan.RouteBuilder)instance;
             return that.DefaultViewModel;
         }
-        private object get_12_RoutePredictions_NavigationHelper(object instance)
+        private object get_12_Interaction_Behaviors(object instance)
+        {
+            return global::Microsoft.Xaml.Interactivity.Interaction.GetBehaviors((global::Windows.UI.Xaml.DependencyObject)instance);
+        }
+        private void set_12_Interaction_Behaviors(object instance, object Value)
+        {
+            global::Microsoft.Xaml.Interactivity.Interaction.SetBehaviors((global::Windows.UI.Xaml.DependencyObject)instance, (global::Microsoft.Xaml.Interactivity.BehaviorCollection)Value);
+        }
+        private object get_13_PushpinCollectionBehavior_ItemsSource(object instance)
+        {
+            var that = (global::Tasks.Behaviors.PushpinCollectionBehavior)instance;
+            return that.ItemsSource;
+        }
+        private void set_13_PushpinCollectionBehavior_ItemsSource(object instance, object Value)
+        {
+            var that = (global::Tasks.Behaviors.PushpinCollectionBehavior)instance;
+            that.ItemsSource = (global::System.Object)Value;
+        }
+        private object get_14_PushpinCollectionBehavior_ItemTemplate(object instance)
+        {
+            var that = (global::Tasks.Behaviors.PushpinCollectionBehavior)instance;
+            return that.ItemTemplate;
+        }
+        private void set_14_PushpinCollectionBehavior_ItemTemplate(object instance, object Value)
+        {
+            var that = (global::Tasks.Behaviors.PushpinCollectionBehavior)instance;
+            that.ItemTemplate = (global::Windows.UI.Xaml.DataTemplate)Value;
+        }
+        private object get_15_PushpinCollectionBehavior_AssociatedObject(object instance)
+        {
+            var that = (global::Tasks.Behaviors.PushpinCollectionBehavior)instance;
+            return that.AssociatedObject;
+        }
+        private object get_16_RoutePredictions_NavigationHelper(object instance)
         {
             var that = (global::RainMan.RoutePredictions)instance;
             return that.NavigationHelper;
         }
-        private object get_13_RoutePredictions_DefaultViewModel(object instance)
+        private object get_17_RoutePredictions_DefaultViewModel(object instance)
         {
             var that = (global::RainMan.RoutePredictions)instance;
             return that.DefaultViewModel;
         }
-        private object get_14_Routes_NavigationHelper(object instance)
+        private object get_18_Routes_NavigationHelper(object instance)
         {
             var that = (global::RainMan.Routes)instance;
             return that.NavigationHelper;
         }
-        private object get_15_Routes_DefaultViewModel(object instance)
+        private object get_19_Routes_DefaultViewModel(object instance)
         {
             var that = (global::RainMan.Routes)instance;
             return that.DefaultViewModel;
@@ -613,28 +695,56 @@ namespace RainMan.RainMan_XamlTypeInfo
                 xamlMember.Getter = get_11_RouteBuilder_DefaultViewModel;
                 xamlMember.SetIsReadOnly();
                 break;
+            case "Microsoft.Xaml.Interactivity.Interaction.Behaviors":
+                userType = (global::RainMan.RainMan_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.Xaml.Interactivity.Interaction");
+                xamlMember = new global::RainMan.RainMan_XamlTypeInfo.XamlMember(this, "Behaviors", "Microsoft.Xaml.Interactivity.BehaviorCollection");
+                xamlMember.SetTargetTypeName("Windows.UI.Xaml.DependencyObject");
+                xamlMember.SetIsAttachable();
+                xamlMember.Getter = get_12_Interaction_Behaviors;
+                xamlMember.Setter = set_12_Interaction_Behaviors;
+                break;
+            case "Tasks.Behaviors.PushpinCollectionBehavior.ItemsSource":
+                userType = (global::RainMan.RainMan_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Tasks.Behaviors.PushpinCollectionBehavior");
+                xamlMember = new global::RainMan.RainMan_XamlTypeInfo.XamlMember(this, "ItemsSource", "Object");
+                xamlMember.SetIsDependencyProperty();
+                xamlMember.Getter = get_13_PushpinCollectionBehavior_ItemsSource;
+                xamlMember.Setter = set_13_PushpinCollectionBehavior_ItemsSource;
+                break;
+            case "Tasks.Behaviors.PushpinCollectionBehavior.ItemTemplate":
+                userType = (global::RainMan.RainMan_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Tasks.Behaviors.PushpinCollectionBehavior");
+                xamlMember = new global::RainMan.RainMan_XamlTypeInfo.XamlMember(this, "ItemTemplate", "Windows.UI.Xaml.DataTemplate");
+                xamlMember.SetIsDependencyProperty();
+                xamlMember.Getter = get_14_PushpinCollectionBehavior_ItemTemplate;
+                xamlMember.Setter = set_14_PushpinCollectionBehavior_ItemTemplate;
+                break;
+            case "Tasks.Behaviors.PushpinCollectionBehavior.AssociatedObject":
+                userType = (global::RainMan.RainMan_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Tasks.Behaviors.PushpinCollectionBehavior");
+                xamlMember = new global::RainMan.RainMan_XamlTypeInfo.XamlMember(this, "AssociatedObject", "Windows.UI.Xaml.DependencyObject");
+                xamlMember.Getter = get_15_PushpinCollectionBehavior_AssociatedObject;
+                xamlMember.SetIsReadOnly();
+                break;
             case "RainMan.RoutePredictions.NavigationHelper":
                 userType = (global::RainMan.RainMan_XamlTypeInfo.XamlUserType)GetXamlTypeByName("RainMan.RoutePredictions");
                 xamlMember = new global::RainMan.RainMan_XamlTypeInfo.XamlMember(this, "NavigationHelper", "RainMan.Common.NavigationHelper");
-                xamlMember.Getter = get_12_RoutePredictions_NavigationHelper;
+                xamlMember.Getter = get_16_RoutePredictions_NavigationHelper;
                 xamlMember.SetIsReadOnly();
                 break;
             case "RainMan.RoutePredictions.DefaultViewModel":
                 userType = (global::RainMan.RainMan_XamlTypeInfo.XamlUserType)GetXamlTypeByName("RainMan.RoutePredictions");
                 xamlMember = new global::RainMan.RainMan_XamlTypeInfo.XamlMember(this, "DefaultViewModel", "RainMan.Common.ObservableDictionary");
-                xamlMember.Getter = get_13_RoutePredictions_DefaultViewModel;
+                xamlMember.Getter = get_17_RoutePredictions_DefaultViewModel;
                 xamlMember.SetIsReadOnly();
                 break;
             case "RainMan.Routes.NavigationHelper":
                 userType = (global::RainMan.RainMan_XamlTypeInfo.XamlUserType)GetXamlTypeByName("RainMan.Routes");
                 xamlMember = new global::RainMan.RainMan_XamlTypeInfo.XamlMember(this, "NavigationHelper", "RainMan.Common.NavigationHelper");
-                xamlMember.Getter = get_14_Routes_NavigationHelper;
+                xamlMember.Getter = get_18_Routes_NavigationHelper;
                 xamlMember.SetIsReadOnly();
                 break;
             case "RainMan.Routes.DefaultViewModel":
                 userType = (global::RainMan.RainMan_XamlTypeInfo.XamlUserType)GetXamlTypeByName("RainMan.Routes");
                 xamlMember = new global::RainMan.RainMan_XamlTypeInfo.XamlMember(this, "DefaultViewModel", "RainMan.Common.ObservableDictionary");
-                xamlMember.Getter = get_15_Routes_DefaultViewModel;
+                xamlMember.Getter = get_19_Routes_DefaultViewModel;
                 xamlMember.SetIsReadOnly();
                 break;
             }

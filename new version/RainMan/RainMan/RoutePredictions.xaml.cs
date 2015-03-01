@@ -127,6 +127,8 @@ namespace RainMan
         {
             this.InitializeComponent();
 
+            this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Disabled;
+
             this.navigationHelper = new NavigationHelper(this);
             this.navigationHelper.LoadState += this.NavigationHelper_LoadState;
             this.navigationHelper.SaveState += this.NavigationHelper_SaveState;
@@ -189,7 +191,7 @@ namespace RainMan
             if (routeResult.Status != MapRouteFinderStatus.Success)
             {
                 // return error
-                computationWindow.Dialog.Hide();
+               // computationWindow.Dialog.Hide();
                 MessageDialog diag = new MessageDialog("Error!");
                 await diag.ShowAsync();
       
@@ -285,6 +287,10 @@ namespace RainMan
             // init prediction
             await this.predictor.InitRouteGroupsPredictions(arguments.Transportation, numTimeSlots);
 
+            // draw all the pushpins
+            annotations = this.predictor.getAllAnnotations();
+            this.defaultViewModel["Pins"] = annotations;
+
             // start binding data
             SuggestionInfo suggestion = new SuggestionInfo();
 
@@ -306,7 +312,7 @@ namespace RainMan
             //computationWindow.Dialog.Hide();
         }
 
-       
+        private List<Annotation> annotations; 
 
         private void handlePathNames()
         {
@@ -319,7 +325,7 @@ namespace RainMan
 
             }
             
-            //translate the given names to a presentable form
+            // translate the given names to a presentable form
             List<PathNameDescriptor> pathNames = PathNameDescriptor.toPathNameDescriptors(Names);
             this.defaultViewModel["PathNames"] = pathNames;
         }
@@ -365,6 +371,16 @@ namespace RainMan
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
+
+            this.map.Children.Clear();
+            annotations.Clear();
+           // this.defaultViewModel["Pins"] = null;
+
+           // var x = this.predictor.routeAnnotations.ElementAt(0);
+
+           
+           // DependencyObject parent = VisualTreeHelper.GetParent(x.Annotations.ElementAt(0));
+
             this.navigationHelper.OnNavigatedFrom(e);
         }
 
@@ -459,5 +475,8 @@ namespace RainMan
                 this.fadeInTime.Begin();
             }
         }
+
+      
+     
     }
 }

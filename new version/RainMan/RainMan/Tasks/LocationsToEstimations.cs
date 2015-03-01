@@ -29,7 +29,7 @@ namespace RainMan.Tasks
         {
 
 
-            
+
 
 
             sw.Start();
@@ -63,12 +63,12 @@ namespace RainMan.Tasks
                     }
                 }
             }
-            
+
             response.Dispose();
             sw.Stop();
             TimeSpan time2 = sw.Elapsed;
             pack[0] = distance * 1000; // meters
-            pack[1] = time /  60;      // minutes
+            pack[1] = time / 60;      // minutes
             return pack;
         }
 
@@ -94,7 +94,7 @@ namespace RainMan.Tasks
 
                 // avoid highways
                 routeResult =
-                    await MapRouteFinder.GetDrivingRouteAsync(source, destination,   
+                    await MapRouteFinder.GetDrivingRouteAsync(source, destination,
                     MapRouteOptimization.Time,
                     MapRouteRestrictions.Highways);
 
@@ -110,7 +110,7 @@ namespace RainMan.Tasks
             double[] pack = new double[2];
             pack[0] = routeResult.Route.LengthInMeters;
             pack[1] = routeResult.Route.EstimatedDuration.TotalMinutes;
-            
+
             return pack;
 
         }
@@ -118,7 +118,7 @@ namespace RainMan.Tasks
         private static async Task<XmlReader> getXmlReader(Geopoint source, Geopoint destination, RainMan.Navigation.RouteKind kind)
         {
 
-            String query_url = makeURL(source, destination,kind);
+            String query_url = makeURL(source, destination, kind);
             //String query_url = "http://dev.virtualearth.net/REST/V1/Routes/Driving?wp.0=Eiffel+Tower&wp.1=louvre+museum&optmz=distance&output=xml&key=AmJqOC6z5Nnf_tL1iajMSSLVyMoWRpwIBREiL1LE20_trwH1uFlK6yC5t0FrIqxD&routeAttributes=routeSummariesOnly";
             HttpClient client = new HttpClient();
             HttpResponseMessage response = await client.GetAsync(query_url);

@@ -5,6 +5,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:Maps="using:Windows.UI.Xaml.Controls.Maps"
+    xmlns:i="using:Microsoft.Xaml.Interactivity"
+    xmlns:behaviors="using:Tasks.Behaviors" 
+    xmlns:core="using:Microsoft.Xaml.Interactions.Core"
     xmlns:valueconverter ="using:RainMan"
     x:Class="RainMan.RoutePredictions"
     DataContext="{Binding DefaultViewModel, RelativeSource={RelativeSource Mode=Self}}"
@@ -67,9 +70,44 @@
         </Grid.ColumnDefinitions>
 
 
-        <Grid Grid.Row="1" x:Name="mapGrid" Grid.Column="0" Grid.ColumnSpan="3">
+        <Grid Grid.Row="1" x:Name="mapGrid" Grid.Column="0" Grid.ColumnSpan="3" DataContext="{Binding}">
             <Maps:MapControl x:Name="map" MapServiceToken="BaBZ6ETOrg8G3L31STm8dg" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
 
+
+                <i:Interaction.Behaviors>
+                    <behaviors:PushpinCollectionBehavior ItemsSource="{Binding Pins}">
+                        <behaviors:PushpinCollectionBehavior.ItemTemplate>
+                            <DataTemplate>
+
+                                <Grid  Maps:MapControl.Location="{Binding Location}"
+                                   Maps:MapControl.NormalizedAnchorPoint="{Binding AnchorPoint}"
+                                   Visibility="{Binding Visible}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="auto"/>
+                                        <RowDefinition Height="auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Rectangle Grid.Row="0" Height="20" Width="20">
+                                        <Rectangle.Fill>
+                                            <SolidColorBrush Color="{Binding RainColor}"></SolidColorBrush>
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+
+
+                                    <Polygon Points="2,0 22,0 2,40"
+                                         Stroke="Black"
+                                         Fill="Black"
+                                         Grid.Row="1"
+                                         />
+
+
+                                </Grid>
+
+                            </DataTemplate>
+                        </behaviors:PushpinCollectionBehavior.ItemTemplate>
+                    </behaviors:PushpinCollectionBehavior>
+                </i:Interaction.Behaviors>
+
+        
 
             </Maps:MapControl>
         </Grid>
