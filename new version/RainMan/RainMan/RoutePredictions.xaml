@@ -37,7 +37,7 @@
     </Page.Resources>
     
     <Page.BottomAppBar >
-        <CommandBar Opened="CommandBar_Opened" Opacity="0.5">
+        <CommandBar Opacity="0.5">
             <AppBarToggleButton x:Name="appInfo" Icon="Help" Label="Information" Checked="appInfo_Checked" Unchecked="appInfo_Unchecked"/>
             <AppBarButton x:Name="routesAppBar" Icon="ViewAll" Label="Routes" Click="routesAppBar_Click" Visibility="Collapsed">
                
@@ -69,9 +69,8 @@
 
         <Grid Grid.Row="1" x:Name="mapGrid" Grid.Column="0" Grid.ColumnSpan="3">
             <Maps:MapControl x:Name="map" MapServiceToken="BaBZ6ETOrg8G3L31STm8dg" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
-                
-        
-                
+
+
             </Maps:MapControl>
         </Grid>
 

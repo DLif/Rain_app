@@ -533,8 +533,8 @@ namespace RainMan
 
             // first, get all points
             List<PixelRep> pixels = findAllPixels();
-            pixels.Clear();
-            pixels.Add(new PixelRep(255, 255));
+           // pixels.Clear();
+           // pixels.Add(new PixelRep(255, 255));
 
             // finally, build the request!
             APIRequest request = new APIRequest(pixels);
@@ -542,7 +542,7 @@ namespace RainMan
             String encodedRequest = RainApiSerializer.SerializeRequest(request);
             var dict = new Dictionary<String, String>();
             dict.Add("places", encodedRequest);
-            numImages = 31;
+            //numImages = 31;
             dict.Add("picturesNum", numImages.ToString());
 
             try
@@ -565,6 +565,8 @@ namespace RainMan
             {
                 MessageDialog diag = new MessageDialog("Server error while processing request");
                 diag.ShowAsync();
+                this.progress.IsActive = false;
+                progress.Visibility = Visibility.Collapsed;
                 return;
             }
 

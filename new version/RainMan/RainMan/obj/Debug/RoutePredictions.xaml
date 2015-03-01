@@ -37,9 +37,9 @@
     </Page.Resources>
     
     <Page.BottomAppBar >
-        <CommandBar x:ConnectionId='1'                            Opacity="0.5">
-            <AppBarToggleButton x:ConnectionId='2' x:Name="appInfo" Icon="Help" Label="Information"                                                        />
-            <AppBarButton x:ConnectionId='3' x:Name="routesAppBar" Icon="ViewAll" Label="Routes"                            Visibility="Collapsed">
+        <CommandBar Opacity="0.5">
+            <AppBarToggleButton x:ConnectionId='1' x:Name="appInfo" Icon="Help" Label="Information"                                                        />
+            <AppBarButton x:ConnectionId='2' x:Name="routesAppBar" Icon="ViewAll" Label="Routes"                            Visibility="Collapsed">
                
             </AppBarButton>
         </CommandBar>
@@ -69,9 +69,8 @@
 
         <Grid Grid.Row="1" x:Name="mapGrid" Grid.Column="0" Grid.ColumnSpan="3">
             <Maps:MapControl x:Name="map" MapServiceToken="BaBZ6ETOrg8G3L31STm8dg" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
-                
-        
-                
+
+
             </Maps:MapControl>
         </Grid>
 
@@ -135,7 +134,7 @@
                         <ColumnDefinition Width="1*"/>
 
                     </Grid.ColumnDefinitions>
-                    <Slider x:ConnectionId='8' x:Name="exitTimeSlider" Maximum="39" Grid.Column="1" VerticalAlignment="Top"                                           />
+                    <Slider x:ConnectionId='7' x:Name="exitTimeSlider" Maximum="39" Grid.Column="1" VerticalAlignment="Top"                                           />
                     <TextBlock Text="{Binding StartTime, Converter={StaticResource DateTimeConverter}}" FontWeight="Light" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="13,0,13,5" FontSize="17"/>
                     <TextBlock Grid.Column="2" FontWeight="Light" Text="{Binding EndTime, Converter={StaticResource DateTimeConverter}}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="13,0,13,5" FontSize="17"/>
                    
@@ -160,13 +159,13 @@
             <TextBlock  Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" FontWeight="Light" Text="{Binding PathTime, Converter={StaticResource DateTimeConverter}}" VerticalAlignment="Top" Margin="13,5,13,0" FontSize="30" />
         </Grid>
 
-        <Grid x:ConnectionId='4' Visibility="Collapsed" DataContext="{Binding Suggestion}" Grid.Row="1" x:Name="SuggestionGrid" Margin="0, 0, 0, 70" Height="100" Grid.Column="1" VerticalAlignment="Bottom"                               >
+        <Grid x:ConnectionId='3' Visibility="Collapsed" DataContext="{Binding Suggestion}" Grid.Row="1" x:Name="SuggestionGrid" Margin="0, 0, 0, 70" Height="100" Grid.Column="1" VerticalAlignment="Bottom"                               >
             <Grid.Background>
                 <SolidColorBrush Color="black" Opacity="0.85"></SolidColorBrush>
             </Grid.Background>
             <Grid.Resources>
                 
-                <Storyboard x:ConnectionId='7' x:Name="fadeOutStoryBoardSuggestion"                                                   >
+                <Storyboard x:ConnectionId='6' x:Name="fadeOutStoryBoardSuggestion"                                                   >
                     <DoubleAnimation From="1" To="0" EnableDependentAnimation="True" Storyboard.TargetName="SuggestionGrid"  Storyboard.TargetProperty="Opacity" Duration="0:0:0.5"/>
                 </Storyboard>
                 
@@ -196,7 +195,7 @@
 
                 </Storyboard>
 
-                <Storyboard x:ConnectionId='5' x:Name="fadeOutPaths"                                    >
+                <Storyboard x:ConnectionId='4' x:Name="fadeOutPaths"                                    >
                     <DoubleAnimation To="0" From="1" Storyboard.TargetName="PathNamesGrid" Storyboard.TargetProperty="Opacity" Duration="0:0:0.5"/>
 
                 </Storyboard>
@@ -215,7 +214,7 @@
 
             <TextBlock Text="Select a path from the following list" TextWrapping="Wrap" Foreground="white" FontSize="20" Grid.Row="0" Margin="10"></TextBlock>
 
-            <ListView x:ConnectionId='6' Margin="10" Grid.Row="1" x:Name="listPathNames" 
+            <ListView x:ConnectionId='5' Margin="10" Grid.Row="1" x:Name="listPathNames" 
                                     ItemsSource="{Binding PathNames}"
 				AutomationProperties.AutomationId="ItemGridView"
 				AutomationProperties.Name="Items In Group"

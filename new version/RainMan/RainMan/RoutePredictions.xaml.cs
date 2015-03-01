@@ -4,6 +4,7 @@ using RainMan.Navigation;
 using RainMan.Tasks;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -58,7 +59,7 @@ namespace RainMan
         }
         public Double AvgRain { get; set; }
 
-        public TimeSpan EstimatedTime { get; set; }
+        public Double EstimatedTime { get; set; }
 
         public Double EstimatedLength { get; set; }
 
@@ -114,31 +115,10 @@ namespace RainMan
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
         private RoutePredictionArgs arguments = null;
-        private RadarMapManager manager = null;
-        private RouteRainPredictor predictor = null;
-
-        // stores computation per ROUTE in group
-        private List<RoutePredictorResult> results = new List<RoutePredictorResult>();
-
-        // stores the best starting point for each route in group (in a form of an index of a radar map)
-        private List<int> minIndices = new List<int>();
-
-        // stores the best average per group
-        private List<double> bestAverages = new List<Double>();
-
-        // number of computation slots per route (to how many subroutes we devide a route into)
-        private int NumTimeSlots;
-
-        // computation modal window
-        private ModalWindow computationWindow;
-
-        // the following contain the current path
-        private int currentPathIndex;
-
-        private int currentTimeIndex;
+        private RouteGroupAnnotator predictor;
+          
 
         // path related information
-        private List<TimeSpan> estimatedPathDuration = new List<TimeSpan>();
         private List<Double> estimatedPathLength = new List<Double>();
         private List<GeoboundingBox> boxes = new List<GeoboundingBox>();
 
@@ -171,9 +151,11 @@ namespace RainMan
 
 
 #region
-        private async Task processRoute(List<Geopoint> path)
+        private async Task<MapRoute> createRoute(List<Geopoint> path, ModalWindow computationWindow)
         {
 
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
             //---------------- PART 1 : Use BING API to complete the route from given waypoints -------------- //
 
             MapRouteFinderResult routeResult = null;
@@ -210,130 +192,47 @@ namespace RainMan
                 computationWindow.Dialog.Hide();
                 MessageDialog diag = new MessageDialog("Error!");
                 await diag.ShowAsync();
-                return;
+      
             }
+            sw.Stop();
+            TimeSpan TIME = sw.Elapsed;
 
-            // ------------------- PART 2 Route computation ---------------------------------- //
+            this.boxes.Add(routeResult.Route.BoundingBox);
+            this.estimatedPathLength.Add(routeResult.Route.LengthInMeters);
 
-            MapRoute route = routeResult.Route;
+            return routeResult.Route;
 
-            estimatedPathDuration.Add(route.EstimatedDuration);
-            this.estimatedPathLength.Add(route.LengthInMeters);
-            boxes.Add(route.BoundingBox);
-
-            if (this.arguments.Transportation == RouteKind.BIKE )
-            {
-                // factor for bike time was not set
-                // calcualte it
-
-                  var drivingSpeed = (route.LengthInMeters / 1000.0) / route.EstimatedDuration.TotalHours; // km/h
-                  // 15.5 is the average bike speed
-                  int factor = (int)(drivingSpeed / 15.5);
-                  EstimatedTimeConverter.factor = factor;
-
-            }
-
-
-            // minimum index [ of starting radar map ] for given path
-            int minIndex = 0;
-
-            // get prediction(s) for given route
-            var res = await predictor.routeToPredictions(route);
-
-            double[] currentAverrageArray = res.averages;
-
-            // find minimum
-            for (int k = 0; k < this.avg.Length; ++k)
-            {
-                if (currentAverrageArray[k] < currentAverrageArray[minIndex])
-                {
-                    minIndex = k;
-                }
-            }
-
-            // save the minimum average and index
-            this.minIndices.Add(minIndex);
-            this.bestAverages.Add(currentAverrageArray[minIndex]);
-
-            // save the result itself
-            this.results.Add(res);
 
         }
 
 #endregion
 
 
-        private int previousPathIndex = -1;
 
-        private void showPath()
+        private async Task updateContentView()
         {
 
-            List<MapRouteView> viewList;
-            if (previousPathIndex >= 0)
-            {
-
-                viewList = this.results.ElementAt(this.previousPathIndex).routesCollection;
-                // first, hide previous
-                foreach (MapRouteView mapRouteView in viewList)
-                {
-                    mapRouteView.OutlineColor = Colors.Transparent;
-                    mapRouteView.RouteColor = Colors.Transparent;
-                }
-            }
-            viewList = this.results.ElementAt(currentPathIndex).routesCollection;
-
-            // now, show current
-            for(int i = 0; i < viewList.Count; ++i)
-            {
-                MapRouteView curr = viewList.ElementAt(i);
-                Color currColor = this.results.ElementAt(currentPathIndex).routesPerStartingTime[currentTimeIndex].ElementAt(i);
-                curr.OutlineColor = currColor;
-                curr.RouteColor = currColor;
-            }
-
-            // update current variables
-            this.previousPathIndex = this.currentPathIndex;
-           
-
-
-        }
-
-
-        private void updateContentView()
-        {
-
-
-            // draw current route
-            showPath();
+            RadarMapManager manager = RadarMapManager.getRadarMapManager();
 
             // set path info
-
             PathInfo pathInfo = new PathInfo();
+            pathInfo.PathName = arguments.RouteNames == null ? null : arguments.RouteNames.ElementAt(predictor.CurrentRouteIndex);
+            pathInfo.EstimatedTime = this.predictor.routeAnnotations.ElementAt(predictor.CurrentRouteIndex).EstimatedTimeMinutes;
+            pathInfo.EstimatedLength = this.estimatedPathLength.ElementAt(predictor.CurrentRouteIndex);
+            pathInfo.AvgRain = this.predictor.routeAnnotations.ElementAt(predictor.CurrentRouteIndex).Averages[predictor.CurrentTimeIndex];
 
-            pathInfo.PathName = arguments.RouteNames == null ? null : arguments.RouteNames.ElementAt(currentPathIndex);
-            pathInfo.EstimatedTime = this.estimatedPathDuration.ElementAt(currentPathIndex);
-            pathInfo.EstimatedLength = this.estimatedPathLength.ElementAt(currentPathIndex);
-            pathInfo.AvgRain = this.results.ElementAt(currentPathIndex).averages[currentTimeIndex];           // mm/hour
             pathInfo.EndTime = manager.Maps.ElementAt(RadarMapManager.totalNumMaps - 2).Time;                 // remember to handle this
             pathInfo.StartTime = manager.Maps.ElementAt(RadarMapManager.totalOldMaps).Time;
-            pathInfo.PathTime = manager.Maps.ElementAt(currentTimeIndex + RadarMapManager.totalOldMaps).Time;
+            pathInfo.PathTime = manager.Maps.ElementAt(predictor.CurrentTimeIndex + RadarMapManager.totalOldMaps).Time;
 
             this.defaultViewModel["PathInfo"] = pathInfo;
 
-        }
+            // update slider
+            this.exitTimeSlider.Value = this.predictor.CurrentTimeIndex * 10 + 5;
 
+            // update route
+            await map.TrySetViewBoundsAsync(this.boxes.ElementAt(predictor.CurrentRouteIndex), null, MapAnimationKind.None);
 
-        private void loadAllPaths()
-        {
-            foreach(var path in this.results)
-            {
-                foreach(MapRouteView view in path.routesCollection)
-                {
-                    view.OutlineColor = Colors.Transparent;
-                    view.RouteColor = Colors.Transparent;
-                    this.map.Routes.Add(view);
-                }
-            }
         }
 
 
@@ -351,109 +250,86 @@ namespace RainMan
         private async void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
 
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
 
+            RadarMapManager manager = RadarMapManager.getRadarMapManager();
             MapService.ServiceToken = "BaBZ6ETOrg8G3L31STm8dg";
-            manager = RadarMapManager.getRadarMapManager();
-            computationWindow = new ModalWindow("Calculating ...", "", "", 1);    
-            computationWindow.Dialog.ShowAsync();
+            
+           ModalWindow computationWindow = new ModalWindow("Calculating ...", "", "", 1);    
+           //await computationWindow.Dialog.ShowAsync();
 
-            // get arguments
+            // get arguments passed to page
             arguments = e.NavigationParameter as RoutePredictionArgs;
 
-            List<String> Names = new List<string>();
-            if(arguments.RouteNames != null)
-            {
-                this.routesAppBar.Visibility = Visibility.Visible;
-                Names = arguments.RouteNames;
-
-            }
-            List<PathNameDescriptor> pathNames = PathNameDescriptor.toPathNameDescriptors(Names);
-            this.defaultViewModel["PathNames"] = pathNames;
+            handlePathNames();
 
             // get num time slots per route 
-            this.NumTimeSlots = arguments.NumTimeSlots;
+            int numTimeSlots = arguments.NumTimeSlots;
+    
+            List<MapRoute> routes = new List<MapRoute>();
 
-            // init predictor 
-            predictor = new RouteRainPredictor(manager, NumTimeSlots, arguments.Transportation);
-
-            // process each route
+            // create an actual path for each collection of waypoints in the given group
             for (int i = 0; i < arguments.RouteCollection.Count; ++ i )
             {
+                MapRoute res = await createRoute(arguments.RouteCollection.ElementAt(i), computationWindow);
+                routes.Add(res);
 
-                await processRoute(arguments.RouteCollection.ElementAt(i));
+                // should handle failure here!
 
             }
 
+            // allocate predictor 
+            predictor = new RouteGroupAnnotator(routes, map);
 
-            int minPathIndex = 0;
-            // find minimum group and 
-            for (int k = 0; k < this.bestAverages.Count; ++k)
-            {
-                if (this.bestAverages[k] < this.bestAverages[minPathIndex])
-                 {
-                     minPathIndex = k;
-                 }
-            }
-
-            // set current path
-            this.currentPathIndex = minPathIndex;
-            this.currentTimeIndex = minIndices.ElementAt(minPathIndex);
-
-            // load all paths onto map control
-            loadAllPaths();
-
+            // init prediction
+            await this.predictor.InitRouteGroupsPredictions(arguments.Transportation, numTimeSlots);
 
             // start binding data
             SuggestionInfo suggestion = new SuggestionInfo();
 
-            
             // put time and path name
-            string pathName = arguments.RouteNames == null ? null : arguments.RouteNames.ElementAt(currentPathIndex);
-            suggestion.TimeSuggestion = manager.Maps.ElementAt(currentTimeIndex + RadarMapManager.totalOldMaps).Time;
+            string pathName = arguments.RouteNames == null ? null : arguments.RouteNames.ElementAt(predictor.CurrentRouteIndex);
+            suggestion.TimeSuggestion = manager.Maps.ElementAt(predictor.CurrentTimeIndex + RadarMapManager.totalOldMaps).Time;
             suggestion.PathNameSuggestion = pathName;
+
             // put suggestion
             this.defaultViewModel["Suggestion"] = suggestion;
             this.SuggestionGrid.Visibility = Visibility.Visible;
 
             // update content view
-            updateContentView();
+            await updateContentView();
 
-            await map.TrySetViewBoundsAsync(this.boxes.ElementAt(currentPathIndex), null, MapAnimationKind.None);
+            sw.Stop();
+            var x = sw.Elapsed;
 
-            this.computationWindow.Dialog.Hide();
+            //computationWindow.Dialog.Hide();
         }
 
-        private MapRoute currentRoute;
+       
 
-        private List<Color>[] colorsPerStartingTime = new List<Color>[4];
-        private double[] avg = new double[4];
-        private List<MapRouteView> routeViews;
+        private void handlePathNames()
+        {
+            List<String> Names = new List<string>();
+            if(arguments.RouteNames != null)
+            {
+                // prediction on a group
+                this.routesAppBar.Visibility = Visibility.Visible;
+                Names = arguments.RouteNames;
+
+            }
+            
+            //translate the given names to a presentable form
+            List<PathNameDescriptor> pathNames = PathNameDescriptor.toPathNameDescriptors(Names);
+            this.defaultViewModel["PathNames"] = pathNames;
+        }
 
         private void setTimeText(int timeIndex)
         {
             //this.timeToLeaveText.Text = String.Format("Leave in {0} minutes", timeIndex * 10);
         }
 
-        public async Task setPredictions(MapRoute route, int numTimeSlots)
-        {
-
-            // calculate prediction over route
-            RouteRainPredictor predictor = new RouteRainPredictor(manager, numTimeSlots, arguments.Transportation);
-            var res = await predictor.routeToPredictions(route);
-            colorsPerStartingTime = res.routesPerStartingTime;
-            routeViews = res.routesCollection;
-            avg = res.averages;
-        }
-
-
-        private void addRouteAnnotations(List<LegAnnotation> legs)
-        {
-            map.Children.Clear();
-            foreach (LegAnnotation leg in legs)
-            {
-                leg.addToMapControl(map);
-            }
-        }
+     
 
         /// <summary>
         /// Preserves state associated with this page in case the application is suspended or the
@@ -494,26 +370,12 @@ namespace RainMan
 
         #endregion
 
-        private void appTimeSlider_Checked(object sender, RoutedEventArgs e)
-        {
-            if (this.exitTimeSliderGrid != null)
-                this.exitTimeSliderGrid.Visibility = Visibility.Visible;
-        }
-
-        private void appTimeSlider_Unchecked(object sender, RoutedEventArgs e)
-        {
-            this.exitTimeSliderGrid.Visibility = Visibility.Collapsed;
-        }
+     
 
         private void appInfo_Checked(object sender, RoutedEventArgs e)
         {
             this.informationGrid.Visibility = Visibility.Visible;
-           // double height = RainToHeight.rainToHeight(this.results.ElementAt(currentPathIndex).averages.ElementAt(currentTimeIndex));
-          //  this.fillBarAnimation.To = height;
-          //  this.rainRec.Height = height;
-           // this.rainRec.Fill = new SolidColorBrush(ColorTranslator.rainToColor(this.results.ElementAt(currentPathIndex).averages.ElementAt(currentTimeIndex)));
-          //  this.fillBar.Begin();
-            
+               
         }
 
         private void appInfo_Unchecked(object sender, RoutedEventArgs e)
@@ -528,30 +390,12 @@ namespace RainMan
             int newIndex = ((int)e.NewValue) / 10;
             if(oldIndex != newIndex)
             {
-                this.currentTimeIndex = newIndex;
+                predictor.changeTimeIndex(newIndex);
                 updateContentView();
             }
 
         }
-
-        private async void updateMapWithRoute(int index)
-        {
-            
-            for (int i = 0; i < this.routeViews.Count; ++ i )
-            {
-                Color c = this.colorsPerStartingTime[index].ElementAt(i);
-                this.routeViews.ElementAt(i).RouteColor = c;
-                this.routeViews.ElementAt(i).OutlineColor = c;
-            }
-
-     
-            await map.TrySetViewBoundsAsync(currentRoute.BoundingBox, null, MapAnimationKind.None);
-        }
-
-        private void CommandBar_Opened(object sender, object e)
-        {
-
-        }
+      
 
         private void SuggestionGrid_Tapped(object sender, TappedRoutedEventArgs e)
         {
@@ -587,28 +431,20 @@ namespace RainMan
             int index = item.Index;
 
 
-            if (this.currentPathIndex == index)
+            if (predictor.CurrentRouteIndex == index)
             {
              
                 this.fadeOutPaths.Begin(); 
                 // same item
                 return;
             }
-            this.currentPathIndex = index;
 
-            // fetch the best time index
-            this.currentTimeIndex = this.minIndices.ElementAt(currentPathIndex);
+
+            this.predictor.changeRoute(index);
 
             // update content view
-            updateContentView();
-            
-            // update slider
-            this.exitTimeSlider.Value = currentTimeIndex * 10 + 5;
-
-            // update route
-            await map.TrySetViewBoundsAsync(this.boxes.ElementAt(currentPathIndex), null, MapAnimationKind.None);
-
-            
+            await updateContentView();
+          
             this.fadeOutPaths.Begin();
 
         }

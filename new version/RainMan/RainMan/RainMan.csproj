@@ -119,6 +119,7 @@
     <Compile Include="Routes.xaml.cs">
       <DependentUpon>Routes.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tasks\LocationsToEstimations.cs" />
     <Compile Include="Tasks\PolygonComputations.cs" />
     <Compile Include="Tasks\RadarMaps.cs" />
     <Compile Include="Tasks\ColorTranslator.cs" />

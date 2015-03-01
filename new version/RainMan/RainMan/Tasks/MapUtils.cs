@@ -101,7 +101,8 @@ namespace RainMan.Tasks
 
 
         // create a color push pin for a route leg, according to the given average rain 
-        public static DependencyObject getRouteRainPushPin(double averageRain)
+        // also returns the rectangle that holds the colour brush
+        public static DependencyObject getRouteRainPushPin(double averageRain, out Rectangle colorRect)
         {
             //Creating a Grid element.
             var myGrid = new Grid();
@@ -131,8 +132,51 @@ namespace RainMan.Tasks
             myPolygon.SetValue(Grid.ColumnProperty, 0);
 
             myGrid.Children.Add(myPolygon);
+            colorRect = myRectangle;
             return myGrid;
 
+        }
+
+        public static DependencyObject getTimeAnnotation(int timeMark)
+        {
+            //Creating a Grid element.
+            var myGrid = new Grid();
+            myGrid.RowDefinitions.Add(new RowDefinition());
+            myGrid.RowDefinitions.Add(new RowDefinition());
+            myGrid.Background = new SolidColorBrush(Colors.Transparent);
+
+            // get color object from average rain
+           // Color color = ColorTranslator.rainToColor(averageRain);
+
+
+            //Creating a textblock
+
+            var myText = new TextBlock { Text = string.Format("{0} minutes", timeMark * 10), FontSize = 20 };
+            myText.SetValue(Grid.RowProperty, 0);
+            myText.SetValue(Grid.ColumnProperty, 0);
+
+            
+            //Creating a Rectangle
+           // var myRectangle = new Rectangle { Fill = new SolidColorBrush(color), Height = 20, Width = 20 };
+            //myRectangle.SetValue(Grid.RowProperty, 0);
+           // myRectangle.SetValue(Grid.ColumnProperty, 0);
+
+            //Adding the Rectangle to the Grid
+            myGrid.Children.Add(myText);
+
+            //Creating a Polygon
+            var myPolygon = new Polygon()
+            {
+                Points = new PointCollection() { new Point(2, 0), new Point(22, 0), new Point(2, 40) },
+                Stroke = new SolidColorBrush(Colors.Black),
+                Fill = new SolidColorBrush(Colors.Black)
+            };
+            myPolygon.SetValue(Grid.RowProperty, 1);
+            myPolygon.SetValue(Grid.ColumnProperty, 0);
+
+            myGrid.Children.Add(myPolygon);
+            
+            return myGrid;
         }
 
         public static void addPinToMap(MapControl map, DependencyObject pin, Geopoint location)
