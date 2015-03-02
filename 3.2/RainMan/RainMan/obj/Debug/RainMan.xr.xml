@@ -142,10 +142,10 @@
       <RootProperty Name="Text" />
       <RootProperty Name="Style" />
       <RootProperty Name="Inlines" />
+      <RootProperty Name="TextTrimming" />
       <RootProperty Name="FontFamily" />
       <RootProperty Name="Visibility" />
       <RootProperty Name="TextAlignment" />
-      <RootProperty Name="TextTrimming" />
     </RootType>
     <RootType FullName="Windows.UI.Xaml.Controls.TextBox">
       <RootProperty Name="HorizontalAlignment" />
@@ -164,8 +164,9 @@
       <RootProperty Name="HorizontalAlignment" />
       <RootProperty Name="Margin" />
       <RootProperty Name="VerticalAlignment" />
-      <RootProperty Name="Foreground" />
+      <RootProperty Name="Visibility" />
       <RootProperty Name="BorderBrush" />
+      <RootProperty Name="Foreground" />
       <RootProperty Name="Flyout" />
       <RootProperty Name="Width" />
       <RootProperty Name="Height" />
@@ -213,6 +214,20 @@
     <RootType FullName="Microsoft.Xaml.Tools.DirectUI.ProxyTypes.ThemeResourceExtension" />
     <RootType FullName="Windows.UI.Xaml.Documents.LineBreak" />
     <RootType FullName="RainMan.GroupBuilder" />
+    <RootType FullName="Windows.UI.Xaml.Controls.UserControl">
+      <RootProperty Name="Content" />
+    </RootType>
+    <RootType FullName="Windows.UI.Xaml.Controls.ProgressBar">
+      <RootProperty Name="IsIndeterminate" />
+      <RootProperty Name="Value" />
+      <RootProperty Name="Height" />
+      <RootProperty Name="VerticalAlignment" />
+      <RootProperty Name="Margin" />
+      <RootProperty Name="Visibility" />
+      <RootProperty Name="Width" />
+      <RootProperty Name="HorizontalAlignment" />
+    </RootType>
+    <RootType FullName="RainMan.LoadingDialog" />
     <RootType FullName="Windows.UI.Xaml.Data.Binding">
       <RootProperty Name="RelativeSource" />
       <RootProperty Name="Converter" />
@@ -303,13 +318,6 @@
       <RootEvent Name="SelectionChanged" />
     </RootType>
     <RootType FullName="RainMan.ManageGroup" />
-    <RootType FullName="Windows.UI.Xaml.Controls.ProgressBar">
-      <RootProperty Name="IsIndeterminate" />
-      <RootProperty Name="Width" />
-      <RootProperty Name="HorizontalAlignment" />
-      <RootProperty Name="VerticalAlignment" />
-      <RootProperty Name="Visibility" />
-    </RootType>
     <RootType FullName="RainMan.DataTimeConverter" />
     <RootType FullName="Windows.UI.Xaml.Controls.Slider">
       <RootProperty Name="Maximum" />

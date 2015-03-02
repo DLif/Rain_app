@@ -26,10 +26,6 @@
         <valueconverter:toColorConvertor x:Key="RainToColor"/>
 
 
-       
-
-        
-
         <DataTemplate x:Name="PathNameTemplate">
             
             <TextBlock FontSize="25" Foreground="White" Text="{Binding Name}"></TextBlock>
@@ -50,6 +46,11 @@
 
     <Grid x:Name="LayoutRoot" DataContext="{Binding}" >
 
+        
+
+
+
+
         <Grid.ChildrenTransitions>
             <TransitionCollection>
                 <EntranceThemeTransition/>
@@ -69,6 +70,8 @@
 
         </Grid.ColumnDefinitions>
 
+
+       
 
         <Grid Grid.Row="1" x:Name="mapGrid" Grid.Column="0" Grid.ColumnSpan="3" DataContext="{Binding}">
             <Maps:MapControl x:Name="map" MapServiceToken="BaBZ6ETOrg8G3L31STm8dg" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">

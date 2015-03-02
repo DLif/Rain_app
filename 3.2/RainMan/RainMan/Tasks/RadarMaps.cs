@@ -323,58 +323,66 @@ namespace RainMan.Tasks
             CloudBlobContainer predictionsContainer = client.GetContainerReference("predictions");
 
             RadarMap[] files = new RadarMap[totalNumMaps];
+   
 
-            for (int i = totalNumMaps-1; i >= 0; --i)
-            {
-                String pngFormatImage = String.Format("{0}.png", i);
-                CloudBlockBlob blob = predictionsContainer.GetBlockBlobReference(pngFormatImage);
-                String jpgFormatImage = String.Format("{0}.jpg", i);
-
-                // download png image
-                var ms = new MemoryStream();
-                try
+            var seq = Enumerable.Range(0, totalNumMaps);
+            var tasks = seq.Select(async i =>
                 {
-                    await blob.DownloadToStreamAsync(ms.AsOutputStream());
-                }
-                catch (Exception e)
-                {
-                    String msg = e.Message;
-                }
-                IRandomAccessStream accessStream = ms.AsRandomAccessStream();
-                accessStream.Seek(0);
-                BitmapImage imageSource = new BitmapImage();
-                await imageSource.SetSourceAsync(accessStream);
 
-                // download jpg image (only for maps we going to predict on)
-                WriteableBitmap writeableImage = null;
-                if(i <= currentRadarMapIndex){
 
-                    blob = predictionsContainer.GetBlockBlobReference(jpgFormatImage);
-                    await blob.DownloadToStreamAsync(ms.AsOutputStream());
-                    accessStream = ms.AsRandomAccessStream();
+                    String pngFormatImage = String.Format("{0}.png", i);
+                    CloudBlockBlob blob = predictionsContainer.GetBlockBlobReference(pngFormatImage);
+                    String jpgFormatImage = String.Format("{0}.jpg", i);
+
+                    // download png image
+                    var ms = new MemoryStream();
+                    try
+                    {
+                        await blob.DownloadToStreamAsync(ms.AsOutputStream());
+                    }
+                    catch (Exception e)
+                    {
+                        String msg = e.Message;
+                    }
+                    IRandomAccessStream accessStream = ms.AsRandomAccessStream();
                     accessStream.Seek(0);
-                    writeableImage = new WriteableBitmap(512, 512);
-                    await writeableImage.SetSourceAsync(accessStream);
-                }
+                    BitmapImage imageSource = new BitmapImage();
+                    await imageSource.SetSourceAsync(accessStream);
+
+                    // download jpg image (only for maps we going to predict on)
+                    WriteableBitmap writeableImage = null;
+                    if (i <= currentRadarMapIndex)
+                    {
+
+                        blob = predictionsContainer.GetBlockBlobReference(jpgFormatImage);
+                        await blob.DownloadToStreamAsync(ms.AsOutputStream());
+                        accessStream = ms.AsRandomAccessStream();
+                        accessStream.Seek(0);
+                        writeableImage = new WriteableBitmap(512, 512);
+                        await writeableImage.SetSourceAsync(accessStream);
+                    }
 
 
 
-                DateTime time = DateTime.Now;
-                time = time.AddMinutes((-1) * (time.Minute % 10));
+                    DateTime time = DateTime.Now;
+                    time = time.AddMinutes((-1) * (time.Minute % 10));
 
-                if (i > currentRadarMapIndex)
-                {
-                    time = time.AddMinutes((-1) * 10 * (i - currentRadarMapIndex));
-                }
-                else if(i < currentRadarMapIndex)
-                {
-                    time = time.AddMinutes(10 * (currentRadarMapIndex - i));
-                }
+                    if (i > currentRadarMapIndex)
+                    {
+                        time = time.AddMinutes((-1) * 10 * (i - currentRadarMapIndex));
+                    }
+                    else if (i < currentRadarMapIndex)
+                    {
+                        time = time.AddMinutes(10 * (currentRadarMapIndex - i));
+                    }
 
-                // flip the order
-                files[totalNumMaps - 1 - i] = new RadarMap(time, imageSource, RadarMapManager.center, writeableImage);
-            }
+                    // flip the order
+                    files[totalNumMaps - 1 - i] = new RadarMap(time, imageSource, RadarMapManager.center, writeableImage);
 
+            });
+            await Task.WhenAll(tasks);
+            
+            
             return files;
 
         }

@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Windows.Devices.Geolocation;
 using Windows.Foundation;
 using Windows.Services.Maps;
+using Windows.Storage.Streams;
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -63,7 +64,7 @@ namespace RainMan.Tasks
             return all;
         }
 
-        public async Task InitRouteGroupsPredictions(RouteKind kind, int timeSlots)
+        public async Task InitRouteGroupsPredictions(RouteKind kind, int timeSlots, LoadingDialog loadingScreen)
         {
 
             List<RadarMap> Maps = new List<RadarMap>();
@@ -79,21 +80,28 @@ namespace RainMan.Tasks
             Stopwatch sw = new Stopwatch();
             sw.Start();
             List<Task> tasks = new List<Task>();
+            int donePaths = 0;
             // create an annotation and predictions for each route in the group
             foreach (MapRoute route in Routes)
             {
+                loadingScreen.updatePredictionProgress(donePaths, Routes.Count);
+
                 SingleRouteAnnotations annotation = new SingleRouteAnnotations();
                 // add to collection
                 routeAnnotations.Add(annotation);
 
                 // initialize predictions and annotations for current route in group
-                await annotation.routeToAnnotations(route, kind, timeSlots, Maps);
+                await annotation.routeToAnnotations(route, kind, timeSlots, Maps, Routes.Count);
 
-
+                ++donePaths;
+    
             }
-            //await Task.WhenAll(tasks);
+            // await Task.WhenAll(tasks);
             sw.Stop();
             TimeSpan x = sw.Elapsed;
+
+            // done with predictions
+            loadingScreen.CurrentStepNum = 3;
 
 
             // load all the routes
@@ -153,6 +161,18 @@ namespace RainMan.Tasks
                     annot.Pin.SetValue(Grid.VisibilityProperty, Visibility.Collapsed);
                     MapControl.SetLocation(annot.Pin, annot.Location);
                     MapControl.SetNormalizedAnchorPoint(annot.Pin, new Point(0.0, 1.0));
+                    
+                   // var pin = new MapIcon()
+                   // {
+                    //    Location = annot.Location,
+                       // Title = "testing",
+                       // NormalizedAnchorPoint = new Point(0.0, 1.0),
+                       // Visible = true,
+                     //   Image = RandomAccessStreamReference.CreateFromUri(new Uri("ms-appx:///Assets/radar/mappin.png"))
+                        
+                    //};
+                    //Map.MapElements.Add(pin);
+                   
                 }
             }
 
@@ -306,10 +326,10 @@ namespace RainMan.Tasks
 
 
         // calculate prediction for the given route and fill the data (colors and averages)
-        public async Task routeToAnnotations(MapRoute route, RouteKind routeKind, int numTimeSlots, List<RadarMap> maps)
+        public async Task routeToAnnotations(MapRoute route, RouteKind routeKind, int numTimeSlots, List<RadarMap> maps, int numRoutes)
         {
            
-            await predictionsForPath(route, 0, numTimeSlots,routeKind, maps);
+            await predictionsForPath(route, 0, numTimeSlots,routeKind, maps, numRoutes);
 
             // find best time to leave
             int minIndex = 0;
@@ -324,7 +344,7 @@ namespace RainMan.Tasks
         }
 
 
-        public async Task predictionsForPath(MapRoute path, double startingMinute, int numTimeSlots, RouteKind kind, List<RadarMap> Maps)
+        public async Task predictionsForPath(MapRoute path, double startingMinute, int numTimeSlots, RouteKind kind, List<RadarMap> Maps, int numRoutes)
         {
 
             int numPaths = 1;
@@ -337,26 +357,74 @@ namespace RainMan.Tasks
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
+
+           
+      
+
+
             int numIterations = (int)Math.Ceiling((path.Path.Positions.Count -1) / (double)(slotSize -1));
             double[][] results = new double[numIterations][];
 
+           // int threadsEachRound = 2;
+           // int numRounds = numIterations / threadsEachRound;
+
+           // numRounds = Math.Max(numRounds, 1);
+
+            //for (int round = 0; round < numRounds - 1; round++)
+            //{
+
+            //    var seq = Enumerable.Range(round * threadsEachRound, threadsEachRound);
+            //    var tasks = seq.Select(async j =>
+            //    {
+            //        i = 1 + (slotSize - 1) * j;
+            //        int startIndex = i - 1;
+            //        int lastIndex = Math.Min(i + slotSize - 2, path.Path.Positions.Count - 1);
+            //        Geopoint startPoint = new Geopoint(path.Path.Positions.ElementAt(startIndex));
+            //        Geopoint endPoint = new Geopoint(path.Path.Positions.ElementAt(lastIndex));
+
+            //        results[j] = await LocationsToEstimations.getTimeAndDistance(startPoint, endPoint, kind);
+            //        //awaitingTask.Wait();
+            //        //results[j] = awaitingTask.Result;
+            //    });
+            //    await Task.WhenAll(tasks);
+
+            //}
+
+
+
             var seq = Enumerable.Range(0, numIterations);
-
             var tasks = seq.Select(async j =>
-                {
-                    i = 1 + (slotSize - 1) * j;
-                   int startIndex = i - 1;
-                   int lastIndex = Math.Min(i + slotSize - 2, path.Path.Positions.Count - 1);
-                   Geopoint startPoint = new Geopoint(path.Path.Positions.ElementAt(startIndex));
-                   Geopoint endPoint = new Geopoint(path.Path.Positions.ElementAt(lastIndex));
+            {
+                i = 1 + (slotSize - 1) * j;
+                int startIndex = i - 1;
+                int lastIndex = Math.Min(i + slotSize - 2, path.Path.Positions.Count - 1);
+                Geopoint startPoint = new Geopoint(path.Path.Positions.ElementAt(startIndex));
+                Geopoint endPoint = new Geopoint(path.Path.Positions.ElementAt(lastIndex));
 
-                   results[j] = await LocationsToEstimations.getTimeAndDistance(startPoint, endPoint, kind);
-                   // awaitingTask.Wait();
-                   // results[j] = awaitingTask.Result;
-               });
+                results[j] = await LocationsToEstimations.getTimeAndDistance(startPoint, endPoint, kind);
+                //awaitingTask.Wait();
+                //results[j] = awaitingTask.Result;
+            });
+            await Task.WhenAll(tasks);
 
-           await Task.WhenAll(tasks);
+            //var finalSeq = Enumerable.Range((numRounds - 1) * threadsEachRound, numIterations - (numRounds - 1) * threadsEachRound);
+            //var finalTasks = finalSeq.Select(async j =>
+            //{
+            //    i = 1 + (slotSize - 1) * j;
+            //    int startIndex = i - 1;
+            //    int lastIndex = Math.Min(i + slotSize - 2, path.Path.Positions.Count - 1);
+            //    Geopoint startPoint = new Geopoint(path.Path.Positions.ElementAt(startIndex));
+            //    Geopoint endPoint = new Geopoint(path.Path.Positions.ElementAt(lastIndex));
 
+            //    results[j] = await LocationsToEstimations.getTimeAndDistance(startPoint, endPoint, kind);
+            //    //awaitingTask.Wait();
+            //    //results[j] = awaitingTask.Result;
+            //});
+
+            //await Task.WhenAll(finalTasks);
+
+  
+     
            
             sw.Stop();
             var x = sw.Elapsed;
@@ -364,7 +432,7 @@ namespace RainMan.Tasks
             for (i = 1, index = 0; i < path.Path.Positions.Count; i = i + slotSize - 1, ++index)
             {
 
-                int startIndex = i -1;
+                int startIndex = i - 1;
                 int lastIndex = Math.Min(i + slotSize - 2, path.Path.Positions.Count -1);
 
                 Annotation annot = new Annotation(new Geopoint(path.Path.Positions.ElementAt((int)(0.5 * startIndex + 0.5 * lastIndex))));

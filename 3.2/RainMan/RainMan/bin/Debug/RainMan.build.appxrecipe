@@ -205,6 +205,9 @@
     <AppxPackagedFile Include="C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\bin\Debug\GroupBuilder.xbf">
       <PackagePath>GroupBuilder.xbf</PackagePath>
     </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\bin\Debug\LoadingDialog.xbf">
+      <PackagePath>LoadingDialog.xbf</PackagePath>
+    </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\bin\Debug\Main.xbf">
       <PackagePath>Main.xbf</PackagePath>
     </AppxPackagedFile>

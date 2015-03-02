@@ -126,13 +126,21 @@ namespace RainMan
         public RoutePredictions()
         {
             this.InitializeComponent();
+            this.LayoutRoot.Children.Add(this.loadingDiag);
+            this.loadingDiag.OnClick = this.GoBackButton_Click;
+            this.BottomAppBar.Visibility = Visibility.Collapsed;
+            loadingDiag.SetValue(Grid.RowSpanProperty, 2);
+            loadingDiag.SetValue(Grid.ColumnSpanProperty, 3);
+           
 
-            this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Disabled;
-
+            this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Disabled; 
             this.navigationHelper = new NavigationHelper(this);
             this.navigationHelper.LoadState += this.NavigationHelper_LoadState;
             this.navigationHelper.SaveState += this.NavigationHelper_SaveState;
         }
+
+      
+       
 
         /// <summary>
         /// Gets the <see cref="NavigationHelper"/> associated with this <see cref="Page"/>.
@@ -152,20 +160,24 @@ namespace RainMan
         }
 
 
+        private LoadingDialog loadingDiag = new LoadingDialog();
+        private string errorMessage;
 #region
-        private async Task<MapRoute> createRoute(List<Geopoint> path, ModalWindow computationWindow)
+        private MapRoute createRoute(List<Geopoint> path)
         {
 
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-            //---------------- PART 1 : Use BING API to complete the route from given waypoints -------------- //
 
+
+            Task timeOutTask = Task.Delay(TimeSpan.FromSeconds(5));
+            var taskWrapper = new Task[2];
+            taskWrapper[0] = (timeOutTask);
             MapRouteFinderResult routeResult = null;
+            IAsyncOperation<MapRouteFinderResult> task = null;
             if (arguments.Transportation == RouteKind.DRIVE)
             {
                 // no restirctions
-                routeResult =
-                    await MapRouteFinder.GetDrivingRouteFromWaypointsAsync(path,
+                task =
+                    MapRouteFinder.GetDrivingRouteFromWaypointsAsync(path,
                     MapRouteOptimization.Time,
                     MapRouteRestrictions.None);
             }
@@ -174,8 +186,8 @@ namespace RainMan
             {
 
                 // avoid highways
-                routeResult =
-                    await MapRouteFinder.GetDrivingRouteFromWaypointsAsync(
+                task =
+                    MapRouteFinder.GetDrivingRouteFromWaypointsAsync(
                     path,
                     MapRouteOptimization.Time,
                     MapRouteRestrictions.Highways);
@@ -184,20 +196,28 @@ namespace RainMan
             else if (arguments.Transportation == RouteKind.WALK)
             {
                 // walking 
-                routeResult = await MapRouteFinder.GetWalkingRouteFromWaypointsAsync(path);
+                task = MapRouteFinder.GetWalkingRouteFromWaypointsAsync(path);
             }
 
+            taskWrapper[1] = (task.AsTask<MapRouteFinderResult>());
+
+            int x = Task.WaitAny(taskWrapper);
+            if(x == 0)
+            {
+                task.Cancel();
+                errorMessage = "Could not compute route";
+                return null;
+            }
+
+            routeResult = task.GetResults();
             // get the route
             if (routeResult.Status != MapRouteFinderStatus.Success)
             {
-                // return error
-               // computationWindow.Dialog.Hide();
-                MessageDialog diag = new MessageDialog("Error!");
-                await diag.ShowAsync();
+                errorMessage =String.Format("Failed to compute route: {0}", routeResult.Status.ToString());
+                return null;
       
             }
-            sw.Stop();
-            TimeSpan TIME = sw.Elapsed;
+           
 
             this.boxes.Add(routeResult.Route.BoundingBox);
             this.estimatedPathLength.Add(routeResult.Route.LengthInMeters);
@@ -251,45 +271,44 @@ namespace RainMan
         /// session.  The state will be null the first time a page is visited.</param>
         private async void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
+            
 
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
+           
+            arguments = e.NavigationParameter as RoutePredictionArgs;
+            this.loadingDiag.PathNames = arguments.RouteNames;
 
             RadarMapManager manager = RadarMapManager.getRadarMapManager();
             MapService.ServiceToken = "BaBZ6ETOrg8G3L31STm8dg";
             
-           ModalWindow computationWindow = new ModalWindow("Calculating ...", "", "", 1);    
-           //await computationWindow.Dialog.ShowAsync();
-
             // get arguments passed to page
-            arguments = e.NavigationParameter as RoutePredictionArgs;
-
             handlePathNames();
-
+            
+            this.loadingDiag.CurrentStepNum = 1;
+            await Task.Delay(1000);
             // get num time slots per route 
             int numTimeSlots = arguments.NumTimeSlots;
-    
             List<MapRoute> routes = new List<MapRoute>();
 
             // create an actual path for each collection of waypoints in the given group
             for (int i = 0; i < arguments.RouteCollection.Count; ++ i )
             {
-                MapRoute res = await createRoute(arguments.RouteCollection.ElementAt(i), computationWindow);
+                MapRoute res =  createRoute(arguments.RouteCollection.ElementAt(i));
+                if(res == null)
+                {
+                    this.loadingDiag.ShowError(this.errorMessage);
+                    return;
+                }
                 routes.Add(res);
-
-                // should handle failure here!
+               
 
             }
-
+            this.loadingDiag.CurrentStepNum = 2;
+        
             // allocate predictor 
             predictor = new RouteGroupAnnotator(routes, map);
 
             // init prediction
-            await this.predictor.InitRouteGroupsPredictions(arguments.Transportation, numTimeSlots);
-
-            // draw all the pushpins
-            annotations = this.predictor.getAllAnnotations();
-            //this.defaultViewModel["Pins"] = annotations;
+            await this.predictor.InitRouteGroupsPredictions(arguments.Transportation, numTimeSlots, this.loadingDiag);
 
             // start binding data
             SuggestionInfo suggestion = new SuggestionInfo();
@@ -306,10 +325,17 @@ namespace RainMan
             // update content view
             await updateContentView();
 
-            sw.Stop();
-            var x = sw.Elapsed;
+            this.loadingDiag.CurrentStepNum = 4;
+            await this.loadingDiag.WaitHide();
 
-            //computationWindow.Dialog.Hide();
+            this.BottomAppBar.Visibility = Visibility.Visible;
+
+ 
+        }
+
+        void GoBackButton_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.GoBack();
         }
 
         private List<Annotation> annotations; 
@@ -328,11 +354,6 @@ namespace RainMan
             // translate the given names to a presentable form
             List<PathNameDescriptor> pathNames = PathNameDescriptor.toPathNameDescriptors(Names);
             this.defaultViewModel["PathNames"] = pathNames;
-        }
-
-        private void setTimeText(int timeIndex)
-        {
-            //this.timeToLeaveText.Text = String.Format("Leave in {0} minutes", timeIndex * 10);
         }
 
      
