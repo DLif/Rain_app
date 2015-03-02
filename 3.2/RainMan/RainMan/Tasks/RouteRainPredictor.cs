@@ -41,6 +41,8 @@ namespace RainMan.Tasks
 
         public int CurrentTimeIndex { get; set; }
 
+        public Boolean ErrorOccured { get; set; }
+
 
         public SingleRouteAnnotations getCurrentAnnotation()
         {
@@ -91,8 +93,13 @@ namespace RainMan.Tasks
                 routeAnnotations.Add(annotation);
 
                 // initialize predictions and annotations for current route in group
-                await annotation.routeToAnnotations(route, kind, timeSlots, Maps, Routes.Count);
+                await annotation.routeToAnnotations(route, kind, timeSlots, Maps, Routes.Count, loadingScreen);
 
+                if(annotation.ErrorOccured)
+                {
+                    ErrorOccured = true;
+                    return;
+                }
                 ++donePaths;
     
             }
@@ -326,10 +333,13 @@ namespace RainMan.Tasks
 
 
         // calculate prediction for the given route and fill the data (colors and averages)
-        public async Task routeToAnnotations(MapRoute route, RouteKind routeKind, int numTimeSlots, List<RadarMap> maps, int numRoutes)
+        public async Task routeToAnnotations(MapRoute route, RouteKind routeKind, int numTimeSlots, List<RadarMap> maps, int numRoutes, LoadingDialog loadingScreen)
         {
            
-            await predictionsForPath(route, 0, numTimeSlots,routeKind, maps, numRoutes);
+            await predictionsForPath(route, 0, numTimeSlots,routeKind, maps, numRoutes, loadingScreen);
+
+            if (ErrorOccured)
+                return;
 
             // find best time to leave
             int minIndex = 0;
@@ -343,8 +353,9 @@ namespace RainMan.Tasks
 
         }
 
+        public Boolean ErrorOccured { get; set; }
 
-        public async Task predictionsForPath(MapRoute path, double startingMinute, int numTimeSlots, RouteKind kind, List<RadarMap> Maps, int numRoutes)
+        public async Task predictionsForPath(MapRoute path, double startingMinute, int numTimeSlots, RouteKind kind, List<RadarMap> Maps, int numRoutes, LoadingDialog loadingScreen)
         {
 
             int numPaths = 1;
@@ -391,22 +402,32 @@ namespace RainMan.Tasks
             //}
 
 
-
-            var seq = Enumerable.Range(0, numIterations);
-            var tasks = seq.Select(async j =>
+            try
             {
-                i = 1 + (slotSize - 1) * j;
-                int startIndex = i - 1;
-                int lastIndex = Math.Min(i + slotSize - 2, path.Path.Positions.Count - 1);
-                Geopoint startPoint = new Geopoint(path.Path.Positions.ElementAt(startIndex));
-                Geopoint endPoint = new Geopoint(path.Path.Positions.ElementAt(lastIndex));
 
-                results[j] = await LocationsToEstimations.getTimeAndDistance(startPoint, endPoint, kind);
-                //awaitingTask.Wait();
-                //results[j] = awaitingTask.Result;
-            });
-            await Task.WhenAll(tasks);
 
+                var seq = Enumerable.Range(0, numIterations);
+                var tasks = seq.Select(async j =>
+                {
+                    i = 1 + (slotSize - 1) * j;
+                    int startIndex = i - 1;
+                    int lastIndex = Math.Min(i + slotSize - 2, path.Path.Positions.Count - 1);
+                    Geopoint startPoint = new Geopoint(path.Path.Positions.ElementAt(startIndex));
+                    Geopoint endPoint = new Geopoint(path.Path.Positions.ElementAt(lastIndex));
+
+                    results[j] = await LocationsToEstimations.getTimeAndDistance(startPoint, endPoint, kind);
+                    //awaitingTask.Wait();
+                    //results[j] = awaitingTask.Result;
+                });
+                await Task.WhenAll(tasks);
+
+            }
+            catch(Exception e)
+            {
+                loadingScreen.ShowError("Connection with server timed-out: " + e.Message);
+                ErrorOccured = true;
+                return;
+            }
             //var finalSeq = Enumerable.Range((numRounds - 1) * threadsEachRound, numIterations - (numRounds - 1) * threadsEachRound);
             //var finalTasks = finalSeq.Select(async j =>
             //{

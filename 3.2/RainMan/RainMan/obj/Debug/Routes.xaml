@@ -80,15 +80,7 @@
                 <Grid DataContext="{Binding QuickRouteOptions}">
                     
                     <Grid.Resources>
-                        <Storyboard x:ConnectionId='18' x:Name="FadeOutStory"                                    >
-                            <DoubleAnimation EnableDependentAnimation="True" From="1" To="0" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="transportImagebrush" Duration="0:0:0.3"></DoubleAnimation>
-                            
-                        </Storyboard>
-                        <Storyboard x:Name="FadeInStory" >
-                            <DoubleAnimation EnableDependentAnimation="True" From="0" To="1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="transportImagebrush" Duration="0:0:0.3"></DoubleAnimation>
-
-                        </Storyboard>
-
+                       
                     </Grid.Resources>
                     
                     <Grid.RowDefinitions>
@@ -187,7 +179,7 @@
             </PivotItem>
             <PivotItem x:Name="GroupPivot" Header="my routes" DataContext="{Binding PathGroups}">
                 <Grid DataContext="{Binding}" HorizontalAlignment="Stretch">
-                <ListView x:ConnectionId='17' x:Name="groupList"
+                <ListView x:ConnectionId='18' x:Name="groupList"
 						AutomationProperties.AutomationId="PathGroupItem"
 						AutomationProperties.Name="Paths in path group"
 						SelectionMode="Single"
@@ -222,6 +214,16 @@
                     <DoubleAnimation EnableDependentAnimation="true" x:Name="hideettingsGrid" From="1" To="0" Duration="0:0:0.5" Storyboard.TargetName="SettingsGrid" Storyboard.TargetProperty="Opacity"/>
 
                 </Storyboard>
+
+                <Storyboard x:ConnectionId='8' x:Name="FadeOutStory"                                    >
+                    <DoubleAnimation EnableDependentAnimation="True" From="1" To="0" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="transportImagebrush" Duration="0:0:0.3"></DoubleAnimation>
+
+                </Storyboard>
+                <Storyboard x:Name="FadeInStory" >
+                    <DoubleAnimation EnableDependentAnimation="True" From="0" To="1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="transportImagebrush" Duration="0:0:0.3"></DoubleAnimation>
+
+                </Storyboard>
+
 
             </Grid.Resources>
             <Grid.Background>
@@ -269,16 +271,16 @@
                         <Button.Flyout>
 
                             <MenuFlyout >
-                                <MenuFlyoutItem x:ConnectionId='14' x:Name="walkFlyout"
+                                <MenuFlyoutItem x:ConnectionId='15' x:Name="walkFlyout"
                                                         Text="Travel on foot" 
                                                                                 />
                                 <MenuFlyoutSeparator/>
-                                <MenuFlyoutItem x:ConnectionId='15' 
+                                <MenuFlyoutItem x:ConnectionId='16' 
                                                         Text="Bicycle" 
                                                                                    
                                                 />
                                 <MenuFlyoutSeparator/>
-                                <MenuFlyoutItem x:ConnectionId='16' 
+                                <MenuFlyoutItem x:ConnectionId='17' 
                                                         x:Name="carFlyout"
                                                         Text="Car" 
                                                                               />
@@ -309,24 +311,24 @@
                         <Button.Flyout>
 
                             <MenuFlyout >
-                                <MenuFlyoutItem x:ConnectionId='10' 
+                                <MenuFlyoutItem x:ConnectionId='11' 
                                                         x:Name="time0"
                                                         Text="Leave now" 
                                                                           />
                                 <MenuFlyoutSeparator/>
-                                <MenuFlyoutItem x:ConnectionId='11' 
+                                <MenuFlyoutItem x:ConnectionId='12' 
                                                     x:Name="time10"
                                                         Text="10 minutes" 
                                                                            
                                                 
                                                 />
                                 <MenuFlyoutSeparator/>
-                                <MenuFlyoutItem x:ConnectionId='12' 
+                                <MenuFlyoutItem x:ConnectionId='13' 
                                                        x:Name="time20"
                                                         Text="20 minutes" 
                                                                            />
                                 <MenuFlyoutSeparator/>
-                                <MenuFlyoutItem x:ConnectionId='13' 
+                                <MenuFlyoutItem x:ConnectionId='14' 
                                                        x:Name="time30"
                                                         Text="30 minutes" 
                                                                            />
@@ -353,11 +355,11 @@
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="Precision rate" Grid.RowSpan="1" HorizontalAlignment="left" FontWeight="Medium" Foreground="White" FontSize="20" Margin="10" />
                     <TextBlock Text="Num of sub routes per route" Grid.RowSpan="1" Grid.Row="1" HorizontalAlignment="left" FontWeight="Medium" Foreground="White" FontSize="15" Grid.ColumnSpan="2" Margin="5" />
-                    <Slider x:ConnectionId='9' Grid.Column="1" x:Name="timeSlotSlider" Maximum="15" Minimum="5" Value="10" Foreground="#FFCDCDCD"                                             />
+                    <Slider x:ConnectionId='10' Grid.Column="1" x:Name="timeSlotSlider" Maximum="15" Minimum="5" Value="10" Foreground="#FFCDCDCD"                                             />
                     <TextBlock Grid.Column="1" Grid.Row="1" x:Name="sliderValueText" Text="10" Grid.RowSpan="2" FontWeight="Light" Foreground="White" FontSize="25" HorizontalAlignment="Center" />
                 </Grid>
                 
-                <Button x:ConnectionId='8' Content="SAVE" x:Name="saveButton" Grid.Row="4" HorizontalAlignment="Center"                         />
+                <Button x:ConnectionId='9' Content="SAVE" x:Name="saveButton" Grid.Row="4" HorizontalAlignment="Center"                         />
 
             </Grid>
 

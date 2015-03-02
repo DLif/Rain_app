@@ -168,9 +168,9 @@ namespace RainMan
 
 
 
-            Task timeOutTask = Task.Delay(TimeSpan.FromSeconds(5));
+            Task timeOutTask = Task.Delay(TimeSpan.FromSeconds(3));
             var taskWrapper = new Task[2];
-            taskWrapper[0] = (timeOutTask);
+            
             MapRouteFinderResult routeResult = null;
             IAsyncOperation<MapRouteFinderResult> task = null;
             if (arguments.Transportation == RouteKind.DRIVE)
@@ -199,10 +199,10 @@ namespace RainMan
                 task = MapRouteFinder.GetWalkingRouteFromWaypointsAsync(path);
             }
 
-            taskWrapper[1] = (task.AsTask<MapRouteFinderResult>());
-
+            taskWrapper[0] = (task.AsTask<MapRouteFinderResult>());
+            taskWrapper[1] = (timeOutTask);
             int x = Task.WaitAny(taskWrapper);
-            if(x == 0)
+            if(x == 1)
             {
                 task.Cancel();
                 errorMessage = "Could not compute route";
@@ -231,7 +231,7 @@ namespace RainMan
 
 
 
-        private async Task updateContentView()
+        private async Task updateContentView(Boolean setBounds)
         {
 
             RadarMapManager manager = RadarMapManager.getRadarMapManager();
@@ -252,8 +252,9 @@ namespace RainMan
             // update slider
             this.exitTimeSlider.Value = this.predictor.CurrentTimeIndex * 10 + 5;
 
+            if(setBounds)
             // update route
-            await map.TrySetViewBoundsAsync(this.boxes.ElementAt(predictor.CurrentRouteIndex), null, MapAnimationKind.None);
+                await map.TrySetViewBoundsAsync(this.boxes.ElementAt(predictor.CurrentRouteIndex), null, MapAnimationKind.None);
 
         }
 
@@ -310,6 +311,9 @@ namespace RainMan
             // init prediction
             await this.predictor.InitRouteGroupsPredictions(arguments.Transportation, numTimeSlots, this.loadingDiag);
 
+            if (predictor.ErrorOccured)
+                return;
+
             // start binding data
             SuggestionInfo suggestion = new SuggestionInfo();
 
@@ -323,7 +327,7 @@ namespace RainMan
             this.SuggestionGrid.Visibility = Visibility.Visible;
 
             // update content view
-            await updateContentView();
+            await updateContentView(true);
 
             this.loadingDiag.CurrentStepNum = 4;
             await this.loadingDiag.WaitHide();
@@ -422,7 +426,7 @@ namespace RainMan
             if(oldIndex != newIndex)
             {
                 predictor.changeTimeIndex(newIndex);
-                updateContentView();
+                updateContentView(false);
             }
 
         }
@@ -474,7 +478,7 @@ namespace RainMan
             this.predictor.changeRoute(index);
 
             // update content view
-            await updateContentView();
+            await updateContentView(true);
           
             this.fadeOutPaths.Begin();
 

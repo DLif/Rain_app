@@ -162,7 +162,6 @@ C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\obj\Debug\L
 C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\obj\Debug\LoadingDialog.g.cs
 C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\obj\Debug\LoadingDialog.xaml
 C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\obj\Debug\LoadingDialog.xbf
-C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\obj\Debug\RainMan.csprojResolveAssemblyReference.cache
 C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\obj\Debug\Microsoft.Data.Edm\layout.resfiles
 C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\obj\Debug\Microsoft.Data.Edm\layout.resfiles.intermediate
 C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\obj\Debug\Microsoft.Data.Edm\Resources.resfiles

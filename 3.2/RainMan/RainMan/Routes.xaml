@@ -80,15 +80,7 @@
                 <Grid DataContext="{Binding QuickRouteOptions}">
                     
                     <Grid.Resources>
-                        <Storyboard x:Name="FadeOutStory" Completed="FadeOutStory_Completed" >
-                            <DoubleAnimation EnableDependentAnimation="True" From="1" To="0" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="transportImagebrush" Duration="0:0:0.3"></DoubleAnimation>
-                            
-                        </Storyboard>
-                        <Storyboard x:Name="FadeInStory" >
-                            <DoubleAnimation EnableDependentAnimation="True" From="0" To="1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="transportImagebrush" Duration="0:0:0.3"></DoubleAnimation>
-
-                        </Storyboard>
-
+                       
                     </Grid.Resources>
                     
                     <Grid.RowDefinitions>
@@ -222,6 +214,16 @@
                     <DoubleAnimation EnableDependentAnimation="true" x:Name="hideettingsGrid" From="1" To="0" Duration="0:0:0.5" Storyboard.TargetName="SettingsGrid" Storyboard.TargetProperty="Opacity"/>
 
                 </Storyboard>
+
+                <Storyboard x:Name="FadeOutStory" Completed="FadeOutStory_Completed" >
+                    <DoubleAnimation EnableDependentAnimation="True" From="1" To="0" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="transportImagebrush" Duration="0:0:0.3"></DoubleAnimation>
+
+                </Storyboard>
+                <Storyboard x:Name="FadeInStory" >
+                    <DoubleAnimation EnableDependentAnimation="True" From="0" To="1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="transportImagebrush" Duration="0:0:0.3"></DoubleAnimation>
+
+                </Storyboard>
+
 
             </Grid.Resources>
             <Grid.Background>
