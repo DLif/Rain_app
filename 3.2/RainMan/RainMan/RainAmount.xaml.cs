@@ -524,12 +524,6 @@ namespace RainMan
             
      
 
-            // now we need the number of images
-            // each hour should contain 6 images
-            int numImages = diff.Days * 24 * 6;
-            // now add todays images
-            numImages += DateTime.Now.Hour * 6;
-
 
             // first, get all points
             List<PixelRep> pixels = findAllPixels();
@@ -543,7 +537,7 @@ namespace RainMan
             var dict = new Dictionary<String, String>();
             dict.Add("places", encodedRequest);
             //numImages = 31;
-            dict.Add("picturesNum", numImages.ToString());
+            dict.Add("numDaysString", diff.Days.ToString());
 
             try
             {
@@ -557,7 +551,7 @@ namespace RainMan
 
                 this.ResultText.Visibility = Visibility.Visible;
                 //this.ResultText.Text = string.Format("Total: {0} Litres", res);
-                this.ResultText.Text = string.Format("Total: {0} Litres", 0.23);
+                this.ResultText.Text = string.Format("Total: {0} Litres", res);
 
 
             }
@@ -586,9 +580,7 @@ namespace RainMan
 
                 shapePixels.Add(new PixelRep(x_pixel, y_pixel));
             }
-
-            var poly = new CustomPolygon(shapePixels.Count, shapePixels);
-            return PolygonPixels.getAllPointsInsidePolygon(poly);
+            return shapePixels;
 
 
         }
