@@ -1,0 +1,371 @@
+﻿<Page
+    x:Class="RainMan.Routes"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:RainMan"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:Maps="using:Windows.UI.Xaml.Controls.Maps"
+    DataContext="{Binding DefaultViewModel, RelativeSource={RelativeSource Mode=Self}}"
+    xmlns:valueconverter="using:RainMan"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Page.BottomAppBar>
+        <CommandBar Foreground="Black" Opacity="0">
+            <AppBarButton x:Name="predictAppBar" Icon="Accept" Label="Predict Rain" Visibility="Collapsed" Click="predictAppBar_Click" />
+            <AppBarButton x:Name="manageGroupAppBar" Icon="Repair" Label="Manage" Visibility="Collapsed" Click="manageGroupAppBar_Click"/>   
+            <AppBarButton x:Name="predictAppBarGroup" Icon="Accept" Label="Predict Rain" Visibility="Collapsed" Click="predictAppBarGroup_Click"/>
+            <AppBarButton x:Name="addGroup" Icon="NewFolder" Label="New" Visibility="Collapsed" Click="addGroup_Click"/>
+            <AppBarButton x:Name="settingsAppbar" Icon="Setting" Label="Settings" Click="settingsAppbar_Click"/>
+
+        </CommandBar>
+    </Page.BottomAppBar>
+    
+    <Page.Resources>
+        <valueconverter:toColorBrushConverter x:Key="toColorBrush"/>
+        <valueconverter:toTextSizeConverter x:Key="toTextSize"/>
+
+    </Page.Resources>
+
+    <Grid x:Name="LayoutRoot" DataContext="{Binding}" >
+        <Grid.Resources>
+            <DataTemplate x:Key="StandardTripleLineItemTemplate">
+                <Grid HorizontalAlignment="Stretch" Margin="10">
+                   
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto">
+
+                        </RowDefinition>
+                        <RowDefinition Height="auto">
+
+                        </RowDefinition>
+                        <RowDefinition Height="auto" >
+
+                        </RowDefinition>
+                        <RowDefinition Height="auto" >
+
+                        </RowDefinition>
+                        <RowDefinition Height="auto" >
+
+                        </RowDefinition>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="{Binding GroupName}" Foreground="{Binding Selected,Converter={StaticResource toColorBrush}}" FontSize="{Binding Selected, Converter={StaticResource toTextSize}}" TextTrimming="CharacterEllipsis"/>
+
+                    <TextBlock Grid.Row="1" FontWeight="Medium" Text="From: " FontSize="18" Margin="10, 0, 0, 0"/>
+                    <TextBlock Grid.Row="2" Text="{Binding StartName}" FontSize="18"  Margin="25, 0, 0, 0" TextTrimming="CharacterEllipsis"/>
+
+
+                    <TextBlock  Grid.Row="3" FontWeight="Medium"  Text="To: " FontSize="18" Margin="10, 0, 0, 0"/>
+                    <TextBlock  Grid.Row="4" Text="{Binding FinishName}"  FontSize="18" Margin="25, 0, 0, 0" TextTrimming="CharacterEllipsis"/>
+
+                </Grid>
+
+            </DataTemplate>
+
+   
+        </Grid.Resources>
+        <Grid.Background>
+            
+            <ImageBrush ImageSource="Assets/bg6.jpg"/>
+
+        </Grid.Background>
+        
+     
+
+        <Pivot x:Name="pivot" SelectionChanged="Pivot_SelectionChanged">
+            <PivotItem x:Name="quickRoutePivot" Header="quick route" DataContext="{Binding}">
+                
+                <!-- Quick Route Section -->
+                <Grid DataContext="{Binding QuickRouteOptions}">
+                    
+                    <Grid.Resources>
+                       
+                    </Grid.Resources>
+                    
+                    <Grid.RowDefinitions>
+
+                        <RowDefinition Height="3.1*"/>
+                        
+                        <RowDefinition Height="0.5*"/>
+
+                    </Grid.RowDefinitions>
+
+
+                    <Grid Grid.Row="1">
+
+                        <Grid.RowDefinitions>
+
+                          
+                            <RowDefinition Height="*"/>
+
+
+                        </Grid.RowDefinitions>
+
+                        
+
+                        <StackPanel  Orientation="Horizontal" Grid.Row="0" HorizontalAlignment="center">
+                            
+                            <StackPanel.Background>
+                                
+                                <SolidColorBrush Color="white" Opacity="0.3"/>
+
+                            </StackPanel.Background>
+                            
+                            <StackPanel.Resources>
+
+                                <Style x:Key="FlyoutTrasnparent" TargetType="FlyoutPresenter">
+                                    <Setter Property="Background"
+                                                                         Value="Transparent" />
+                                </Style>
+
+                            </StackPanel.Resources>
+
+
+
+                        </StackPanel>
+                       
+
+                    </Grid>
+
+                    <Maps:MapControl MapServiceToken="BaBZ6ETOrg8G3L31STm8dg" x:Name="map" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Grid.Row="0"  Loaded="map_Loaded" >
+                        <Maps:MapItemsControl ItemsSource="{Binding Points}">
+
+                            <Maps:MapItemsControl.ItemTemplate>
+                                <DataTemplate>
+
+                                    <Image Source="{Binding imagePath}" Height="{Binding Height}" Width="{Binding Width}"
+                          
+											Maps:MapControl.Location="{Binding Location}"
+											Maps:MapControl.NormalizedAnchorPoint="{Binding AnchorPoint}" />
+
+
+                                </DataTemplate>
+                            </Maps:MapItemsControl.ItemTemplate>
+
+
+                        </Maps:MapItemsControl>
+                    </Maps:MapControl>
+
+
+                    <Grid x:Name="MapOverlay2"  Grid.Row="0" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Background="Transparent" Tapped="MapOverlay2_Tapped" >
+      
+
+                    </Grid>
+
+                    <Grid x:Name="MapOverlay" Opacity="{Binding OverlayVisibile}" Grid.Row="0" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Tapped="MapOverlay_Tapped" >
+                        <Grid.Background>                        
+                            <SolidColorBrush Color="Black" Opacity="0.3"></SolidColorBrush>
+                        </Grid.Background>
+
+
+                        <StackPanel Grid.Row="0" VerticalAlignment="Center" Height="70">
+                            <StackPanel.Background>
+                                <SolidColorBrush Color="Black" Opacity="0.7"></SolidColorBrush>
+                                
+                            </StackPanel.Background>
+                            
+                            <TextBlock HorizontalAlignment="Center" Text="Select source and destination points" FontSize="19" TextWrapping="WrapWholeWords"  Foreground="White" VerticalAlignment="Center" Margin="0,15, 0, 0"/>
+                            <TextBlock HorizontalAlignment="Center" Text="Tap on the map to manage the selection" FontSize="19" TextWrapping="WrapWholeWords"   Foreground="white"  VerticalAlignment="Center"/>
+                        
+
+                        </StackPanel>
+
+                    </Grid>
+
+
+                </Grid>
+
+            </PivotItem>
+            <PivotItem x:Name="GroupPivot" Header="my routes" DataContext="{Binding PathGroups}">
+                <Grid DataContext="{Binding}" HorizontalAlignment="Stretch">
+                <ListView x:Name="groupList"
+						AutomationProperties.AutomationId="PathGroupItem"
+						AutomationProperties.Name="Paths in path group"
+						SelectionMode="Single"
+						IsItemClickEnabled="True"
+                        Margin="0, 0, 0, 50"
+                        VerticalAlignment="Stretch"
+						ItemsSource="{Binding}"
+						ItemTemplate="{StaticResource StandardTripleLineItemTemplate}"
+						HorizontalAlignment="Stretch"
+						ContinuumNavigationTransitionInfo.ExitElementContainer="True" SelectionChanged="groupList_SelectionChanged" ItemClick="groupList_ItemClick">
+                        
+                </ListView>
+
+                </Grid>
+
+            </PivotItem>
+        </Pivot>
+
+
+        <Grid x:Name="SettingsGrid"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Opacity="0" Visibility="Collapsed">
+
+            <Grid.Resources>
+                
+                <Storyboard x:Name="showSettingsGridStory">
+
+                    <DoubleAnimation EnableDependentAnimation="true" x:Name="showSettingsGrid" From="0" To="1" Duration="0:0:0.5" Storyboard.TargetName="SettingsGrid" Storyboard.TargetProperty="Opacity"/>
+                    
+
+                </Storyboard>
+                <Storyboard x:Name="hideSettingsGridStory" Completed="hideSettingsGridStory_Completed">
+
+                    <DoubleAnimation EnableDependentAnimation="true" x:Name="hideettingsGrid" From="1" To="0" Duration="0:0:0.5" Storyboard.TargetName="SettingsGrid" Storyboard.TargetProperty="Opacity"/>
+
+                </Storyboard>
+
+                <Storyboard x:Name="FadeOutStory" Completed="FadeOutStory_Completed" >
+                    <DoubleAnimation EnableDependentAnimation="True" From="1" To="0" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="transportImagebrush" Duration="0:0:0.3"></DoubleAnimation>
+
+                </Storyboard>
+                <Storyboard x:Name="FadeInStory" >
+                    <DoubleAnimation EnableDependentAnimation="True" From="0" To="1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="transportImagebrush" Duration="0:0:0.3"></DoubleAnimation>
+
+                </Storyboard>
+
+
+            </Grid.Resources>
+            <Grid.Background>
+                <SolidColorBrush Color="black" Opacity="0.7"></SolidColorBrush>
+            </Grid.Background>
+            <Grid.RowDefinitions>
+
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="5*"/>
+                <RowDefinition Height="1*"/>
+
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="1">
+                <Grid.Background>
+                    <SolidColorBrush Color="black"/>
+                </Grid.Background>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="PREDICTION SETTINGS" FontWeight="Medium" Foreground="White" FontSize="22" HorizontalAlignment="Center" Margin="0, 20, 0, 0"/>
+
+                <Grid Grid.Row="1" x:Name="TransportationGrid" Background="#FF686868" Margin="10" Height="100">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                      
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+
+
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Transportation" HorizontalAlignment="left" FontWeight="Medium" Foreground="White" FontSize="20"  Margin="10, 35, 0, 0"/>
+                   
+                    <Button Grid.Column="1" x:Name="transportButton" Width="30" Height="50" BorderThickness="0" HorizontalAlignment="Center" VerticalAlignment="top" Margin="0, 20, 0, 0" BorderBrush="White" Foreground="White">
+                        <Button.Background>
+                            <ImageBrush x:Name="transportImagebrush"   ImageSource="ms-appx:///Assets/icons/walking.png" Stretch="Uniform" ></ImageBrush>
+                        </Button.Background>
+                        <Button.Flyout>
+
+                            <MenuFlyout >
+                                <MenuFlyoutItem x:Name="walkFlyout"
+                                                        Text="Travel on foot" 
+                                                       Click="walkFlyout_Click" />
+                                <MenuFlyoutSeparator/>
+                                <MenuFlyoutItem 
+                                                        Text="Bicycle" 
+                                                       Click="MenuFlyoutItem_Click"
+                                                />
+                                <MenuFlyoutSeparator/>
+                                <MenuFlyoutItem 
+                                                        x:Name="carFlyout"
+                                                        Text="Car" 
+                                                       Click="carFlyout_Click"/>
+
+                            </MenuFlyout>
+
+                        </Button.Flyout>
+
+                    </Button>
+                  
+                </Grid>
+                <Grid Grid.Row="2" x:Name="MaxStallGrid" Background="#FF424242" Margin="10" Height="100">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+
+
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Max waiting time" HorizontalAlignment="left" FontWeight="Medium" Foreground="White" FontSize="20"  Margin="10, 35, 0, 0"/>
+
+                    <Button x:Name="timeButton" Grid.Column="1" Content="30 minutes" HorizontalAlignment="Center" Foreground="White" Margin="0,0,10,0" BorderBrush="#FFFDFDFD" >
+
+                        <Button.Flyout>
+
+                            <MenuFlyout >
+                                <MenuFlyoutItem 
+                                                        x:Name="time0"
+                                                        Text="Leave now" 
+                                                       Click="time0_Click"/>
+                                <MenuFlyoutSeparator/>
+                                <MenuFlyoutItem 
+                                                    x:Name="time10"
+                                                        Text="10 minutes" 
+                                                       Click="time10_Click"
+                                                
+                                                />
+                                <MenuFlyoutSeparator/>
+                                <MenuFlyoutItem 
+                                                       x:Name="time20"
+                                                        Text="20 minutes" 
+                                                       Click="time20_Click"/>
+                                <MenuFlyoutSeparator/>
+                                <MenuFlyoutItem 
+                                                       x:Name="time30"
+                                                        Text="30 minutes" 
+                                                       Click="time30_Click"/>
+
+                            </MenuFlyout>
+
+                        </Button.Flyout>
+
+                    </Button>
+                </Grid>
+
+                <Grid Grid.Row="3" x:Name="TimeSlotBar" Background="#FF424242" Margin="10" Height="100">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition/>
+
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+
+
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Precision rate" Grid.RowSpan="1" HorizontalAlignment="left" FontWeight="Medium" Foreground="White" FontSize="20" Margin="10" />
+                    <TextBlock Text="Num of sub routes per route" Grid.RowSpan="1" Grid.Row="1" HorizontalAlignment="left" FontWeight="Medium" Foreground="White" FontSize="15" Grid.ColumnSpan="2" Margin="5" />
+                    <Slider Grid.Column="1" x:Name="timeSlotSlider" Maximum="15" Minimum="5" Value="10" Foreground="#FFCDCDCD" ValueChanged="timeSlotSlider_ValueChanged"  />
+                    <TextBlock Grid.Column="1" Grid.Row="1" x:Name="sliderValueText" Text="10" Grid.RowSpan="2" FontWeight="Light" Foreground="White" FontSize="25" HorizontalAlignment="Center" />
+                </Grid>
+                
+                <Button Content="SAVE" x:Name="saveButton" Grid.Row="4" HorizontalAlignment="Center" Click="saveButton_Click"/>
+
+            </Grid>
+
+
+        </Grid>
+
+
+    </Grid>
+</Page>

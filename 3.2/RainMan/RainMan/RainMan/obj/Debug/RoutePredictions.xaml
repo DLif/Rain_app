@@ -1,0 +1,287 @@
+﻿<Page
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:RainMan"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:Maps="using:Windows.UI.Xaml.Controls.Maps"
+    xmlns:i="using:Microsoft.Xaml.Interactivity"
+    xmlns:behaviors="using:Tasks.Behaviors" 
+    xmlns:core="using:Microsoft.Xaml.Interactions.Core"
+    xmlns:valueconverter ="using:RainMan"
+    x:Class="RainMan.RoutePredictions"
+    DataContext="{Binding DefaultViewModel, RelativeSource={RelativeSource Mode=Self}}"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    
+    <Page.Resources>
+        
+        <valueconverter:DataTimeConverter x:Key="DateTimeConverter"/>
+        <valueconverter:NameSuggestionConverter x:Key="NameSuggestionConverter"/>
+        <valueconverter:PathNameConverter x:Key="PathNameConverter"/>
+        <valueconverter:AvgRainConverter x:Key="AvgRainConverter"/>
+        <valueconverter:EstimatedLengthConverter x:Key="LengthConverter"/>
+        <valueconverter:EstimatedTimeConverter x:Key="TimeConverter"/>
+        <valueconverter:RainToHeight x:Key="RainToHeight"/>
+        <valueconverter:toColorConvertor x:Key="RainToColor"/>
+
+
+        <DataTemplate x:Name="PathNameTemplate">
+            
+            <TextBlock FontSize="25" Foreground="White" Text="{Binding Name}"></TextBlock>
+            
+        </DataTemplate>
+        
+        <ImageBrush x:Name="pushpinImage" ImageSource="Assets/icons/icon1.png"/>
+
+
+
+
+    </Page.Resources>
+    
+    <Page.BottomAppBar >
+        <CommandBar Opacity="0.5">
+            <AppBarToggleButton x:ConnectionId='1' x:Name="appInfo" Icon="Help" Label="Information"                                                        />
+            <AppBarButton x:ConnectionId='2' x:Name="routesAppBar" Icon="ViewAll" Label="Routes"                            Visibility="Collapsed">
+               
+            </AppBarButton>
+        </CommandBar>
+    </Page.BottomAppBar>
+
+    <Grid x:Name="LayoutRoot" DataContext="{Binding}" >
+
+        
+
+
+
+
+        <Grid.ChildrenTransitions>
+            <TransitionCollection>
+                <EntranceThemeTransition/>
+            </TransitionCollection>
+        </Grid.ChildrenTransitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="10*"/>
+
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="10*"/>
+            <ColumnDefinition Width="1*"/>
+
+        </Grid.ColumnDefinitions>
+
+
+       
+
+        <Grid Grid.Row="1" x:Name="mapGrid" Grid.Column="0" Grid.ColumnSpan="3" DataContext="{Binding}">
+            <Maps:MapControl x:Name="map" MapServiceToken="BaBZ6ETOrg8G3L31STm8dg" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+
+    <!--
+                <i:Interaction.Behaviors>
+                    <behaviors:PushpinCollectionBehavior ItemsSource="{Binding Pins}">
+                        <behaviors:PushpinCollectionBehavior.ItemTemplate>
+                            <DataTemplate>
+
+                                <Grid  Maps:MapControl.Location="{Binding Location}"
+                                   Maps:MapControl.NormalizedAnchorPoint="{Binding AnchorPoint}"
+                                   Visibility="{Binding Visible}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="auto"/>
+                                        <RowDefinition Height="auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Rectangle Grid.Row="0" Height="20" Width="20">
+                                        <Rectangle.Fill>
+                                            <SolidColorBrush Color="{Binding RainColor}"></SolidColorBrush>
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+
+
+                                    <Polygon Points="2,0 22,0 2,40"
+                                         Stroke="Black"
+                                         Fill="Black"
+                                         Grid.Row="1"
+                                         />
+
+
+                                </Grid>
+
+                            </DataTemplate>
+                        </behaviors:PushpinCollectionBehavior.ItemTemplate>
+                    </behaviors:PushpinCollectionBehavior>
+                </i:Interaction.Behaviors>
+
+        -->
+
+            </Maps:MapControl>
+        </Grid>
+
+        
+       
+        
+
+        <Grid Visibility="Collapsed" DataContext="{Binding PathInfo}" Grid.Row="1" x:Name="informationGrid"  VerticalAlignment="top" Margin="0, 0, 0, 0" Background="Transparent" Grid.Column="0" Grid.ColumnSpan="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" DataContext="{Binding}">
+                <Grid.Background>
+                    <SolidColorBrush Color="black" Opacity="0.8"></SolidColorBrush>
+                </Grid.Background>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid x:Name="routeInformationGrid"   Margin="20, 10, 20, 0">
+                   
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    
+                    
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    <!-- Text="{Binding EstimatedLength, Converter={StaticResource LengthConverter}}" -->
+                    <!-- Text="{Binding AvgRain, Converter={StaticResource AvgRainConverter}}" -->
+                    <!-- Text = {Binding EstimatedTime, Converter={StaticResource TimeConverter}} -->
+
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"  Text="Information"  TextTrimming="CharacterEllipsis" HorizontalAlignment="Center" FontWeight="Bold" FontSize="18" Margin="0, 10, 0, 0"/>
+                        <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" x:Name="pathNameText" Text="{Binding PathName, Converter={StaticResource PathNameConverter}}"  TextTrimming="CharacterEllipsis" FontSize="17" Margin="0, 10, 0, 0"/>
+                    <TextBlock Grid.Row="2" x:Name="estimatedTimeText" Text = "{Binding EstimatedTime, Converter={StaticResource TimeConverter}}" FontSize="17" Margin="0, 10, 0, 0"/>
+                        <TextBlock Grid.Row="2" HorizontalAlignment="Center" Grid.Column="1" x:Name="estimatedLengthText" Text="{Binding EstimatedLength, Converter={StaticResource LengthConverter}}" FontSize="17" Margin="0, 10, 0, 0"/>
+                    <TextBlock Grid.Row="3" x:Name="averageRainText" Text="{Binding AvgRain, Converter={StaticResource AvgRainConverter}}" FontSize="17" Margin="0, 10, 0, 0"/> 
+                    <local:ColorSlider  x:Name="colorSlider" HorizontalAlignment="Center" Grid.Row="3" Heightt="80" Widthh="271" Grid.Column="0" Grid.ColumnSpan="2" Margin="0, 35, 0, 0" />
+
+
+                </Grid>
+                <Grid Grid.Row="1" x:Name="exitTimeSliderGrid">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="3*"/>
+                        <ColumnDefinition Width="1*"/>
+
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" Grid.Column="1">
+                        <TextBlock Grid.Row="0"   Text="Departure Time: "  TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" FontWeight="Bold" FontSize="18"/>
+                        <TextBlock Grid.Row="0"   Text="{Binding PathTime, Converter={StaticResource DateTimeConverter}}"  TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" FontWeight="Bold" FontSize="19" Margin="9, 0, 0, 0"/>
+                    </StackPanel>
+                    <Slider x:ConnectionId='8' x:Name="exitTimeSlider" Maximum="39" Grid.Row="1" Grid.Column="1" VerticalAlignment="Top"                                           />
+                    <TextBlock Text="{Binding StartTime, Converter={StaticResource DateTimeConverter}}" FontWeight="Light" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="13,0,13,5" FontSize="17" Grid.Row="1"/>
+                    <TextBlock Grid.Column="2" FontWeight="Light" Text="{Binding EndTime, Converter={StaticResource DateTimeConverter}}" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="1" Margin="13,0,13,5" FontSize="17"/>
+                   
+                </Grid>
+            </Grid>
+
+        </Grid>
+
+        <Grid DataContext="{Binding PathInfo}" x:Name="CurrentTimeGrid" Visibility="Collapsed" Opacity="0" Grid.Row="1" Grid.ColumnSpan="3" VerticalAlignment="Bottom" HorizontalAlignment="left" Margin="20, 70, 70, 70">
+
+            <Grid.Resources>
+
+                <Storyboard x:Name="fadeInTime" >
+                    <DoubleAnimation EnableDependentAnimation="True" From="0" To="1" Storyboard.TargetName="CurrentTimeGrid"  Storyboard.TargetProperty="Opacity" Duration="0:0:0.5"/>
+                </Storyboard>
+
+            </Grid.Resources>
+            <Grid.Background>
+                <SolidColorBrush Color="Black" Opacity="0.8"/>
+
+            </Grid.Background>
+            <TextBlock  Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" FontWeight="Light" Text="{Binding PathTime, Converter={StaticResource DateTimeConverter}}" VerticalAlignment="Top" Margin="13,5,13,0" FontSize="30" />
+        </Grid>
+
+        <Grid x:ConnectionId='3' Visibility="Collapsed" DataContext="{Binding Suggestion}" Grid.Row="1" x:Name="SuggestionGrid" Margin="0, 0, 0, 70" Height="100" Grid.Column="1" VerticalAlignment="Bottom"                               >
+            <Grid.Background>
+                <SolidColorBrush Color="black" Opacity="0.85"></SolidColorBrush>
+            </Grid.Background>
+            <Grid.Resources>
+                
+                <Storyboard x:ConnectionId='7' x:Name="fadeOutStoryBoardSuggestion"                                                   >
+                    <DoubleAnimation From="1" To="0" EnableDependentAnimation="True" Storyboard.TargetName="SuggestionGrid"  Storyboard.TargetProperty="Opacity" Duration="0:0:0.5"/>
+                </Storyboard>
+                
+            </Grid.Resources>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+
+            </Grid.RowDefinitions>
+
+
+            <TextBlock Grid.Row="0" HorizontalAlignment="Center" x:Name="suggestionPathName" Text="{Binding PathNameSuggestion, Converter={StaticResource NameSuggestionConverter}}" TextTrimming="CharacterEllipsis" FontSize="20" Margin="0, 10, 0, 0"/>
+            <TextBlock Grid.Row="1" HorizontalAlignment="Center" x:Name="suggestionExitTime" Text="{Binding TimeSuggestion, Converter={StaticResource DateTimeConverter}}" FontSize="34" FontWeight="Light"  Margin="0, 0, 0, 0"/>
+            <TextBlock Grid.Row="2" HorizontalAlignment="Center" Text="TAP TO HIDE" Foreground="gray" Margin="0, 3, 0, 0"></TextBlock>
+                
+           
+
+        </Grid>
+
+        <Grid Visibility="Collapsed" Opacity="0" DataContext="{Binding}" Grid.Row="1" x:Name="PathNamesGrid" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+
+            <Grid.Resources>
+                
+                <Storyboard x:Name="fadeInPaths" >
+                    <DoubleAnimation To="1" From="0" Storyboard.TargetName="PathNamesGrid" Storyboard.TargetProperty="Opacity" Duration="0:0:0.5"/>
+
+                </Storyboard>
+
+                <Storyboard x:ConnectionId='4' x:Name="fadeOutPaths"                                    >
+                    <DoubleAnimation To="0" From="1" Storyboard.TargetName="PathNamesGrid" Storyboard.TargetProperty="Opacity" Duration="0:0:0.5"/>
+
+                </Storyboard>
+
+            </Grid.Resources>
+            
+            <Grid.Background>
+                <SolidColorBrush Color="black"/>
+            </Grid.Background>
+            <Grid.RowDefinitions>
+
+                <RowDefinition Height="auto"/>
+                <RowDefinition/>
+                <RowDefinition Height="auto"/>
+                
+
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="SELECT A PATH " HorizontalAlignment="Center" TextWrapping="Wrap" Foreground="white" FontSize="20" FontWeight="Medium" Grid.Row="0" Margin="30 "></TextBlock>
+
+            <ListView x:ConnectionId='5' Margin="25, 0, 0, 0" Grid.Row="1" x:Name="listPathNames" 
+                                    ItemsSource="{Binding PathNames}"
+				AutomationProperties.AutomationId="ItemGridView"
+				AutomationProperties.Name="Items In Group"
+				ItemTemplate="{StaticResource PathNameTemplate}"
+				SelectionMode="Single"
+				IsItemClickEnabled="True"
+				ContinuumNavigationTransitionInfo.ExitElementContainer="True" ScrollViewer.VerticalScrollBarVisibility="Auto"                                     >
+
+            </ListView>
+            <Button x:ConnectionId='6' x:Name="btnClose" Content="Close" Grid.Row="2" HorizontalAlignment="Center"                        />
+
+        </Grid>
+
+
+    </Grid>
+</Page>
+
