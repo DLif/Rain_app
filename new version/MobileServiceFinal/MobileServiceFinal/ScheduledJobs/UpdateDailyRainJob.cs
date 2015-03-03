@@ -46,38 +46,11 @@ namespace MobileServiceFinal.ScheduledJobs
         /* needs to be run exactly at 23:55 */
         public override Task ExecuteAsync()
         {
+
             double[,] sums = new double[image_size_x,image_size_y]; /*represents the sum over all pixels*/
-            double sum = 0;
             int x,y =0;
             string name;
-         //   double[,] previousum = new double[image_size_x, image_size_y]; /*represents the sum over all pixels*/
-            /*initialize array 
-            for (x = 0; x < image_size_x; x++)
-            {
-                for (y = 0; y < image_size_y; y++)
-                {
-                    previousum[x, y] = 0;
-                }
-
-            }
-             * */
-
-
-            initializeBlobClient();
-      //      for (int i = 0; i < 30; i++)
-       //     {
-            //    name = String.Format("{0}.jpg", i);
-             //   previousum = newArray( 5656 - (24 * 6 * (i )), 5656 - (24 * 6 * (i + 1)), name, previousum);
-           // }
-
-     //       return Task.FromResult(true); 
-            
-            int max = getMaxIndex(maxPixTextFileName, storageNameMinutes);
-         //   int num = 6 * 24; /* full day.. */
-            int num = 5; //fixed me
-            String currentName;
-
-            /*initialize array */
+            /*initializing the array  */
             for (x = 0; x < image_size_x; x++)
             {
                 for (y = 0; y < image_size_y; y++)
@@ -87,122 +60,62 @@ namespace MobileServiceFinal.ScheduledJobs
 
             }
 
+            initializeBlobClient();
 
-            //threads....
-          //  Parallel.For(0, num, i =>
-               for (int i = 0 /*fix me - start with 0 */; i <num ; i++)
+            
+            int max = getMaxIndex(maxPixTextFileName, storageNameMinutes);
+            int num = 6 * 24; /* full day.. */
+            String currentName;
+
+            /* get the rain amount of the last day */
+            for (int i = 0; i < num; i++)
             {
-                currentName = String.Format("{0}.jpg",(max-i) );
-
-                Bitmap file = new Bitmap(GetStreamImage(currentName));
-
-                /* bug in the picture */
-                if (file.Height == 1)
+                currentName = String.Format("{0}.jpg", (max - i));
+                try
                 {
-                       continue;
-               //     return;
+                    Bitmap file = new Bitmap(GetStreamImage(currentName));
 
-                }
-                for (x = 0; x < image_size_x; x++)
-                {
-                    for (y = 0; y < image_size_y; y++)
+                    /* bug in the picture */
+                    if (file.Height == 1)
                     {
-                        try
+                        continue;
+
+                    }
+                    for (x = 0; x < image_size_x; x++)
+                    {
+                        for (y = 0; y < image_size_y; y++)
                         {
-                            Color RGB = file.GetPixel(x, y);
-                            sums[x,y] += Models.ColorTranslator.RBG_to_power(RGB.R, RGB.G, RGB.B);
-                            //  RBGArray = RGBFromImageBitmap(file, pixel);
-                            //  sum += Models.ColorTranslator.RBG_to_power(RBGArray[0], RBGArray[1], RBGArray[2]);
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine(ex);
-                            continue;
-                          //  return; /* Fix me before we handle the project - continue.. */
+                            try
+                            {
+                                Color RGB = file.GetPixel(x, y);
+                                sums[x, y] += Models.ColorTranslator.RBG_to_power(RGB.R, RGB.G, RGB.B);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine(ex);
+                                continue;
+                            }
                         }
                     }
                 }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                    continue;
+                }
 
-                    }
-          //  }); // Parallel.For
 
-           
-       //     exportArrayToDB( sums, "0.jpg");
+            }
+
+         
             updateMonthBack(sums);
-
-
-
 
             return Task.FromResult(true);
         }
 
 
-        double[,] newArray(int first,int last, string name,double[,] previoussum)
-        {
 
-
-            double[,] sums = new double[image_size_x, image_size_y]; /*represents the sum over all pixels*/
-            double sum = 0;
-            int x, y = 0;
-
-            // int num = 6 * 24; /* full day.. */
-            int num = first-last;
-            String currentName;
-
-            /*initialize array */
-            for (x = 0; x < image_size_x; x++)
-            {
-                for (y = 0; y < image_size_y; y++)
-                {
-                    sums[x, y] = previoussum[x,y];
-                }
-
-            }
-
-
-            //threads....
-            //  Parallel.For(0, num, i =>
-            for (int i = 0 /*fix me - start with 0 */; i < num; i++)
-            {
-                currentName = String.Format("{0}.jpg", (first - i));
-                Bitmap file = new Bitmap(GetStreamImage(currentName));
-
-                /* bug in the picture */
-                if (file.Height == 1)
-                {
-                    continue;
-                    //     return;
-
-                }
-                for (x = 0; x < image_size_x; x++)
-                {
-                    for (y = 0; y < image_size_y; y++)
-                    {
-                        try
-                        {
-                            Color RGB = file.GetPixel(x, y);
-                            sums[x, y] += Models.ColorTranslator.RBG_to_power(RGB.R, RGB.G, RGB.B);
-                            //  RBGArray = RGBFromImageBitmap(file, pixel);
-                            //  sum += Models.ColorTranslator.RBG_to_power(RBGArray[0], RBGArray[1], RBGArray[2]);
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine(ex);
-                            continue;
-                            //  return; /* Fix me before we handle the project - continue.. */
-                        }
-                    }
-                }
-
-            }
-
-
-
-        exportArrayToDB( sums,name);
-        return sums;
-
-        }
-
+        /*updates the month to be forwarded my one month */
         int updateMonthBack(double[,] sums)
         {
             int i = 0;
@@ -212,25 +125,33 @@ namespace MobileServiceFinal.ScheduledJobs
             string fileName;
             for (i =(period-1);i> 0; i--)
             {
-                fileNameAbove =  String.Format("{0}.jpg", i-1);
-                fileName = String.Format("{0}.jpg", i );
-                temp =  GetDoubleArray(fileNameAbove);
-                
-                for (x = 0; x < image_size_x; x++)
+                try
                 {
-                    for (y = 0; y < image_size_y; y++)
+                    fileNameAbove = String.Format("{0}.jpg", i - 1);
+                    fileName = String.Format("{0}.jpg", i);
+                    temp = GetDoubleArray(fileNameAbove);
+
+                    for (x = 0; x < image_size_x; x++)
                     {
-                        temp[x,y]+=sums[x,y];
+                        for (y = 0; y < image_size_y; y++)
+                        {
+                            temp[x, y] += sums[x, y];
+                        }
                     }
+
+                        exportArrayToDB(temp,fileName); 
                 }
-            //    exportArrayToDB(temp,fileName); fix me
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                    continue;
+                 
+                }
 
             }
             /* i ==0 */
             fileName = String.Format("{0}.jpg", 0);
-       //     exportArrayToDB(sums, fileName);  fix me
-
-
+            exportArrayToDB(sums, fileName); 
             return 1;
 
         }
@@ -251,7 +172,6 @@ namespace MobileServiceFinal.ScheduledJobs
                 fileStream.Read(intByte, 0, fileByteLength);
 
                 // If the system architecture is little-endian (that is, little end first), 
-                // reverse the byte array :((((((((((((. 
                 if (BitConverter.IsLittleEndian)
                     Array.Reverse(intByte);
                 Array.Copy(intByte, intReverse, fileByteLength);
@@ -267,43 +187,6 @@ namespace MobileServiceFinal.ScheduledJobs
             }
 
         }
-
-        private int increaseMaxIndex(string maxPixTextFileName, string storageName)
-        {
-            try
-            {
-
-
-                int currentIndex = getMaxIndex(maxPixTextFileName, storageName);
-                UnicodeEncoding uniEncoding = new UnicodeEncoding();
-                MemoryStream ms = new MemoryStream();
-                var sw = new StreamWriter(ms);
-                sw.Write(currentIndex + 1);
-                sw.Flush();
-                ms.Seek(0, SeekOrigin.Begin);
-
-                CloudBlobContainer sampleContainer = client.GetContainerReference(storageName);
-                sampleContainer.CreateIfNotExists();
-                CloudBlockBlob blob = sampleContainer.GetBlockBlobReference(maxPixTextFileName);
-               
-
-                blob.UploadFromStream(ms);
-                return 0;
-            }
-
-
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                return -1;
-            }
-
-        }
-
-
-
-
-
 
         int ConvertLittleEndian(byte[] array)
         {
@@ -330,23 +213,14 @@ namespace MobileServiceFinal.ScheduledJobs
                 Console.WriteLine(ex);
             }
         }
-
+        /*exports the array to a file n the filName in the blob */
         public async void exportArrayToDB(double[,] sums,string fileName)
         {
 
             try
             {
 
-           //     increaseMaxIndex(maxPixTextFileName, storageNameDaily);
-          //      int max = getMaxIndex(maxPixTextFileName, storageNameDaily);
-
-              //  String fileName = String.Format("{0}.txt", max);
-
-
                 IFormatter formatter = new BinaryFormatter();
-             //   Stream stream = new FileStream(fileName,
-                                    //     FileMode.Create,
-                                      //   FileAccess.Write, FileShare.None);
                 Stream stream = new MemoryStream();
                 formatter.Serialize(stream, sums);
                 stream.Flush();
@@ -360,16 +234,12 @@ namespace MobileServiceFinal.ScheduledJobs
                 blob.UploadFromStream(stream);
 
                 stream.Close();
-                //  }
 
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
             }
-            //  Console.WriteLine("Done... press a key to end.");
-            //  Console.ReadKey();
-
         }
 
         public static Stream GetStreamImageFromUrl(string url)
@@ -379,23 +249,7 @@ namespace MobileServiceFinal.ScheduledJobs
                 return client.OpenRead(url);
             }
         }
-        /*  
-          public static Stream GetStreamImageFromUrl(string url)
-              {
-                  HttpWebRequest httpWebRequest = (HttpWebRequest)HttpWebRequest.Create(url);
 
-                      using (HttpWebResponse httpWebReponse = (HttpWebResponse)httpWebRequest.GetResponse())
-                      {
-                          using (Stream stream = httpWebReponse.GetResponseStream())
-                          {
-                              return stream;
-                          }
-                      }
-              }
-          }
-         
-         */
-        
         // method connects to the blob and downloads the radar image 
         private Stream GetStreamImage(String fileName)
         {
@@ -412,9 +266,6 @@ namespace MobileServiceFinal.ScheduledJobs
                 Stream fileStream = new MemoryStream();
                 blob.DownloadToStream(fileStream);
                 return fileStream;
-                //  fileStream.Position = 0;
-                //  fileStream.Read(myByteArray, 0, fileByteLength);
-                //   return myByteArray;
 
 
             }
