@@ -326,7 +326,7 @@ namespace RainMan.Tasks
         // used to convert time estimations
         private double toBikeFixFactor(double lengthInMeters, double totalHours)
         {
-            var avgDrivingSpeed = lengthInMeters / totalHours; // km/h
+            var avgDrivingSpeed = (lengthInMeters /1000) / (totalHours / 60); // km/h
             // 15.5 is the average bike speed
             return avgDrivingSpeed / 15.5;
         }
@@ -405,7 +405,7 @@ namespace RainMan.Tasks
             try
             {
 
-
+     
                 var seq = Enumerable.Range(0, numIterations);
                 var tasks = seq.Select(async j =>
                 {
@@ -416,6 +416,10 @@ namespace RainMan.Tasks
                     Geopoint endPoint = new Geopoint(path.Path.Positions.ElementAt(lastIndex));
 
                     results[j] = await LocationsToEstimations.getTimeAndDistance(startPoint, endPoint, kind);
+                    if(results[j] == null)
+                    {
+                        this.ErrorOccured = true;
+                    }
                     //awaitingTask.Wait();
                     //results[j] = awaitingTask.Result;
                 });
@@ -426,6 +430,12 @@ namespace RainMan.Tasks
             {
                 loadingScreen.ShowError("Connection with server timed-out: " + e.Message);
                 ErrorOccured = true;
+                return;
+            }
+
+            if(this.ErrorOccured)
+            {
+                loadingScreen.ShowError("Connection with server timed-out");    
                 return;
             }
             //var finalSeq = Enumerable.Range((numRounds - 1) * threadsEachRound, numIterations - (numRounds - 1) * threadsEachRound);

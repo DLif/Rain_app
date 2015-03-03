@@ -242,6 +242,7 @@ namespace RainMan
             pathInfo.EstimatedTime = this.predictor.routeAnnotations.ElementAt(predictor.CurrentRouteIndex).EstimatedTimeMinutes;
             pathInfo.EstimatedLength = this.estimatedPathLength.ElementAt(predictor.CurrentRouteIndex);
             pathInfo.AvgRain = this.predictor.routeAnnotations.ElementAt(predictor.CurrentRouteIndex).Averages[predictor.CurrentTimeIndex];
+            this.colorSlider.RainAvg = this.predictor.routeAnnotations.ElementAt(predictor.CurrentRouteIndex).Averages[predictor.CurrentTimeIndex];
 
             pathInfo.EndTime = manager.Maps.ElementAt(RadarMapManager.totalNumMaps - 2).Time;                 // remember to handle this
             pathInfo.StartTime = manager.Maps.ElementAt(RadarMapManager.totalOldMaps).Time;
@@ -410,6 +411,7 @@ namespace RainMan
         private void appInfo_Checked(object sender, RoutedEventArgs e)
         {
             this.informationGrid.Visibility = Visibility.Visible;
+            
                
         }
 
@@ -495,7 +497,14 @@ namespace RainMan
             }
         }
 
-      
+        private void btnClose_Click(object sender, RoutedEventArgs e)
+        {
+            this.fadeOutPaths.Begin();
+           
+            return;
+        }
+
+       
      
     }
 }

@@ -201,80 +201,83 @@ namespace RainMan.Tasks
         public static Color rainToColor(double average)
         {
 
-            if (average <= 0.1)
+            if (average <= 0.1) //248
             {
                 return Color.FromArgb(255, 9, 92, 245);
             }
-            if (average <= 0.2)
+            if (average <= 0.2) // 236
             {
                 return Color.FromArgb(255, 0, 194, 193);
             }
-            if (average <= 0.7)
+            if (average <= 0.7) // 222
             {
                 return Color.FromArgb(255, 2, 167, 171);
             }
-            if (average <= 0.9)
+            if (average <= 0.9) // 212
             {
                 return Color.FromArgb(255, 2, 143, 127);
             }
-            if (average <= 1.2)
+            if (average <= 1.2) // 203
             {
                 return Color.FromArgb(255, 1, 132, 88);
             }
-            if (average <= 2.0)
+            if (average <= 2.0)  // 191
             {
                 return Color.FromArgb(255, 1, 153, 53);
             }
-            if (average <= 4.0)
+            if (average <= 4.0) // 179
             {
                 return Color.FromArgb(255, 0, 185, 42);
             }
-            if (average <= 6.0)
+            if (average <= 6.0)// 169
             {
                 return Color.FromArgb(255, 0, 204, 29);
             }
-            if (average <= 9.0)
+            if (average <= 9.0) // 161
             {
                 return Color.FromArgb(255, 5, 230, 14);
             }
-            if (average <= 13)
+            if (average <= 13) // 147
             {
                 return Color.FromArgb(255, 32, 247, 29);
             }
-            if (average <= 22)
+            if (average <= 22) // 123
             {
                 return Color.FromArgb(255, 255, 241, 18);
             }
-            if (average <= 26)
+            if (average <= 26) // 107
             {
                 return Color.FromArgb(255, 255, 204, 7);
             }
-            if (average <= 30)
+            if (average <= 30) // 97
             {
                 return Color.FromArgb(255, 255, 183, 3);
             }
-            if (average <= 40)
+            if (average <= 40) // 82
             {
                 return Color.FromArgb(255, 255, 142, 2);
             }
-            if (average <= 60)
+            if (average <= 60) // 61
             {
                 return Color.FromArgb(255, 246, 43, 2);
             }
-            if (average <= 100)
+            if (average <= 100) // 44
             {
                 return Color.FromArgb(255, 221, 9, 21);
             }
-            if (average <= 150)
+            if (average <= 150) // 33
             {
                 return Color.FromArgb(255, 219, 0, 144);
             }
 
-
+			// 16
             return Color.FromArgb(255, 255, 0, 252);
 
 
-
+			// y offset 9
+			// slider details: width 8, height 28
+			
+			// image details: 271x80
 
         }
     }

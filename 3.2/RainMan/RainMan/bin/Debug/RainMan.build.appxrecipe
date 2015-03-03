@@ -158,8 +158,14 @@
       <PackagePath>Assets\Logo.scale-240.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
     </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\Assets\radar\baseRange.png">
+      <PackagePath>Assets\radar\baseRange.png</PackagePath>
+    </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\Assets\radar\mappin.png">
       <PackagePath>Assets\radar\mappin.png</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\Assets\radar\slider.png">
+      <PackagePath>Assets\radar\slider.png</PackagePath>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\Assets\radar\waypointpin.png">
       <PackagePath>Assets\radar\waypointpin.png</PackagePath>
@@ -207,6 +213,9 @@
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\bin\Debug\App.xbf">
       <PackagePath>App.xbf</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\bin\Debug\ColorSlider.xbf">
+      <PackagePath>ColorSlider.xbf</PackagePath>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\bin\Debug\GroupBuilder.xbf">
       <PackagePath>GroupBuilder.xbf</PackagePath>

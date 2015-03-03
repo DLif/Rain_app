@@ -82,6 +82,9 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ColorSlider.xaml.cs">
+      <DependentUpon>ColorSlider.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Common\NavigationHelper.cs" />
     <Compile Include="Common\ObservableDictionary.cs" />
     <Compile Include="Common\RelayCommand.cs" />
@@ -150,7 +153,9 @@
     <Content Include="Assets\icons\icon2.png" />
     <Content Include="Assets\icons\walking.png" />
     <Content Include="Assets\Logo.scale-240.png" />
+    <Content Include="Assets\radar\baseRange.png" />
     <Content Include="Assets\radar\mappin.png" />
+    <Content Include="Assets\radar\slider.png" />
     <Content Include="Assets\radar\waypointpin.png" />
     <Content Include="Assets\rain\moon.png" />
     <Content Include="Assets\rain\moon_cloud.png" />
@@ -170,6 +175,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="ColorSlider.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="GroupBuilder.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

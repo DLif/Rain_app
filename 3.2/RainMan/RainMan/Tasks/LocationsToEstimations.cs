@@ -28,15 +28,12 @@ namespace RainMan.Tasks
         public static async Task<double[]> getTimeAndDistance(Geopoint source, Geopoint destination, RainMan.Navigation.RouteKind kind)
         {
 
-
-
-
-
-            sw.Start();
             XmlReader response = await getXmlReader(source, destination, kind);
-            sw.Stop();
-            TimeSpan time1 = sw.Elapsed;
-            sw.Restart();
+            if(response == null)
+            {
+                return null;
+            }
+            
             double distance = 0.0;
             double time = 0.0;
             double[] pack = new double[2];
@@ -64,8 +61,7 @@ namespace RainMan.Tasks
                 }
             }
 
-            response.Dispose();
-            sw.Stop();
+            response.Dispose();  
             TimeSpan time2 = sw.Elapsed;
             pack[0] = distance * 1000; // meters
             pack[1] = time / 60;      // minutes
@@ -118,12 +114,25 @@ namespace RainMan.Tasks
         private static async Task<XmlReader> getXmlReader(Geopoint source, Geopoint destination, RainMan.Navigation.RouteKind kind)
         {
 
-            String query_url = makeURL(source, destination, kind);
-            //String query_url = "http://dev.virtualearth.net/REST/V1/Routes/Driving?wp.0=Eiffel+Tower&wp.1=louvre+museum&optmz=distance&output=xml&key=AmJqOC6z5Nnf_tL1iajMSSLVyMoWRpwIBREiL1LE20_trwH1uFlK6yC5t0FrIqxD&routeAttributes=routeSummariesOnly";
-            HttpClient client = new HttpClient();
-            HttpResponseMessage response = await client.GetAsync(query_url);
-            XmlReader reader = XmlReader.Create(response.Content.ReadAsStreamAsync().Result);
+            XmlReader reader;
+            try
+            {
+                String query_url = makeURL(source, destination, kind);
+                //String query_url = "http://dev.virtualearth.net/REST/V1/Routes/Driving?wp.0=Eiffel+Tower&wp.1=louvre+museum&optmz=distance&output=xml&key=AmJqOC6z5Nnf_tL1iajMSSLVyMoWRpwIBREiL1LE20_trwH1uFlK6yC5t0FrIqxD&routeAttributes=routeSummariesOnly";
+                HttpClient client = new HttpClient();
+
+                HttpResponseMessage response = await client.GetAsync(query_url);
+                reader = XmlReader.Create(response.Content.ReadAsStreamAsync().Result);
+                
+
+            }
+            catch
+            {
+                reader = null;
+            }
+
             return reader;
+           
         }
 
         private static String makeURL(Geopoint source, Geopoint destination, RainMan.Navigation.RouteKind kind)

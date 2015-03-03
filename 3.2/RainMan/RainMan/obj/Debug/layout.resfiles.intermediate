@@ -5,7 +5,9 @@ Assets\icons\icon1.png
 Assets\icons\icon2.png
 Assets\icons\walking.png
 Assets\Logo.scale-240.png
+Assets\radar\baseRange.png
 Assets\radar\mappin.png
+Assets\radar\slider.png
 Assets\radar\waypointpin.png
 Assets\rain\moon.png
 Assets\rain\moon_cloud.png
@@ -20,6 +22,7 @@ Assets\Square71x71Logo.scale-240.png
 Assets\StoreLogo.scale-240.png
 Assets\WideLogo.scale-240.png
 App.xbf
+ColorSlider.xbf
 GroupBuilder.xbf
 LoadingDialog.xbf
 Main.xbf

@@ -123,7 +123,7 @@
        
         
 
-        <Grid Visibility="Collapsed" DataContext="{Binding PathInfo}" Grid.Row="1" x:Name="informationGrid" Height="220" VerticalAlignment="top" Margin="0, 0, 0, 0" Background="Transparent" Grid.Column="0" Grid.ColumnSpan="3">
+        <Grid Visibility="Collapsed" DataContext="{Binding PathInfo}" Grid.Row="1" x:Name="informationGrid"  VerticalAlignment="top" Margin="0, 0, 0, 0" Background="Transparent" Grid.Column="0" Grid.ColumnSpan="3">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
@@ -139,36 +139,38 @@
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
 
-                <Grid x:Name="routeInformationGrid" Visibility="Visible" >
-                    <Grid.Resources>
-                        
-                        <Storyboard x:Name="fillBar" >
-                            <DoubleAnimation x:Name="fillBarAnimation" From="0" Duration="0:0:1" Storyboard.TargetName="rainRec" Storyboard.TargetProperty="Height"  EnableDependentAnimation="True"/>
-                        </Storyboard>
-                        <Storyboard x:Name="colorChange" >
-                            <ColorAnimation x:Name="changeColorAnimation" Storyboard.TargetName="rainRec" Storyboard.TargetProperty="Fill" Duration="0:0:0.5"/>
-                        </Storyboard>
-                        
-                    </Grid.Resources>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="10*"/>
-                        <ColumnDefinition Width="4*"/>
-                    </Grid.ColumnDefinitions>
+                <Grid x:Name="routeInformationGrid"   Margin="20, 10, 20, 0">
+                   
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
                     
-                    <StackPanel Orientation="Vertical" Margin="20, 20, 0, 20" Grid.Column="0">
-                        <TextBlock x:Name="pathNameText" Text="{Binding PathName, Converter={StaticResource PathNameConverter}}"  TextTrimming="CharacterEllipsis" FontSize="17" Margin="0, 10, 0, 0"/>
-                        <TextBlock x:Name="estimatedTimeText" Text="{Binding EstimatedTime, Converter={StaticResource TimeConverter}}" FontSize="17" Margin="0, 10, 0, 0"/>
-                        <TextBlock x:Name="estimatedLengthText" Text="{Binding EstimatedLength, Converter={StaticResource LengthConverter}}" FontSize="17" Margin="0, 10, 0, 0"/>
-                        <TextBlock x:Name="averageRainText" Text="{Binding AvgRain, Converter={StaticResource AvgRainConverter}}" FontSize="17" Margin="0, 10, 0, 0"/>
-                    </StackPanel>
+                    
 
-                    <Rectangle Visibility="Collapsed" x:Name="rainRec" Margin="0, 10, 20, 10"  VerticalAlignment="Bottom" Height="10" Fill="Blue" Grid.Column="1" Width="50"  >
-                        
-                    </Rectangle>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    <!-- Text="{Binding EstimatedLength, Converter={StaticResource LengthConverter}}" -->
+                    <!-- Text="{Binding AvgRain, Converter={StaticResource AvgRainConverter}}" -->
+                    <!-- Text = {Binding EstimatedTime, Converter={StaticResource TimeConverter}} -->
+
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"  Text="Information"  TextTrimming="CharacterEllipsis" HorizontalAlignment="Center" FontWeight="Bold" FontSize="18" Margin="0, 10, 0, 0"/>
+                        <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" x:Name="pathNameText" Text="{Binding PathName, Converter={StaticResource PathNameConverter}}"  TextTrimming="CharacterEllipsis" FontSize="17" Margin="0, 10, 0, 0"/>
+                    <TextBlock Grid.Row="2" x:Name="estimatedTimeText" Text = "{Binding EstimatedTime, Converter={StaticResource TimeConverter}}" FontSize="17" Margin="0, 10, 0, 0"/>
+                        <TextBlock Grid.Row="2" HorizontalAlignment="Center" Grid.Column="1" x:Name="estimatedLengthText" Text="{Binding EstimatedLength, Converter={StaticResource LengthConverter}}" FontSize="17" Margin="0, 10, 0, 0"/>
+                    <TextBlock Grid.Row="3" x:Name="averageRainText" Text="{Binding AvgRain, Converter={StaticResource AvgRainConverter}}" FontSize="17" Margin="0, 10, 0, 0"/> 
+                    <local:ColorSlider  x:Name="colorSlider" HorizontalAlignment="Center" Grid.Row="3" Heightt="80" Widthh="271" Grid.Column="0" Grid.ColumnSpan="2" Margin="0, 35, 0, 0" />
+
 
                 </Grid>
                 <Grid Grid.Row="1" x:Name="exitTimeSliderGrid">
                     <Grid.RowDefinitions>
+                        <RowDefinition/>
                         <RowDefinition/>
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
@@ -179,9 +181,13 @@
                         <ColumnDefinition Width="1*"/>
 
                     </Grid.ColumnDefinitions>
-                    <Slider x:ConnectionId='7' x:Name="exitTimeSlider" Maximum="39" Grid.Column="1" VerticalAlignment="Top"                                           />
-                    <TextBlock Text="{Binding StartTime, Converter={StaticResource DateTimeConverter}}" FontWeight="Light" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="13,0,13,5" FontSize="17"/>
-                    <TextBlock Grid.Column="2" FontWeight="Light" Text="{Binding EndTime, Converter={StaticResource DateTimeConverter}}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="13,0,13,5" FontSize="17"/>
+                    <StackPanel Orientation="Horizontal" Grid.Column="1">
+                        <TextBlock Grid.Row="0"   Text="Departure Time: "  TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" FontWeight="Bold" FontSize="18"/>
+                        <TextBlock Grid.Row="0"   Text="{Binding PathTime, Converter={StaticResource DateTimeConverter}}"  TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" FontWeight="Bold" FontSize="19" Margin="9, 0, 0, 0"/>
+                    </StackPanel>
+                    <Slider x:ConnectionId='8' x:Name="exitTimeSlider" Maximum="39" Grid.Row="1" Grid.Column="1" VerticalAlignment="Top"                                           />
+                    <TextBlock Text="{Binding StartTime, Converter={StaticResource DateTimeConverter}}" FontWeight="Light" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="13,0,13,5" FontSize="17" Grid.Row="1"/>
+                    <TextBlock Grid.Column="2" FontWeight="Light" Text="{Binding EndTime, Converter={StaticResource DateTimeConverter}}" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="1" Margin="13,0,13,5" FontSize="17"/>
                    
                 </Grid>
             </Grid>
@@ -210,7 +216,7 @@
             </Grid.Background>
             <Grid.Resources>
                 
-                <Storyboard x:ConnectionId='6' x:Name="fadeOutStoryBoardSuggestion"                                                   >
+                <Storyboard x:ConnectionId='7' x:Name="fadeOutStoryBoardSuggestion"                                                   >
                     <DoubleAnimation From="1" To="0" EnableDependentAnimation="True" Storyboard.TargetName="SuggestionGrid"  Storyboard.TargetProperty="Opacity" Duration="0:0:0.5"/>
                 </Storyboard>
                 
@@ -231,7 +237,7 @@
 
         </Grid>
 
-        <Grid Visibility="Collapsed" Opacity="0" DataContext="{Binding}" Grid.Row="1" x:Name="PathNamesGrid" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Margin="10">
+        <Grid Visibility="Collapsed" Opacity="0" DataContext="{Binding}" Grid.Row="1" x:Name="PathNamesGrid" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
 
             <Grid.Resources>
                 
@@ -254,12 +260,14 @@
 
                 <RowDefinition Height="auto"/>
                 <RowDefinition/>
+                <RowDefinition Height="auto"/>
+                
 
             </Grid.RowDefinitions>
 
-            <TextBlock Text="Select a path from the following list" TextWrapping="Wrap" Foreground="white" FontSize="20" Grid.Row="0" Margin="10"></TextBlock>
+            <TextBlock Text="SELECT A PATH " HorizontalAlignment="Center" TextWrapping="Wrap" Foreground="white" FontSize="20" FontWeight="Medium" Grid.Row="0" Margin="30 "></TextBlock>
 
-            <ListView x:ConnectionId='5' Margin="10" Grid.Row="1" x:Name="listPathNames" 
+            <ListView x:ConnectionId='5' Margin="25, 0, 0, 0" Grid.Row="1" x:Name="listPathNames" 
                                     ItemsSource="{Binding PathNames}"
 				AutomationProperties.AutomationId="ItemGridView"
 				AutomationProperties.Name="Items In Group"
@@ -269,7 +277,7 @@
 				ContinuumNavigationTransitionInfo.ExitElementContainer="True" ScrollViewer.VerticalScrollBarVisibility="Auto"                                     >
 
             </ListView>
-
+            <Button x:ConnectionId='6' x:Name="btnClose" Content="Close" Grid.Row="2" HorizontalAlignment="Center"                        />
 
         </Grid>
 

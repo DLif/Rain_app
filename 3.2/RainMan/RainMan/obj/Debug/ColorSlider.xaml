@@ -1,0 +1,34 @@
+﻿<UserControl
+    x:Class="RainMan.ColorSlider"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:RainMan"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="80"
+    d:DesignWidth="271">
+    
+   
+    
+    <Grid x:Name="imageGrid" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+            <Grid.Resources>
+                <Storyboard x:ConnectionId='1' x:Name="moveSlider"                                 >
+                    <DoubleAnimation EnableDependentAnimation="True" x:Name="moveSliderAnimation" Duration="0:0:0.5" Storyboard.TargetName="mover" Storyboard.TargetProperty="Width"/>
+                </Storyboard>
+                
+            </Grid.Resources>
+        
+        <Grid.Background>
+            <ImageBrush ImageSource="Assets/radar/baseRange.png"/>
+        </Grid.Background>
+
+            <StackPanel Orientation="Horizontal">
+            <Rectangle Fill="Transparent" Width="0" x:Name="mover"/>
+            <Image x:Name="Slider"   VerticalAlignment="Top" HorizontalAlignment="Left"  Source="Assets/radar/slider.png" Height="28" Width="8"/>
+            </StackPanel>
+        </Grid>
+
+  
+</UserControl>
+
