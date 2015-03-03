@@ -101,7 +101,7 @@ namespace RainMan
             }
             else if (average <= 0.7) // 222
             {
-                ratio = 222 / baseWidth;
+                ratio = 228 / baseWidth;
             }
             else if (average <= 0.9) // 212
             {

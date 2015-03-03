@@ -234,10 +234,10 @@ namespace RainMan.Tasks
         public ObservableCollection<RadarMap> Maps { get; set; }
 
         // holds the index of the current radar map (current time map)
-        private static int currentRadarMapIndex = 4;
+        private static int currentRadarMapIndex = 3;
 
         // how many MAPS (old+current+new) we provide
-        public static int totalNumMaps = 8;
+        public static int totalNumMaps = 7;
 
         // how many OLD images we provide
         public static int totalOldMaps = 3;
@@ -330,9 +330,9 @@ namespace RainMan.Tasks
                 {
 
 
-                    String pngFormatImage = String.Format("{0}.png", i);
+                    String pngFormatImage = String.Format("{0}.png", i+1);
                     CloudBlockBlob blob = predictionsContainer.GetBlockBlobReference(pngFormatImage);
-                    String jpgFormatImage = String.Format("{0}.jpg", i);
+                    String jpgFormatImage = String.Format("{0}.jpg", i+1);
 
                     // download png image
                     var ms = new MemoryStream();

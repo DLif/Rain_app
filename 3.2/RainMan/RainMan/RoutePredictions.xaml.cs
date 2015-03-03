@@ -244,7 +244,7 @@ namespace RainMan
             pathInfo.AvgRain = this.predictor.routeAnnotations.ElementAt(predictor.CurrentRouteIndex).Averages[predictor.CurrentTimeIndex];
             this.colorSlider.RainAvg = this.predictor.routeAnnotations.ElementAt(predictor.CurrentRouteIndex).Averages[predictor.CurrentTimeIndex];
 
-            pathInfo.EndTime = manager.Maps.ElementAt(RadarMapManager.totalNumMaps - 2).Time;                 // remember to handle this
+            pathInfo.EndTime = manager.Maps.ElementAt(RadarMapManager.totalNumMaps - 1).Time;                
             pathInfo.StartTime = manager.Maps.ElementAt(RadarMapManager.totalOldMaps).Time;
             pathInfo.PathTime = manager.Maps.ElementAt(predictor.CurrentTimeIndex + RadarMapManager.totalOldMaps).Time;
 

@@ -132,7 +132,7 @@
                 </Grid.ColumnDefinitions>
 
             <TextBlock Grid.Row="0" x:Name="oldestTimeText" Grid.Column="0" Text="{Binding oldestTime, Converter={StaticResource DateTimeConverter}}" Margin="0, 10, 10, 0" Foreground="white" FontSize="20"/>
-            <Slider Grid.Row="0" x:Name="timeSlider" Grid.Column="1" Maximum="39" Value="20" HorizontalAlignment="Stretch" ValueChanged="timeSlider_ValueChanged" Width="250" LargeChange="5" Foreground="#FF0BC2F8"/>
+            <Slider Grid.Row="0" x:Name="timeSlider" Grid.Column="1" Maximum="34" Value="18" HorizontalAlignment="Stretch" ValueChanged="timeSlider_ValueChanged" Width="250" LargeChange="5" Foreground="#FF0BC2F8"/>
             <TextBlock Grid.Row="0" x:Name="newestTimeText" Grid.Column="2" Text="{Binding newestTime, Converter={StaticResource DateTimeConverter}}"  Foreground="white" FontSize="20" Margin="10,10,0,0"/>
           
             </Grid>
