@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Geolocation;
 using Windows.Foundation;
+using Windows.Storage.Streams;
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -102,40 +103,77 @@ namespace RainMan.Tasks
 
         // create a color push pin for a route leg, according to the given average rain 
         // also returns the rectangle that holds the colour brush
-        public static DependencyObject getRouteRainPushPin(double averageRain, out Rectangle colorRect)
+        public static DependencyObject getRouteRainPushPin(double averageRain, out Ellipse colorCircle, ImageBrush imageBrush)
         {
+
+             RandomAccessStreamReference image = RandomAccessStreamReference.CreateFromUri(new Uri("ms-appx:///Assets/icons/icon1.png"));
+
             //Creating a Grid element.
             var myGrid = new Grid();
-            myGrid.RowDefinitions.Add(new RowDefinition());
-            myGrid.RowDefinitions.Add(new RowDefinition());
-            myGrid.Background = new SolidColorBrush(Colors.Transparent);
+         
+            myGrid.Background = imageBrush;
+            myGrid.Width = 50;
+            myGrid.Height = 50;
 
-            // get color object from average rain
-            Color color = ColorTranslator.rainToColor(averageRain);
+            Ellipse colorFill = new Ellipse() { Fill = new SolidColorBrush(ColorTranslator.rainToColor(averageRain)),
+                                                Width = 27, Height = 26,
+                                                };
+            colorFill.SetValue(Grid.RowProperty, 0);
+            colorFill.SetValue(Grid.ColumnProperty, 0);
+            colorFill.HorizontalAlignment = HorizontalAlignment.Center;
+            colorFill.VerticalAlignment = VerticalAlignment.Top;
+            colorFill.Margin = new Thickness(0, 6, 0, 0);
+            myGrid.Children.Add(colorFill);
 
-            //Creating a Rectangle
-            var myRectangle = new Rectangle { Fill = new SolidColorBrush(color), Height = 20, Width = 20 };
-            myRectangle.SetValue(Grid.RowProperty, 0);
-            myRectangle.SetValue(Grid.ColumnProperty, 0);
+            colorCircle = colorFill;
+            
+            // y == 18 center
+            // y == 5 top
+            // size is probably 25, x offset 12, y offset 5
 
-            //Adding the Rectangle to the Grid
-            myGrid.Children.Add(myRectangle);
-
-            //Creating a Polygon
-            var myPolygon = new Polygon()
-            {
-                Points = new PointCollection() { new Point(2, 0), new Point(22, 0), new Point(2, 40) },
-                Stroke = new SolidColorBrush(Colors.Black),
-                Fill = new SolidColorBrush(Colors.Black)
-            };
-            myPolygon.SetValue(Grid.RowProperty, 1);
-            myPolygon.SetValue(Grid.ColumnProperty, 0);
-
-            myGrid.Children.Add(myPolygon);
-            colorRect = myRectangle;
             return myGrid;
+            
 
         }
+
+        //  // create a color push pin for a route leg, according to the given average rain 
+        //// also returns the rectangle that holds the colour brush
+        //public static DependencyObject getRouteRainPushPin(double averageRain, out Rectangle colorRect)
+        //{
+        //    //Creating a Grid element.
+        //    var myGrid = new Grid();
+        //    myGrid.RowDefinitions.Add(new RowDefinition());
+        //    myGrid.RowDefinitions.Add(new RowDefinition());
+        //    myGrid.Background = new SolidColorBrush(Colors.Transparent);
+
+        //    // get color object from average rain
+        //    Color color = ColorTranslator.rainToColor(averageRain);
+
+        //    //Creating a Rectangle
+        //    var myRectangle = new Rectangle { Fill = new SolidColorBrush(color), Height = 20, Width = 20 };
+        //    myRectangle.SetValue(Grid.RowProperty, 0);
+        //    myRectangle.SetValue(Grid.ColumnProperty, 0);
+
+        //    //Adding the Rectangle to the Grid
+        //    myGrid.Children.Add(myRectangle);
+
+        //    //Creating a Polygon
+        //    var myPolygon = new Polygon()
+        //    {
+        //        Points = new PointCollection() { new Point(2, 0), new Point(22, 0), new Point(2, 40) },
+        //        Stroke = new SolidColorBrush(Colors.Black),
+        //        Fill = new SolidColorBrush(Colors.Black)
+        //    };
+        //    myPolygon.SetValue(Grid.RowProperty, 1);
+        //    myPolygon.SetValue(Grid.ColumnProperty, 0);
+
+        //    myGrid.Children.Add(myPolygon);
+        //    colorRect = myRectangle;
+        //    return myGrid;
+
+        //     Image = RandomAccessStreamReference.CreateFromUri(new Uri("ms-appx:///Assets/pin.png
+
+        //}
 
         public static DependencyObject getTimeAnnotation(int timeMark)
         {

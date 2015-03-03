@@ -145,6 +145,12 @@
     <AppxPackagedFile Include="C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\Assets\icons\car.png">
       <PackagePath>Assets\icons\car.png</PackagePath>
     </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\Assets\icons\icon1.png">
+      <PackagePath>Assets\icons\icon1.png</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\Assets\icons\icon2.png">
+      <PackagePath>Assets\icons\icon2.png</PackagePath>
+    </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\Assets\icons\walking.png">
       <PackagePath>Assets\icons\walking.png</PackagePath>
     </AppxPackagedFile>

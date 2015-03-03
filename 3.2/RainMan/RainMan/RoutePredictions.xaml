@@ -32,6 +32,10 @@
             
         </DataTemplate>
         
+        <ImageBrush x:Name="pushpinImage" ImageSource="Assets/icons/icon1.png"/>
+
+
+
 
     </Page.Resources>
     

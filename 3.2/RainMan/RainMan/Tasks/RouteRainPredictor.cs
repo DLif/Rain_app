@@ -66,7 +66,7 @@ namespace RainMan.Tasks
             return all;
         }
 
-        public async Task InitRouteGroupsPredictions(RouteKind kind, int timeSlots, LoadingDialog loadingScreen)
+        public async Task InitRouteGroupsPredictions(RouteKind kind, int timeSlots, LoadingDialog loadingScreen, ImageBrush pushpinImage)
         {
 
             List<RadarMap> Maps = new List<RadarMap>();
@@ -93,7 +93,7 @@ namespace RainMan.Tasks
                 routeAnnotations.Add(annotation);
 
                 // initialize predictions and annotations for current route in group
-                await annotation.routeToAnnotations(route, kind, timeSlots, Maps, Routes.Count, loadingScreen);
+                await annotation.routeToAnnotations(route, kind, timeSlots, Maps, Routes.Count, loadingScreen, pushpinImage);
 
                 if(annotation.ErrorOccured)
                 {
@@ -167,7 +167,7 @@ namespace RainMan.Tasks
                     Map.Children.Add(annot.Pin);
                     annot.Pin.SetValue(Grid.VisibilityProperty, Visibility.Collapsed);
                     MapControl.SetLocation(annot.Pin, annot.Location);
-                    MapControl.SetNormalizedAnchorPoint(annot.Pin, new Point(0.0, 1.0));
+                    MapControl.SetNormalizedAnchorPoint(annot.Pin, new Point(0.5, 1.0));
                     
                    // var pin = new MapIcon()
                    // {
@@ -316,7 +316,7 @@ namespace RainMan.Tasks
             foreach (Annotation anno in Annotations)
             {
                 // update the annotation color
-                anno.ColorRect.SetValue(Rectangle.FillProperty, new SolidColorBrush(currentColors.ElementAt(k)));
+                anno.ColorCircle.SetValue(Rectangle.FillProperty, new SolidColorBrush(currentColors.ElementAt(k)));
                 ++k;
             }
 
@@ -333,10 +333,10 @@ namespace RainMan.Tasks
 
 
         // calculate prediction for the given route and fill the data (colors and averages)
-        public async Task routeToAnnotations(MapRoute route, RouteKind routeKind, int numTimeSlots, List<RadarMap> maps, int numRoutes, LoadingDialog loadingScreen)
+        public async Task routeToAnnotations(MapRoute route, RouteKind routeKind, int numTimeSlots, List<RadarMap> maps, int numRoutes, LoadingDialog loadingScreen, ImageBrush pushpinImage)
         {
-           
-            await predictionsForPath(route, 0, numTimeSlots,routeKind, maps, numRoutes, loadingScreen);
+
+            await predictionsForPath(route, 0, numTimeSlots, routeKind, maps, numRoutes, loadingScreen, pushpinImage);
 
             if (ErrorOccured)
                 return;
@@ -355,7 +355,7 @@ namespace RainMan.Tasks
 
         public Boolean ErrorOccured { get; set; }
 
-        public async Task predictionsForPath(MapRoute path, double startingMinute, int numTimeSlots, RouteKind kind, List<RadarMap> Maps, int numRoutes, LoadingDialog loadingScreen)
+        public async Task predictionsForPath(MapRoute path, double startingMinute, int numTimeSlots, RouteKind kind, List<RadarMap> Maps, int numRoutes, LoadingDialog loadingScreen, ImageBrush pushpinImage)
         {
 
             int numPaths = 1;
@@ -456,7 +456,7 @@ namespace RainMan.Tasks
                 int startIndex = i - 1;
                 int lastIndex = Math.Min(i + slotSize - 2, path.Path.Positions.Count -1);
 
-                Annotation annot = new Annotation(new Geopoint(path.Path.Positions.ElementAt((int)(0.5 * startIndex + 0.5 * lastIndex))));
+                Annotation annot = new Annotation(new Geopoint(path.Path.Positions.ElementAt((int)(0.5 * startIndex + 0.5 * lastIndex))),pushpinImage);
                 this.Annotations.Add(annot);
 
                 
@@ -619,17 +619,17 @@ namespace RainMan.Tasks
         // anchor point
        //.// public Point AnchorPoint { get; set; }
 
-        public Rectangle ColorRect { get; set; }
+        public Ellipse ColorCircle { get; set; }
 
         public DependencyObject Pin { get; set; }
 
-        public Annotation(Geopoint location)
+        public Annotation(Geopoint location, ImageBrush pushpinImage)
         {
             this.Location = location;
             //this.AnchorPoint = new Point(0.0, 1.0);
-            Rectangle colorRect;
-            Pin = MapUtils.getRouteRainPushPin(0, out colorRect);
-            this.ColorRect = colorRect;
+            Ellipse colorCircle;
+            Pin = MapUtils.getRouteRainPushPin(0, out colorCircle, pushpinImage);
+            this.ColorCircle = colorCircle;
 
 
         }
