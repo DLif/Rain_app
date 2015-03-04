@@ -48,7 +48,7 @@
             
         </Grid>
         
-        <Grid Visibility="Visible" Grid.Row="0" Grid.ColumnSpan="3" Grid.RowSpan="2" VerticalAlignment="Stretch" x:Name="overlayGrid">
+        <Grid Visibility="Collapsed" Grid.Row="0" Grid.ColumnSpan="3" Grid.RowSpan="2" VerticalAlignment="Stretch" x:Name="overlayGrid">
 
             <Grid.RowDefinitions>
                 
@@ -96,7 +96,7 @@
                 <!-- future option -->
                 
                 <ToggleSwitch x:ConnectionId='9' Grid.ColumnSpan="2" Grid.Row="3" Margin="10" x:Name="usePredictions" Header="Use predictions"   HorizontalAlignment="Left" VerticalAlignment="Top"                                 />
-                <Button x:Name="predictionNumBtn" Visibility="Collapsed" Content="Minutes: 30" Margin="60, 15, 10, 0" Grid.Row="3" Grid.Column="2" BorderThickness="0">
+                <Button x:Name="predictionNumBtn" Visibility="Collapsed" Content="Minutes: 30" FontSize="15" Margin="60, 10, 0, 0" Grid.Row="3" Grid.Column="2" BorderThickness="0" HorizontalAlignment="Left">
                     <Button.Flyout>
                         <MenuFlyout>
                             <MenuFlyoutItem x:ConnectionId='10' x:Name="prediction30" Text="30 minutes forward" HorizontalAlignment="Center"                            ></MenuFlyoutItem>

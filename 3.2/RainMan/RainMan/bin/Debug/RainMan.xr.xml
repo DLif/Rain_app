@@ -5,6 +5,8 @@
   </Roots.Interfaces>
   <Roots.PropertyPathNames>
     <RootPropertyPathName Name="DefaultViewModel" />
+    <RootPropertyPathName Name="ItemWidth" />
+    <RootPropertyPathName Name="ItemHeight" />
     <RootPropertyPathName Name="Info" />
     <RootPropertyPathName Name="ImagePath" />
     <RootPropertyPathName Name="Title" />
@@ -214,6 +216,7 @@
       <RootProperty Name="Visibility" />
       <RootProperty Name="BorderBrush" />
       <RootProperty Name="Foreground" />
+      <RootProperty Name="FontSize" />
       <RootProperty Name="BorderThickness" />
       <RootProperty Name="Flyout" />
       <RootProperty Name="Width" />
@@ -235,6 +238,8 @@
       <RootEvent Name="MapTapped" />
       <RootEvent Name="ZoomLevelChanged" />
       <RootEvent Name="Tapped" />
+      <RootEvent Name="PitchChanged" />
+      <RootEvent Name="HeadingChanged" />
       <RootMethod Name="GetLocation" />
       <RootMethod Name="SetLocation" />
       <RootMethod Name="GetNormalizedAnchorPoint" />

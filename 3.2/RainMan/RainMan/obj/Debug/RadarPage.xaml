@@ -72,7 +72,7 @@
 
       
 
-        <Maps:MapControl x:ConnectionId='6' MapServiceToken="Atb6DOMKy2vjVrFbmzdlVxhq4mxAkyBPfCg2XDG2X-thzfgZuk-g-8MNwkuIcry9" x:Name="map" Grid.Row ="1" Grid.ColumnSpan="3" VerticalAlignment="Stretch"  HorizontalAlignment="Stretch"                                                             DataContext="{Binding RadarMaps}" ManipulationMode="TranslateInertia"                                               ColorScheme="Dark">
+        <Maps:MapControl x:ConnectionId='6' MapServiceToken="Atb6DOMKy2vjVrFbmzdlVxhq4mxAkyBPfCg2XDG2X-thzfgZuk-g-8MNwkuIcry9" x:Name="map" Grid.Row ="1" Grid.ColumnSpan="3" VerticalAlignment="Stretch"  HorizontalAlignment="Stretch"                                                             DataContext="{Binding RadarMaps}" ManipulationMode="TranslateInertia"                                               ColorScheme="Dark"                                                                    >
            <!--
             <Maps:MapItemsControl ItemsSource="{Binding}">
 

@@ -72,7 +72,7 @@
 
       
 
-        <Maps:MapControl MapServiceToken="Atb6DOMKy2vjVrFbmzdlVxhq4mxAkyBPfCg2XDG2X-thzfgZuk-g-8MNwkuIcry9" x:Name="map" Grid.Row ="1" Grid.ColumnSpan="3" VerticalAlignment="Stretch"  HorizontalAlignment="Stretch" Loaded="map_Loaded" ZoomLevelChanged="map_ZoomLevelChanged" DataContext="{Binding RadarMaps}" ManipulationMode="TranslateInertia" MapTapped="map_MapTapped" Tapped="map_Tapped" ColorScheme="Dark">
+        <Maps:MapControl MapServiceToken="Atb6DOMKy2vjVrFbmzdlVxhq4mxAkyBPfCg2XDG2X-thzfgZuk-g-8MNwkuIcry9" x:Name="map" Grid.Row ="1" Grid.ColumnSpan="3" VerticalAlignment="Stretch"  HorizontalAlignment="Stretch" Loaded="map_Loaded" ZoomLevelChanged="map_ZoomLevelChanged" DataContext="{Binding RadarMaps}" ManipulationMode="TranslateInertia" MapTapped="map_MapTapped" Tapped="map_Tapped" ColorScheme="Dark" PitchChanged="map_PitchChanged" HeadingChanged="map_HeadingChanged">
            <!--
             <Maps:MapItemsControl ItemsSource="{Binding}">
 

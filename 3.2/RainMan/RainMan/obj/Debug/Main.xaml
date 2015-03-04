@@ -27,7 +27,7 @@
 
         </DataTemplate>
         <DataTemplate x:Key="IconTemplate">
-            <StackPanel HorizontalAlignment="center" Margin="5,5,5,5" Width="170" Height="130" >
+            <StackPanel HorizontalAlignment="center" Margin="5,5,5,5" Width="{Binding ItemWidth}" Height="{Binding ItemHeight}" >
                 <StackPanel.Background>
                     <SolidColorBrush Color="white" Opacity="0.15" />
                 </StackPanel.Background>
@@ -195,6 +195,11 @@
 
 
         </Grid>
-    </Grid>
+      
+            
+            
+            
+        </Grid>
+    
 </Page>
 

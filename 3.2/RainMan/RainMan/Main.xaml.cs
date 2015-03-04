@@ -120,8 +120,24 @@ namespace RainMan
                 //    dialogShown = true;
                 //}
 
+                var screenBounds = Window.Current.Bounds;
+                var heightResizeFactor = 130.0 / 666.666;
+                var widthResizeFactor = 170.0 / 400;
+
                 var icons = await PredictionIconDataSource.getData(this.mapManager);
+                foreach(var icon in icons.PredictionIcons)
+                {
+                    icon.ItemHeight = heightResizeFactor * screenBounds.Height;
+                    icon.ItemWidth = widthResizeFactor * screenBounds.Width;
+                }
                 this.defaultViewModel["IconCollection"] = icons;
+
+               
+                //this.defaultViewModel["FirstItem"] = icons.PredictionIcons.ElementAt(0);
+                //this.defaultViewModel["SecondItem"] = icons.PredictionIcons.ElementAt(0);
+                //this.defaultViewModel["ThirdItem"] = icons.PredictionIcons.ElementAt(0);
+                //this.defaultViewModel["FourthItem"] = icons.PredictionIcons.ElementAt(0);
+
                 this.defaultViewModel["Selection"] = icons.PredictionIcons.ElementAt(0);
                 this.waterRec.Height = RainToHeight.rainToHeight(icons.PredictionIcons.ElementAt(0).Avg);
                 

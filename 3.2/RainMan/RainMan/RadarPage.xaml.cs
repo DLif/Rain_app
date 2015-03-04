@@ -828,6 +828,16 @@ namespace RainMan
             }
         }
 
+        private void map_PitchChanged(MapControl sender, object args)
+        {
+            sender.DesiredPitch = 0.0;
+        }
+
+        private void map_HeadingChanged(MapControl sender, object args)
+        {
+            sender.Heading = 0.0;
+        }
+
 
     }
 }

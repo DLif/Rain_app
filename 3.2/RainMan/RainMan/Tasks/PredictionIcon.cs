@@ -18,6 +18,8 @@ namespace RainMan.Tasks
         public String ImagePath { get; set; }
         public String AvgInfo { get; set; }
         public Double Avg { set; get; }
+        public Double ItemWidth { get; set; }
+        public Double ItemHeight { get; set; }
 
 
         public PredictionIcon(double averageRain, int timeIndex, DateTime time)
@@ -27,6 +29,8 @@ namespace RainMan.Tasks
             AvgInfo = String.Format(" MM/HOUR: {0:0.00}", averageRain);
             InitImagePath(averageRain);
             Avg = averageRain;
+            ItemWidth = 170;
+            ItemHeight = 130;
         }
 
 
