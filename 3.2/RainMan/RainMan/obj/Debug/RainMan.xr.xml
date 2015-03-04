@@ -15,12 +15,12 @@
     <RootPropertyPathName Name="Selection" />
     <RootPropertyPathName Name="AvgInfo" />
     <RootPropertyPathName Name="Avg" />
-    <RootPropertyPathName Name="Paths" />
-    <RootPropertyPathName Name="PathName" />
     <RootPropertyPathName Name="Group" />
     <RootPropertyPathName Name="FinishName" />
     <RootPropertyPathName Name="StartName" />
     <RootPropertyPathName Name="GroupName" />
+    <RootPropertyPathName Name="Paths" />
+    <RootPropertyPathName Name="PathName" />
     <RootPropertyPathName Name="newestTime" />
     <RootPropertyPathName Name="oldestTime" />
     <RootPropertyPathName Name="currentTime" />
@@ -163,7 +163,6 @@
       <RootProperty Name="Label" />
       <RootEvent Name="Checked" />
       <RootEvent Name="Unchecked" />
-      <RootEvent Name="Click" />
     </RootType>
     <RootType FullName="Windows.UI.Xaml.Controls.SymbolIcon">
       <RootProperty Name="Symbol" />
@@ -307,6 +306,14 @@
       <RootProperty Name="Orientation" />
     </RootType>
     <RootType FullName="RainMan.Main" />
+    <RootType FullName="Windows.UI.Xaml.Controls.ProgressRing">
+      <RootProperty Name="IsActive" />
+      <RootProperty Name="VerticalAlignment" />
+      <RootProperty Name="HorizontalAlignment" />
+      <RootProperty Name="Background" />
+      <RootProperty Name="Visibility" />
+      <RootProperty Name="Margin" />
+    </RootType>
     <RootType FullName="Windows.UI.Xaml.Controls.ListView">
       <RootProperty Name="Margin" />
       <RootProperty Name="ItemsSource" />
@@ -333,11 +340,6 @@
     <RootType FullName="RainMan.RadarPage" />
     <RootType FullName="Windows.UI.Xaml.Controls.DatePicker">
       <RootProperty Name="Margin" />
-    </RootType>
-    <RootType FullName="Windows.UI.Xaml.Controls.ProgressRing">
-      <RootProperty Name="Visibility" />
-      <RootProperty Name="HorizontalAlignment" />
-      <RootProperty Name="VerticalAlignment" />
     </RootType>
     <RootType FullName="Windows.UI.Xaml.Controls.ToggleSwitch">
       <RootProperty Name="Margin" />

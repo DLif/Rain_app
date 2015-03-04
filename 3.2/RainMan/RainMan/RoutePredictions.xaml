@@ -26,10 +26,8 @@
         <valueconverter:toColorConvertor x:Key="RainToColor"/>
 
 
-        <DataTemplate x:Name="PathNameTemplate">
-            
-            <TextBlock FontSize="25" Foreground="White" Text="{Binding Name}"></TextBlock>
-            
+        <DataTemplate x:Name="PathNameTemplate"> 
+            <TextBlock FontSize="25" Foreground="White" Text="{Binding Name}"></TextBlock>      
         </DataTemplate>
         
         <ImageBrush x:Name="pushpinImage" ImageSource="Assets/icons/icon1.png"/>

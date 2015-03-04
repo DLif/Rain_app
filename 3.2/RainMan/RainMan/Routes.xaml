@@ -179,7 +179,7 @@
             </PivotItem>
             <PivotItem x:Name="GroupPivot" Header="my routes" DataContext="{Binding PathGroups}">
                 <Grid DataContext="{Binding}" HorizontalAlignment="Stretch">
-                <ListView x:Name="groupList"
+                    <ListView x:Name="groupList"
 						AutomationProperties.AutomationId="PathGroupItem"
 						AutomationProperties.Name="Paths in path group"
 						SelectionMode="Single"
@@ -191,8 +191,9 @@
 						HorizontalAlignment="Stretch"
 						ContinuumNavigationTransitionInfo.ExitElementContainer="True" SelectionChanged="groupList_SelectionChanged" ItemClick="groupList_ItemClick">
                         
-                </ListView>
-
+                    </ListView>
+                    <ProgressRing x:Name="loadingListProgress" Background="Transparent" Margin="0, 100, 0, 0" IsActive="True" HorizontalAlignment="Center" VerticalAlignment="Center"></ProgressRing>
+                    <TextBlock x:Name="loadingErrorMessage" Text="Downloading groups ..." Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" FontSize="20"></TextBlock>
                 </Grid>
 
             </PivotItem>
@@ -266,7 +267,7 @@
                    
                     <Button Grid.Column="1" x:Name="transportButton" Width="30" Height="50" BorderThickness="0" HorizontalAlignment="Center" VerticalAlignment="top" Margin="0, 20, 0, 0" BorderBrush="White" Foreground="White">
                         <Button.Background>
-                            <ImageBrush x:Name="transportImagebrush"   ImageSource="ms-appx:///Assets/icons/walking.png" Stretch="Uniform" ></ImageBrush>
+                            <ImageBrush x:Name="transportImagebrush"   ImageSource="ms-appx:///Assets/icons/bike.png" Stretch="Uniform" ></ImageBrush>
                         </Button.Background>
                         <Button.Flyout>
 

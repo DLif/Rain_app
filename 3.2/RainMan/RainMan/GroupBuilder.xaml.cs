@@ -153,35 +153,7 @@ namespace RainMan
 
         }
 
-        private DependencyObject getWayPointPin(Geopoint point)
-        {
-
-            //Creating a Grid element.
-            var myGrid = new Grid();
-            myGrid.RowDefinitions.Add(new RowDefinition());
-            myGrid.RowDefinitions.Add(new RowDefinition());
-            myGrid.Background = new SolidColorBrush(Colors.Transparent);
-            ImageBrush imgBrush = new ImageBrush();
-            if (this.startingPoint == null)
-            {
-                imgBrush.ImageSource = new BitmapImage(new Uri("ms-appx:///Assets/radar/mappin.png"));
-            }
-            else
-            {
-                imgBrush.ImageSource = new BitmapImage(new Uri("ms-appx:///Assets/radar/waypointpin.png"));
-            }
-
-            //Creating a Rectangle
-            var myRectangle = new Rectangle { Fill = imgBrush, Height = 35, Width = 20 };
-            myRectangle.SetValue(Grid.RowProperty, 0);
-            myRectangle.SetValue(Grid.ColumnProperty, 0);
-
-            //Adding the Rectangle to the Grid
-            myGrid.Children.Add(myRectangle);
-
-            return myGrid;
-
-        }
+   
 
         private void enableAddress_Checked(object sender, RoutedEventArgs e)
         {
@@ -200,18 +172,7 @@ namespace RainMan
         private Geopoint endingPoint = null;
         private DependencyObject endingPin = null;
 
-        private void addWayPoint(Geopoint point)
-        {
-            // this.wayPoints.Add(point);
-            DependencyObject wayPointPin = getWayPointPin(point);
-            // this.wayPointsPins.Add(wayPointPin);
-
-            // add pin to map
-            this.map.Children.Add(wayPointPin);
-
-            // MapControl.SetLocation(wayPointPin, point);
-            // MapControl.SetNormalizedAnchorPoint(wayPointPin, new Point(0.5, 1));
-        }
+      
 
         private async void addressTextBox_KeyDown(object sender, KeyRoutedEventArgs e)
         {
@@ -239,21 +200,33 @@ namespace RainMan
             try
             {
 
-                MapLocationFinderResult result = await MapLocationFinder.FindLocationsAsync(address, RadarMapManager.center, 5);
+                Task[] tasks = new Task[2];
+                tasks[0] = Task.Delay(2000);
 
+                var findLocationTast = MapLocationFinder.FindLocationsAsync(address, RadarMapManager.center, 5);
+                tasks[1] = findLocationTast.AsTask<MapLocationFinderResult>();
 
-
-                if (result.Status == MapLocationFinderStatus.Success && result.Locations.Count > 0)
+                int res = Task.WaitAny(tasks);
+                if (res == 0)
                 {
-
-                    location = result.Locations[0].Point;
-                    await map.TrySetViewAsync(result.Locations[0].Point);
-
+                    errorText = "Request timed-out, please try again";
                 }
                 else
                 {
-                    errorText = "Location was not found, try again";
 
+                    MapLocationFinderResult result = findLocationTast.GetResults();
+                    if (result.Status == MapLocationFinderStatus.Success && result.Locations.Count > 0)
+                    {
+
+                        location = result.Locations[0].Point;
+                        await map.TrySetViewAsync(result.Locations[0].Point);
+
+                    }
+                    else
+                    {
+                        errorText = "Location was not found, try again";
+
+                    }
                 }
             }
 
@@ -275,11 +248,12 @@ namespace RainMan
                 this.handleNewPoint(location);
             }
 
-            this.locateAddressModalWindow.Dialog.Hide();
-            if (errorText != "")
+            
+            else
             {
+                this.locateAddressModalWindow.Dialog.Hide();
                 MessageDialog diag = new MessageDialog(errorText);
-                diag.ShowAsync();
+                await diag.ShowAsync();
             }
 
         }
@@ -304,7 +278,7 @@ namespace RainMan
             if (this.undoAppBar.Visibility == Visibility.Collapsed)
                 this.undoAppBar.Visibility = Visibility.Visible;
 
-            DependencyObject wayPointPin = getWayPointPin(location);
+            DependencyObject wayPointPin = MapUtils.getMapPin(location, Colors.Red, null);
             if (this.startingPoint == null)
             {
 
@@ -395,7 +369,7 @@ namespace RainMan
 
                 var myPosition = await locator.GetGeopositionAsync(
                     maximumAge: TimeSpan.FromSeconds(60),
-                    timeout: TimeSpan.FromSeconds(10)
+                    timeout: TimeSpan.FromSeconds(5)
                     );
 
                 // navigate to location
@@ -430,7 +404,7 @@ namespace RainMan
             if (errorOccured)
             {
                 MessageDialog dialog = new MessageDialog(error);
-                dialog.ShowAsync();
+                await dialog.ShowAsync();
             }
 
 
@@ -479,12 +453,32 @@ namespace RainMan
 
             // store group in cloud
             newGroup.UserId = App.userId;
-            await this.groupsTable.InsertAsync(newGroup);
+            Boolean error = false;
+
+            try
+            {
+
+                await this.groupsTable.InsertAsync(newGroup);
+            }
+            catch
+            {
+                error = true;
+            }
             modalWindow.Dialog.Hide();
 
+            if(error)
+            {
+                MessageDialog msg = new MessageDialog("Oops, failed to upload the group to the server, please try again");
+                await msg.ShowAsync();
+            }
+            else
+            {
+                this.Frame.Navigate(typeof(Routes), givenArgument);
+            }
 
 
-            this.Frame.Navigate(typeof(Routes), givenArgument);
+
+            
         }
 
         private void name_GotFocus(object sender, RoutedEventArgs e)

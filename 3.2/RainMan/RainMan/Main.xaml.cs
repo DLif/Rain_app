@@ -77,6 +77,52 @@ namespace RainMan
         private async void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
 
+
+//0.1           0,93, 243 ----> 0.07
+//0.2           12, 190, 190 --> 0.72
+//0.7           1, 171, 171 --> 0.72
+//1.2           0, 134, 92 --> 1.35
+//2             3, 155, 54 --> 2.94
+//4             12, 177, 47 --> 3.84
+//6             12, 202, 34 --> 4.54
+//9             27, 217, 33 --> 5.16
+//13            55, 234, 55 --> 5.39
+//18            240, 244, 89 --> 19.52
+//24            246, 218, 56 --> 23.31
+//30            235, 182, 52 --> 26.43
+//40            230, 143, 40 --> 30.2
+           
+
+            //var x = ColorTranslator.RBG_to_power(0, 93, 243); 
+
+            //x = ColorTranslator.RBG_to_power(12, 190, 190); 
+
+            //x = ColorTranslator.RBG_to_power(1, 171, 171); 
+
+            //x = ColorTranslator.RBG_to_power(0, 134, 92); 
+
+            //x = ColorTranslator.RBG_to_power(3, 155, 54); 
+
+            //x = ColorTranslator.RBG_to_power(12, 177, 47); 
+
+            //x = ColorTranslator.RBG_to_power(12, 202, 34); 
+
+            //x = ColorTranslator.RBG_to_power(27, 217, 33); 
+
+            //x = ColorTranslator.RBG_to_power(55, 234, 55); 
+
+            //x = ColorTranslator.RBG_to_power(240, 244, 89); 
+
+            //x = ColorTranslator.RBG_to_power(246, 218, 56); 
+
+            //x = ColorTranslator.RBG_to_power(235, 182, 52); 
+
+            //x = ColorTranslator.RBG_to_power(230, 143, 40); 
+
+            ////  x = ColorTranslator.RBG_to_power(255, 220, 2); // should be 24 really is 23.9
+
+            //// x = ColorTranslator.RBG_to_power(255, 182, 2); // should be 30 really is 27.09
+
             if(Frame.BackStackDepth > 0)
             {
                 Frame.BackStack.Clear();
@@ -143,7 +189,7 @@ namespace RainMan
                 
             }
 
-            var x = (PredictionCollection)this.defaultViewModel["IconCollection"];
+           
             
          
             if (dialogShown)

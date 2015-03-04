@@ -20,6 +20,9 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using RainMan.Tasks;
+using Windows.Devices.Geolocation;
+using Windows.UI.Xaml.Controls.Maps;
+using Windows.UI;
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
 
@@ -86,6 +89,7 @@ namespace RainMan
             group = e.NavigationParameter as PathGroup;
             this.GeneralInformationGrid.Visibility = Visibility.Collapsed;
             this.defaultViewModel["Group"] = group;
+            this.defaultViewModel["GroupName"] = group.GroupName;
             await refreshPaths();
 
 
@@ -132,28 +136,46 @@ namespace RainMan
 
         private void appBarDetails_Click(object sender, RoutedEventArgs e)
         {
-
+            this.BottomAppBar.Visibility = Visibility.Collapsed;
+            this.fadeInStory.Begin();
         }
 
-        private void appBarDetails_Checked(object sender, RoutedEventArgs e)
-        {
-            this.GeneralInformationGrid.Visibility = Visibility.Visible;
-        }
+        
 
-        private void appBarDetails_Unchecked(object sender, RoutedEventArgs e)
-        {
-            this.GeneralInformationGrid.Visibility = Visibility.Collapsed;
-        }
-
+     
         private async void appBarDeleteGroup_Click(object sender, RoutedEventArgs e)
         {
             ModalWindow win = new ModalWindow(String.Format("Removing {0} ...", this.selectedPath.PathName), "Please wait ... ", "");
             win.Dialog.ShowAsync();
-            await this.pathTable.DeleteAsync(selectedPath);
-            this.selectedPath = null;
-            this.appBarDeletePath.Visibility = Visibility.Collapsed;
-            await this.refreshPaths();
-            win.Dialog.Hide();
+
+            Boolean error = false;
+
+            try
+            {
+
+                await this.pathTable.DeleteAsync(selectedPath);
+                this.selectedPath = null;
+                this.appBarDeletePath.Visibility = Visibility.Collapsed;
+            }
+            catch
+            {
+                error = true;
+            }
+
+            if(error)
+            {
+                win.Dialog.Hide();
+                MessageDialog diag = new MessageDialog("Oops, check your internet connection!");
+                await diag.ShowAsync();
+            }
+            else
+            {
+                await this.refreshPaths();
+                win.Dialog.Hide();
+            }
+
+                
+            
         }
 
         private async void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -162,7 +184,7 @@ namespace RainMan
             if (this.groupName.Text == "" || this.startName.Text == "" || this.endName.Text == "")
             {
                 MessageDialog diag = new MessageDialog("One of the fields is empty, please fill the information");
-                diag.ShowAsync();
+                await diag.ShowAsync();
                 return;
             }
 
@@ -170,12 +192,24 @@ namespace RainMan
             group.StartName = this.startName.Text;
             group.FinishName = this.endName.Text;
 
-            await groupsTable.UpdateAsync(group);
+            string message = null;
 
-            MessageDialog dialog = new MessageDialog("Changes were succesfully saved!");
+            try
+            {
+                await groupsTable.UpdateAsync(group);
+                message = "Changes were succesfully saved!"; 
+          
+            }
+            catch
+            {
+                message = "Oops, server is down! try again later";
+                
+            }
+
+            this.fadeOutStory.Begin();
+            
+            MessageDialog dialog = new MessageDialog(message);
             await dialog.ShowAsync();
-            this.GeneralInformationGrid.Visibility = Visibility.Collapsed;
-            this.appBarDetails.IsChecked = false;
 
         }
 
@@ -183,18 +217,41 @@ namespace RainMan
         private async Task refreshPaths()
         {
 
-            var paths = await pathTable.Where(item => item.UserId == App.userId).ToCollectionAsync<DataModels.Path>();
-            var groupPaths = paths.Where(item => item.groupId == group.Id).ToList();
+            errorText.Visibility = Visibility.Visible;
+            progress.Visibility = Visibility.Visible;
+            errorText.Text = "Downloading paths ...";
 
-            // set my paths
-            this.defaultViewModel["Paths"] = groupPaths;
+            try
+            {
+
+                var paths = await pathTable.Where(item => item.UserId == App.userId).ToCollectionAsync<DataModels.Path>();
+                var groupPaths = paths.Where(item => item.groupId == group.Id).ToList();
+
+                // set my paths
+                this.defaultViewModel["Paths"] = groupPaths;
+
+                if(groupPaths.Count == 0)
+                {
+                    errorText.Text = "Group is empty";
+                }
+                else
+                {
+                    errorText.Visibility = Visibility.Collapsed;
+                }
+            }
+            catch
+            {
+                errorText.Text = "Oops, could not retrieve paths. Please check your internet connection";
+            }
+
+            progress.Visibility = Visibility.Collapsed;
+           
 
         }
 
         private void addPathButton_Click(object sender, RoutedEventArgs e)
         {
 
-            this.appBarDetails.IsChecked = false;
             this.GeneralInformationGrid.Visibility = Visibility.Collapsed;
 
             Frame.Navigate(typeof(RouteBuilder), this.group);
@@ -208,27 +265,150 @@ namespace RainMan
 
         private DataModels.Path selectedPath = null;
 
-        private void pathList_ItemClick(object sender, ItemClickEventArgs e)
+        private async void pathList_ItemClick(object sender, ItemClickEventArgs e)
         {
             this.selectedPath = e.ClickedItem as DataModels.Path;
             this.appBarDeletePath.Visibility = Visibility.Visible;
+
+            List<Geopoint> wayPoints = PathSerializer.ByteArrayToObject(selectedPath.PathClass);
+            wayPoints.RemoveAt(0);
+            wayPoints.RemoveAt(wayPoints.Count - 1);
+
+            // remove start and destination
+            for(int i = 2; i < this.map.Children.Count; ++i)
+            {
+                this.map.Children.RemoveAt(i);
+            }
+            List<BasicGeoposition> basicPositions = new List<BasicGeoposition>();
+            int counter = 1;
+            foreach(Geopoint wayPoint in wayPoints)
+            {
+                DependencyObject pin = MapUtils.getMapPin(wayPoint, Colors.Blue, counter.ToString());
+                MapUtils.addPinToMap(map, pin, wayPoint);
+                basicPositions.Add(wayPoint.Position);
+                ++counter;
+            }
+
+            
+            basicPositions.Add(startPoint.Position);
+            basicPositions.Add(endPoint.Position);
+
+            // try to set view
+            try
+            {
+
+                bool result = await map.TrySetViewBoundsAsync(GeoboundingBox.TryCompute(basicPositions), null, MapAnimationKind.None);
+
+                if (!result)
+                {
+                    MessageDialog errorDialog = new MessageDialog("Sorry, something went wrong with the mapping service!", "Oops");
+                    await errorDialog.ShowAsync();
+                }
+                else
+                {
+                    map.ZoomLevel -= 0.1;
+
+
+                }
+
+            }
+            catch
+            {
+                MessageDialog errorDialog = new MessageDialog("Sorry, something went wrong with the mapping service!", "Oops");
+                errorDialog.ShowAsync();
+            }
+          
+
         }
 
         private async void DeleteGroup_Click(object sender, RoutedEventArgs e)
         {
                 ModalWindow modalWindow = new ModalWindow("Group is being deleted", "Please wait ... ", "");
                 modalWindow.Dialog.ShowAsync();
+                Boolean error = false;
+                try
+                {
+                    await this.groupsTable.DeleteAsync(this.group);
 
-                await this.groupsTable.DeleteAsync(this.group);
-                //this.defaultViewModel["PathGroups"] = await this.groupsTable.ToCollectionAsync<PathGroup>();
+                    for(int i = 2; i < this.map.Children.Count; ++i)
+                    {
+                        map.Children.RemoveAt(i);
+                    }
 
-               // this.selectedGroup = null;
-               // this.appBarRemoveGroup.Visibility = Visibility.Collapsed;
-               // this.selectGroup.Visibility = Visibility.Collapsed;
+
+                }
+
+                catch
+                {
+                    error = true;
+                }
+
+
 
                 modalWindow.Dialog.Hide();
 
-                Frame.GoBack();
+                if(error)
+                {
+                    MessageDialog diag = new MessageDialog("Sorry, your internet connection seems to be down, try again later");
+                    await diag.ShowAsync();
+                }
+                else
+                    Frame.GoBack();
         }
+
+        private void fadeOutStory_Completed(object sender, object e)
+        {
+            GeneralInformationGrid.Visibility = Visibility.Collapsed;
+            this.BottomAppBar.Visibility = Visibility.Visible;
+        }
+
+        private DependencyObject startPin;
+        private Geopoint startPoint;
+        private Geopoint endPoint;
+        private DependencyObject endPin;
+       
+
+        private async void map_Loaded(object sender, RoutedEventArgs e)
+        {
+            // get start and end points
+            List<BasicGeoposition> basicPositions = new List<BasicGeoposition>();
+            startPoint = GeopointSerializer.ByteArrayToObject(this.group.SourcePoint);
+            endPoint = GeopointSerializer.ByteArrayToObject(this.group.DestinationPoint);
+            basicPositions.Add(startPoint.Position);
+            basicPositions.Add(endPoint.Position);
+
+            try
+            {
+
+                // add the map icons
+               startPin = MapUtils.getMapPin(startPoint, Colors.Red, "Start");
+               endPin = MapUtils.getMapPin(endPoint, Colors.Red, "End");
+                MapUtils.addPinToMap(map, startPin, startPoint);
+                MapUtils.addPinToMap(map, endPin, endPoint);
+
+                bool result = await map.TrySetViewBoundsAsync(GeoboundingBox.TryCompute(basicPositions), null, MapAnimationKind.None);
+
+                if (!result)
+                {
+                    MessageDialog errorDialog = new MessageDialog("Sorry, something went wrong with the mapping service!", "Oops");
+                    await errorDialog.ShowAsync();
+                }
+                else
+                {
+                    map.ZoomLevel -= 0.1;
+
+                    
+                }
+            }
+            catch
+            {
+
+                MessageDialog errorDialog = new MessageDialog("Sorry, something went wrong with the mapping service!", "Oops");
+                errorDialog.ShowAsync();
+
+            }
+        }
+
+    
     }
 }

@@ -70,7 +70,7 @@ namespace RainMan.Tasks
         }
 
         // color options: Colors.red, Colors.blue
-        public static DependencyObject getMapPin(Geopoint point, Color color)
+        public static DependencyObject getMapPin(Geopoint point, Color color, string optionalText)
         {
 
             //Creating a Grid element.
@@ -90,8 +90,20 @@ namespace RainMan.Tasks
 
             //Creating a Rectangle
             var myRectangle = new Rectangle { Fill = imgBrush, Height = 35, Width = 20 };
-            myRectangle.SetValue(Grid.RowProperty, 0);
-            myRectangle.SetValue(Grid.ColumnProperty, 0);
+
+            if (optionalText != null)
+            {
+                myRectangle.SetValue(Grid.RowProperty, 1);
+                myRectangle.SetValue(Grid.ColumnProperty, 0);
+                var textblock = new TextBlock() { Text = optionalText,Foreground = new SolidColorBrush(Colors.Red), FontSize = 15, HorizontalAlignment = HorizontalAlignment.Center };
+                textblock.SetValue(Grid.RowProperty, 0);
+                myGrid.Children.Add(textblock);
+            }
+            else
+            {
+                myRectangle.SetValue(Grid.RowProperty, 0);
+                myRectangle.SetValue(Grid.ColumnProperty, 0);
+            }
 
             //Adding the Rectangle to the Grid
             myGrid.Children.Add(myRectangle);
@@ -108,9 +120,10 @@ namespace RainMan.Tasks
 
              RandomAccessStreamReference image = RandomAccessStreamReference.CreateFromUri(new Uri("ms-appx:///Assets/icons/icon1.png"));
 
+
             //Creating a Grid element.
             var myGrid = new Grid();
-         
+
             myGrid.Background = imageBrush;
             myGrid.Width = 50;
             myGrid.Height = 50;

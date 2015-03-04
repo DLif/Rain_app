@@ -310,8 +310,9 @@ namespace RainMan
             predictor = new RouteGroupAnnotator(routes, map);
 
             // init prediction
-            await this.predictor.InitRouteGroupsPredictions(arguments.Transportation, numTimeSlots, this.loadingDiag, this.pushpinImage);
+            await this.predictor.InitRouteGroupsPredictions(arguments.Transportation, numTimeSlots, this.loadingDiag, this.pushpinImage, arguments.MaxStallingTime);
 
+            
             if (predictor.ErrorOccured)
                 return;
 

@@ -10,13 +10,30 @@ namespace RainMan.Tasks
     class ColorTranslator
     {
 
+
         static int image_size_x = 512;
         static int image_size_y = 512;
 
-        // HUE ranges 0-230,290-360
+        //HUE ranges 0-235,290-360
         //this array holds the intervals given in the site(they are very problematic)
-        static double[] lowerPart_intervals;
-        static double[] upperPart_intervals;
+        static double[] lowerPart_intervals = new double[15] { 50.0, 40.0, 30.0, 24.0, 18.0, 13.0, 9.0, 6.0, 4.0, 2.0, 1.2, 0.7, 0.2, 0.1, 0.0 };
+        static double[] upperPart_intervals = new double[4] { 250.0, 200.0, 100.0, 50.0 };
+
+
+
+        static int[][] pointsArray = new int[21][] { 
+            new int[3] { 0, 0, 0 }, new int[3] { 6, 82, 244 },new int[3] { 0, 88, 243 }, new int[3] { 3, 195, 202 },new int[3] { 0, 181, 186 }, new int[3] { 1, 169, 175 }
+            ,new int[3] { 0, 142, 128 }, new int[3] { 1, 134, 84 },new int[3] { 0, 154, 53 }, new int[3] { 0, 189, 39 },new int[3] { 2, 207, 25 }, new int[3] { 6, 231, 11 }
+            ,new int[3] { 34, 249, 30 },new int[3] { 138, 255, 32 }, new int[3] { 230, 252, 33 },new int[3] { 255, 220, 2 } ,new int[3] {255, 182, 2} ,new int[3] {255, 131, 5} 
+            ,new int[3] {246, 53,0} ,new int[3] { 194, 5, 42 }, new int[3] { 244, 6, 249 }
+        };
+        static double[] pointsPower = new double[21] { 0, 0.01, 0.1, 0.2, 0.45, 0.7, 0.95, 1.2, 2, 4, 6, 9, 13, 15.5, 18, 24, 30, 40, 50, 100, 200 };
+
+
+
+
+
+      
 
         //This function calculates power sum for the given "picture arry" to the given x and y and radius
         //The array pixels shold be of the size 4 * width * height
@@ -68,18 +85,43 @@ namespace RainMan.Tasks
                     //for black pixel- give 
                     if (r == 0 && g == 0 && b == 0) power = 0;
                     //the case in whitch r==b==g is problematic for hue calculation
-                    else if (r == b && b == g)
+                    /*else if (r == b && b == g)
                     {
                         if (pixelRadius < 3) return power_to_radius(pixels, x_pixel, y_pixel, 3, width);
                         else continue;//if radius large enough, ignore point 
-                    }
-                    else power = ColorTranslator.RBG_to_power(r, g, b);
+                    }*/
+                    else power = ColorTranslator.RGB_array_power(r, g, b);
 
                     num_pixels_in_radius++;
                     power_sum += power;
                 }
             }
             return power_sum / num_pixels_in_radius;
+        }
+
+        public static double RGB_array_power(int R, int G, int B)
+        {
+            int min_index = -1;
+            int index = 0;
+            double min_distance = Double.MaxValue;
+
+
+            foreach (int[] test_point in pointsArray)
+            {
+                double cur_distance = distance_formula(R, G, B, test_point[0], test_point[1], test_point[2]);
+                if (cur_distance < min_distance)
+                {
+                    min_distance = cur_distance;
+                    min_index = index;
+                }
+                index++;
+            }
+            return pointsPower[min_index];
+        }
+
+        public static double distance_formula(int r1, int g1, int b1, int r2, int g2, int b2)
+        {
+            return Math.Sqrt((double)((r2 - r1) * (r2 - r1) + (g2 - g1) * (g2 - g1) + (b2 - b1) * (b2 - b1)));
         }
 
         //main clac function
@@ -89,9 +131,9 @@ namespace RainMan.Tasks
             lowerPart_intervals = new double[15] { 50.0, 40.0, 30.0, 24.0, 18.0, 13.0, 9.0, 6.0, 4.0, 2.0, 1.2, 0.7, 0.2, 0.1, 0.0 };
             upperPart_intervals = new double[4] { 250.0, 200.0, 100.0, 50.0 };
             double hue = RBG_to_HUE(R, G, B);
-            if (hue > 240 && hue < 290)
+            if (hue > 235 && hue < 290)
             {//this hue should not exsist in the bar. fake nearest one
-                if (hue <= 265) hue = 240;
+                if (hue <= 265) hue = 235;
                 else hue = 290;
             }
             return get_hue_power(hue);
@@ -107,11 +149,11 @@ namespace RainMan.Tasks
             //this is the normal cases calculation
 
             //lower part
-            else if (point <= 240)
+            else if (point <= 235)
             {
-                int subpart_of_point = get_point_part(point, 0, 240, 14);
+                int subpart_of_point = get_point_part(point, 0, 235, 14);
                 double stratched_point = point * 14;//instad of / num_parts 
-                double fraction = (stratched_point - subpart_of_point * 240) / 240;//equals : (point - subpart_of_point * (240 / 14)) / ((240 / 14));
+                double fraction = (stratched_point - subpart_of_point * 235) / 235;//equals : (point - subpart_of_point * (235 / 14)) / ((235 / 14));
                 return lowerPart_intervals[subpart_of_point + 1] + (1 - fraction) * (lowerPart_intervals[subpart_of_point] - lowerPart_intervals[subpart_of_point + 1]);
             }
 
@@ -141,7 +183,7 @@ namespace RainMan.Tasks
                 }
             }
             if (point == ending) return 0;
-            if ((point > ending + (num_parts - 1 + 1) * subpart_size) && (point <= begining)) return num_parts - 1;
+            else if ((point > ending + (num_parts - 1 + 1) * subpart_size) && (point <= begining)) return num_parts - 1;
             //should never get here
             return -1;
         }
@@ -152,12 +194,12 @@ namespace RainMan.Tasks
         {
             if (R == G && G == B)
             {
-                return (double)0.0;//this is a shade of gray and it's hue is 0;
+                return (float)0.0;//this is a shade of gray and it's hue is 0;
             }
 
-            double r = R / (double)255.0;
-            double g = G / (double)255.0;
-            double b = B / (double)255.0;
+            double r = R / 255.0;
+            double g = G / 255.0;
+            double b = B / 255.0;
 
             //calc max
             double max = Max(r, g, b);
@@ -168,8 +210,8 @@ namespace RainMan.Tasks
 
             if (r == g && g == b) return 0.0;
             else if (max == r) base_hue = ((g - b) / (max - min));
-            else if (max == g) base_hue = (double)2.0 + ((b - r) / (max - min));
-            else base_hue = (double)4.0 + ((r - g) / (max - min)); //max == b
+            else if (max == g) base_hue = 2.0 + ((b - r) / (max - min));
+            else base_hue = 4.0 + ((r - g) / (max - min)); //max == b
 
             //convert for hue circle(range 0 to 360)
             base_hue = base_hue * 60;
@@ -177,8 +219,6 @@ namespace RainMan.Tasks
             if (base_hue < 0) base_hue = base_hue + 360;
             return base_hue;
         }
-
-
 
         private static double Max(double r, double g, double b)
         {
@@ -195,6 +235,7 @@ namespace RainMan.Tasks
             if (b < min) min = b;
             return min;
         }
+    
 
         // dummy implementation
         // needs a more carefull implementation

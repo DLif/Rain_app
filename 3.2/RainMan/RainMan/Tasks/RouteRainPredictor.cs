@@ -66,7 +66,7 @@ namespace RainMan.Tasks
             return all;
         }
 
-        public async Task InitRouteGroupsPredictions(RouteKind kind, int timeSlots, LoadingDialog loadingScreen, ImageBrush pushpinImage)
+        public async Task InitRouteGroupsPredictions(RouteKind kind, int timeSlots, LoadingDialog loadingScreen, ImageBrush pushpinImage, int maxStallTime)
         {
 
             List<RadarMap> Maps = new List<RadarMap>();
@@ -115,7 +115,7 @@ namespace RainMan.Tasks
             loadAllPaths(Routes);
 
             // show the selected path (so far without annotations)
-            int bestPath = this.getBestPathIndex();
+            int bestPath = this.getBestPathIndex(maxStallTime);
             showPath(bestPath);
 
             // annoate the best path from the group with the best possible departure time
@@ -246,11 +246,11 @@ namespace RainMan.Tasks
         }
 
         // get the index of the group with the minimal rain damage
-        public int getBestPathIndex()
+        public int getBestPathIndex(int maxStallTime)
         {
             int minIndex = 0;
             double minAvg = this.routeAnnotations.ElementAt(0).Averages[this.routeAnnotations.ElementAt(0).BestTime];
-            for (int i = 1; i < this.routeAnnotations.Count; ++i)
+            for (int i = 1; i < this.routeAnnotations.Count && i <= maxStallTime; ++i)
             {
                 double currAvg = this.routeAnnotations.ElementAt(i).Averages[this.routeAnnotations.ElementAt(i).BestTime];
                 if (currAvg < minAvg)

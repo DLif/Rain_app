@@ -519,7 +519,7 @@ namespace RainMan
 
 
 
-                double res = ((Double.Parse(result) * (1 / 6.0)) / 1000) / (inside_points.Count + pixels.Count); // in liters [Note: this is bullshit ]
+                double res = ((Double.Parse(result) * (1 / 6.0)) / 1000) / (inside_points.Count + pixels.Count); 
                 //double res = 0.23;
                 if(this.usePredictions.IsOn)
                 {
