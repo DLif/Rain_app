@@ -48,7 +48,7 @@
             
         </Grid>
         
-        <Grid Visibility="Collapsed" Grid.Row="0" Grid.ColumnSpan="3" Grid.RowSpan="2" VerticalAlignment="Stretch" x:Name="overlayGrid">
+        <Grid Visibility="Visible" Grid.Row="0" Grid.ColumnSpan="3" Grid.RowSpan="2" VerticalAlignment="Stretch" x:Name="overlayGrid">
 
             <Grid.RowDefinitions>
                 
@@ -72,6 +72,7 @@
                     <RowDefinition/>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
 
                 </Grid.RowDefinitions>
 
@@ -81,16 +82,30 @@
                     <ColumnDefinition/>
 
                 </Grid.ColumnDefinitions>
-                <Button x:ConnectionId='7' x:Name="GoBtn" Content="Go" Grid.Row="3" Grid.Column="0" HorizontalAlignment="right" VerticalAlignment="Center" Margin="0, 0, 10, 0"                    />
-                <Button x:ConnectionId='8' x:Name="CancelButton" Content="Close" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10, 0, 0, 0"                     />
+                <Button x:ConnectionId='7' x:Name="GoBtn" Content="Go" Grid.Row="5" Grid.Column="0" HorizontalAlignment="right" VerticalAlignment="Center" Margin="0, 0, 10, 0"                    />
+                <Button x:ConnectionId='8' x:Name="CancelButton" Content="Close" Grid.Row="5" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10, 0, 0, 0"                     />
                 
                 <DatePicker x:Name="date" Grid.Row="1" Grid.ColumnSpan="1" Grid.Column="1" Margin="10" />
                 <TextBlock Text="Choose a date" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="22" FontWeight="Medium" Grid.Column="0" Grid.Row="1"></TextBlock>
                 
                 <TextBlock Text="Select a date and receive the total amount of water that rained over the area you selected, starting from the selected day, up until today" Grid.ColumnSpan="2" Margin="10" FontSize="20" TextWrapping="Wrap"></TextBlock>
-                <ProgressRing Visibility="Collapsed" x:Name="progress" Grid.Row="2" HorizontalAlignment="Center" Grid.ColumnSpan="2"  VerticalAlignment="Center"/>
+                <ProgressRing Visibility="Collapsed" x:Name="progress" Grid.Row="4" HorizontalAlignment="Center" Grid.ColumnSpan="2"  VerticalAlignment="Center"/>
                 <TextBlock Visibility="Collapsed" Text="Result" x:Name="ResultText" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="22" Margin="20" FontWeight="Medium" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="4"></TextBlock>
+              
 
+                <!-- future option -->
+                
+                <ToggleSwitch x:ConnectionId='9' Grid.ColumnSpan="2" Grid.Row="3" Margin="10" x:Name="usePredictions" Header="Use predictions"   HorizontalAlignment="Left" VerticalAlignment="Top"                                 />
+                <Button x:Name="predictionNumBtn" Visibility="Collapsed" Content="Minutes: 30" Margin="60, 15, 10, 0" Grid.Row="3" Grid.Column="2" BorderThickness="0">
+                    <Button.Flyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem x:ConnectionId='10' x:Name="prediction30" Text="30 minutes forward" HorizontalAlignment="Center"                            ></MenuFlyoutItem>
+                            <MenuFlyoutItem x:ConnectionId='11' x:Name="prediction20" Text="20 minutes forward" HorizontalAlignment="Center"                            ></MenuFlyoutItem>
+                            <MenuFlyoutItem x:ConnectionId='12' x:Name="prediction10" Text="10 minutes forward" HorizontalAlignment="Center"                            ></MenuFlyoutItem>
+                        </MenuFlyout>
+                    </Button.Flyout>
+                    
+                </Button>
 
 
             </Grid>

@@ -1,1 +1,1 @@
-C:\Users\David\Documents\GitHub\Rain_app\3.2\RainMan\RainMan\RainMan.csproj;neutral
+C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\RainMan.csproj;neutral

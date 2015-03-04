@@ -43,7 +43,7 @@ namespace RainMan
         private List<Geopoint> wayPoints = new List<Geopoint>();
         private List<DependencyObject> wayPointsPins = new List<DependencyObject>();
         private List<MapPolyline> lineCollection = new List<MapPolyline>();
-
+        private int numPredictionImages = 3;
         
 
       
@@ -351,11 +351,11 @@ namespace RainMan
         }
 
 
-        private Boolean pathGenerated = false;
+        
 
         private MapPolygon polygon = null;
 
-        private async void acceptAppBar_Click(object sender, RoutedEventArgs e)
+        private void acceptAppBar_Click(object sender, RoutedEventArgs e)
         {
 
             if (this.polygon == null)
@@ -395,34 +395,7 @@ namespace RainMan
 
         }
 
-        private async Task createNewPath()
-        {
-            // build path way points
-            List<Geopoint> actualWayPoints = new List<Geopoint>();
-            //actualWayPoints.Add(this.source);
-           // actualWayPoints.AddRange(this.wayPoints);
-           // actualWayPoints.Add(this.destination);
-
-            // now we're going to seriallize EVERYTHING
-            byte[] pathData = PathSerializer.ObjetToByteArray(actualWayPoints);
-
-            // great, now create a new path object
-            DataModels.Path pt = new DataModels.Path();
-            pt.groupId = this.currentGroup.Id;
-            pt.PathClass = pathData;
-           
-            pt.UserId = App.userId;
-
-            ModalWindow window = new ModalWindow("Uploading path to cloud", "Please wait ... ", "");
-            window.Dialog.ShowAsync();
-
-           // await pathTable.InsertAsync(pt);
-
-            window.Dialog.Hide();
-
-
-        }
-
+     
 
         private async void addressTextBox_KeyDown(object sender, KeyRoutedEventArgs e)
         {
@@ -504,15 +477,14 @@ namespace RainMan
         private async void GoBtn_Click(object sender, RoutedEventArgs e)
         {
 
-            if(progress.IsActive == true)
+            if (progress.IsActive == true)
             {
                 return;
             }
             DateTime time = date.Date.LocalDateTime;
-
             TimeSpan diff = DateTime.Now - time;
 
-            if(diff.TotalDays > 20)
+            if (diff.TotalDays > 20)
             {
                 MessageDialog diag = new MessageDialog("Date is too old! Requests are limited to 20 days back");
                 await diag.ShowAsync();
@@ -521,14 +493,13 @@ namespace RainMan
 
             progress.IsActive = true;
             progress.Visibility = Visibility.Visible;
-            
-     
+
+
 
 
             // first, get all points
             List<PixelRep> pixels = findAllPixels();
-           // pixels.Clear();
-           // pixels.Add(new PixelRep(255, 255));
+
 
             // finally, build the request!
             APIRequest request = new APIRequest(pixels);
@@ -536,7 +507,6 @@ namespace RainMan
             String encodedRequest = RainApiSerializer.SerializeRequest(request);
             var dict = new Dictionary<String, String>();
             dict.Add("places", encodedRequest);
-            //numImages = 31;
             dict.Add("numDaysString", diff.Days.ToString());
 
             try
@@ -547,10 +517,24 @@ namespace RainMan
                 progress.Visibility = Visibility.Collapsed;
 
 
-                double res = (Double.Parse(result) * (1 / 6.0)) / 1000; // in liters
+                double res = (Double.Parse(result) * (1 / 6.0)) / 1000; // in liters [Note: this is bullshit ]
+
+                if(this.usePredictions.IsOn)
+                {
+                    // add precitions data
+                    // use:
+                    var x = this.numPredictionImages;
+
+
+
+                }
+
+
+
+
+
 
                 this.ResultText.Visibility = Visibility.Visible;
-                //this.ResultText.Text = string.Format("Total: {0} Litres", res);
                 this.ResultText.Text = string.Format("Total: {0} Litres", res);
 
 
@@ -561,7 +545,7 @@ namespace RainMan
                 diag.ShowAsync();
                 this.progress.IsActive = false;
                 progress.Visibility = Visibility.Collapsed;
-                return;
+                
             }
 
         }
@@ -580,9 +564,47 @@ namespace RainMan
 
                 shapePixels.Add(new PixelRep(x_pixel, y_pixel));
             }
+
+            //var poly = new CustomPolygon(shapePixels.Count, shapePixels);
+            //return PolygonPixels.getAllPointsInsidePolygon(poly);
             return shapePixels;
 
 
+        }
+
+
+
+        private void usePredictions_Toggled(object sender, RoutedEventArgs e)
+        {
+            if(usePredictions.IsOn)
+            {
+                this.predictionNumBtn.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                this.predictionNumBtn.Visibility = Visibility.Collapsed;
+            }
+        }
+
+       
+
+        private void prediction30_Click(object sender, RoutedEventArgs e)
+        {
+            this.numPredictionImages = 3;
+            predictionNumBtn.Content = "Minutes: 30";
+            
+        }
+
+        private void prediction20_Click(object sender, RoutedEventArgs e)
+        {
+            this.numPredictionImages = 2;
+            predictionNumBtn.Content = "Minutes: 20";
+        }
+
+        private void prediction10_Click(object sender, RoutedEventArgs e)
+        {
+            this.numPredictionImages = 1;
+            predictionNumBtn.Content = "Minutes: 10";
         }
 
 

@@ -24,6 +24,7 @@ using Windows.UI.Xaml.Media.Imaging;
 using RainMan.Tasks;
 using Windows.Services.Maps;
 using System.Threading.Tasks;
+using System.Collections.ObjectModel;
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
 
@@ -114,7 +115,8 @@ namespace RainMan
 
             dialog.Hide();
             // set view data
-            this.defaultViewModel["RadarMaps"] = mapManager.Maps;
+            //this.defaultViewModel["RadarMaps"] = mapManager.Maps;
+            attachRadarMapsToMap(mapManager.Maps);
             this.defaultViewModel["oldestTime"] = mapManager.Maps.ElementAt(0).Time;
             this.defaultViewModel["newestTime"] = mapManager.Maps.ElementAt(mapManager.Maps.Count-1).Time;
             this.defaultViewModel["currentTime"] = mapManager.Maps.ElementAt(RadarMapManager.totalOldMaps).Time;
@@ -124,6 +126,31 @@ namespace RainMan
 
 
         }
+
+        private void attachRadarMapsToMap(ObservableCollection<RadarMap> maps)
+        {
+            foreach(RadarMap map in maps)
+            {
+                Image image = new Image();
+                image.Visibility = map.Visibile;
+                image.Height = map.Height;
+                image.Width = map.Width;
+                image.Source = map.ImageSrc;
+
+                MapControl.SetLocation(image, map.Point);
+                MapControl.SetNormalizedAnchorPoint(image, map.AnchorPoint);
+                this.map.Children.Add(image);
+                
+            }
+        }
+
+         //<Image Source="{Binding ImageSrc}" Height="{Binding Height}" Width="{Binding Width}"
+         //                  Visibility="{Binding Visibile}"
+         //                  Maps:MapControl.Location="{Binding Point}"
+         //                  Maps:MapControl.NormalizedAnchorPoint="{Binding AnchorPoint}"
+         //                  ImageOpened="Image_ImageOpened">
+
+         //               </Image>
 
         /// <summary>
         /// Preserves state associated with this page in case the application is suspended or the
@@ -216,10 +243,7 @@ namespace RainMan
             return null;
         }
 
-        private void location_TextChanged(object sender, TextChangedEventArgs e)
-        {
-
-        }
+      
 
         private void location_GotFocus(object sender, RoutedEventArgs e)
         {
@@ -581,11 +605,11 @@ namespace RainMan
 
             int val = (int)(((Slider)sender).Value);
             int nextMapIndex = 0;
-            this.mapManager.Maps.ElementAt(currentMapIndex).setVisible(false);
+            this.map.Children.ElementAt(currentMapIndex).SetValue(VisibilityProperty, Visibility.Collapsed);
 
             nextMapIndex = val / 5;
 
-            this.mapManager.Maps.ElementAt(nextMapIndex).setVisible(true);
+            this.map.Children.ElementAt(nextMapIndex).SetValue(VisibilityProperty, Visibility.Visible);
             this.currentMapIndex = nextMapIndex;
 
             // update map time
@@ -605,7 +629,7 @@ namespace RainMan
             {
                 double currScale = getScale();
                 double resizeParam = this.baseScale / currScale;
-                var currentMap = maps.ElementAt(currentMapIndex);
+                var currentMap = (Image)this.map.Children.ElementAt(currentMapIndex);
 
                 currentMap.Height = 512 * resizeParam;
                 currentMap.Width = 512 * resizeParam;
@@ -614,13 +638,6 @@ namespace RainMan
         }
 
 
-
-        private void Image_ImageOpened(object sender, RoutedEventArgs e)
-        {
-
-
-
-        }
 
         private bool flyoutOpened = false;
 
@@ -674,11 +691,39 @@ namespace RainMan
                         this.errorText.Text = "Oops! failed to navigate to location";
                         this.errorText.Visibility = Visibility.Visible;
                         locationFindBar.Visibility = Visibility.Collapsed;
+                        
 
                     }
                     else
                     {
                         this.Flyout.Hide();
+
+
+                        // handle location pin
+                        // draw a pin on the map
+                        if (this.currentLocationPin == null)
+                        {
+
+
+                            DependencyObject obj = getMyLocationPin();
+                            this.map.Children.Add(obj);
+                            // update location of pin on map
+                            MapControl.SetLocation(obj, point);
+                            MapControl.SetNormalizedAnchorPoint(obj, new Point(0.5, 1));
+
+                            this.currentLocationPin = obj;
+
+
+
+                        }
+                        else
+                        {
+                            // update location of pin on map
+                            MapControl.SetLocation(this.currentLocationPin, point);
+
+                        }
+
+
                     }
 
                 }
