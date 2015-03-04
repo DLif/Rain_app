@@ -513,33 +513,30 @@ namespace RainMan
             {
                 string result = await App.mobileClient.InvokeApiAsync<string>("RainAmount", System.Net.Http.HttpMethod.Get, dict);
 
-                this.progress.IsActive = false;
-                progress.Visibility = Visibility.Collapsed;
 
 
                 double res = (Double.Parse(result) * (1 / 6.0)) / 1000; // in liters [Note: this is bullshit ]
-
+                //double res = 0.23;
                 if(this.usePredictions.IsOn)
                 {
                     // add precitions data
                     // use:
                     var x = this.numPredictionImages;
-
+                    res += future_calc(x, pixels);
 
 
                 }
 
 
-
-
-
+                this.progress.IsActive = false;
+                progress.Visibility = Visibility.Collapsed;
 
                 this.ResultText.Visibility = Visibility.Visible;
                 this.ResultText.Text = string.Format("Total: {0} Litres", res);
 
 
             }
-            catch
+            catch (Exception ex)
             {
                 MessageDialog diag = new MessageDialog("Server error while processing request");
                 diag.ShowAsync();
@@ -605,6 +602,50 @@ namespace RainMan
         {
             this.numPredictionImages = 1;
             predictionNumBtn.Content = "Minutes: 10";
+        }
+
+        private void futureCalcClick(object sender, RoutedEventArgs e)
+        {
+            if (progress.IsActive == true)
+            {
+                return;
+            }
+            progress.IsActive = true;
+            progress.Visibility = Visibility.Visible;
+
+            double power = future_calc(0, findAllPixels());
+
+            this.ResultText.Visibility = Visibility.Visible;
+            this.ResultText.Text = string.Format("Total: {0} Litres", power);
+        }
+
+        private double future_calc(int future_images, List<PixelRep> polygon_points)
+        {
+            double power = 0.0;
+            var poly = new CustomPolygon(polygon_points.Count, polygon_points);
+            List<PixelRep> inside_points = PolygonPixels.getAllPointsInsidePolygon(poly);
+            for (int i = 4; i < 4 + future_images || i < 6; i++)
+            {
+                foreach (PixelRep j in inside_points)
+                {
+                    power += futureCalc_for_image_and_point(j.X, j.Y, RadarMapManager.getRadarMapManager().Maps.ElementAt(i).ReadableImage);
+                }
+            }
+            return power;
+        }
+
+        private double futureCalc_for_image_and_point(int x_pixel, int y_pixel, WriteableBitmap ReadableImage)
+        {
+            int image_size_x = 512;
+            int image_size_y = 512;
+            double power = 0.0;
+            using (var buffer = ReadableImage.PixelBuffer.AsStream())
+            {
+                Byte[] pixels = new Byte[4 * image_size_x * image_size_y];
+                buffer.Read(pixels, 0, pixels.Length);
+                power = ColorTranslator.power_to_radius(pixels, x_pixel, y_pixel, 1, ReadableImage.PixelWidth);
+            }
+            return power;
         }
 
 
