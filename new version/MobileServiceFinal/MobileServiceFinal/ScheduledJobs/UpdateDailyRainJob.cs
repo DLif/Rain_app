@@ -37,7 +37,7 @@ namespace MobileServiceFinal.ScheduledJobs
         String storageNameDaily = "daysums";
         String maxPixTextFileName = "Maxpic.txt";
         CloudStorageAccount account;
-        CloudBlobClient client;
+        CloudBlobClient client = null;
         int image_size_x = 512;
         int image_size_y = 512;
         int period = 30;
@@ -59,6 +59,49 @@ namespace MobileServiceFinal.ScheduledJobs
                 }
 
             }
+
+            /* just for check 
+            double[,] previousum = new double[image_size_x, image_size_y]; /*represents the sum over all pixels*/
+
+            /*initialize array  
+
+            for (x = 0; x < image_size_x; x++)
+            {
+
+                for (y = 0; y < image_size_y; y++)
+                {
+
+                    previousum[x, y] = 0;
+
+                }
+
+
+
+            }
+
+
+
+
+
+            initializeBlobClient();
+
+            for (int i = 0; i < 30; i++)
+            {
+
+                name = String.Format("{0}.jpg", i);
+
+                previousum = newArray(6042 - (24 * 6 * (i)), 6042 - (24 * 6 * (i + 1)), name, previousum);
+
+            }
+
+
+
+            return Task.FromResult(true); 
+
+
+
+
+            check*/
 
             initializeBlobClient();
 
@@ -112,6 +155,152 @@ namespace MobileServiceFinal.ScheduledJobs
 
             return Task.FromResult(true);
         }
+
+        double[,] newArray(int first, int last, string name, double[,] previoussum)
+        {
+
+
+
+
+
+            double[,] sums = new double[image_size_x, image_size_y]; /*represents the sum over all pixels*/
+
+            double sum = 0;
+
+            int x, y = 0;
+
+
+
+            // int num = 6 * 24; /* full day.. */
+
+            int num = first - last;
+
+            String currentName;
+
+
+
+            /*initialize array */
+
+            for (x = 0; x < image_size_x; x++)
+            {
+
+                for (y = 0; y < image_size_y; y++)
+                {
+
+                    sums[x, y] = previoussum[x, y];
+
+                }
+
+
+
+            }
+
+
+
+
+
+            //threads....
+
+            //  Parallel.For(0, num, i =>
+
+            for (int i = 0 /*fix me - start with 0 */; i < num; i++)
+            {
+
+                currentName = String.Format("{0}.jpg", (first - i));
+
+                try
+                {
+
+                    Bitmap file = new Bitmap(GetStreamImage(currentName));
+
+
+
+
+
+                    /* bug in the picture */
+
+                    if (file.Height == 1)
+                    {
+
+                        continue;
+
+                        //     return;
+
+
+
+                    }
+
+                    for (x = 0; x < image_size_x; x++)
+                    {
+
+                        for (y = 0; y < image_size_y; y++)
+                        {
+
+                            try
+                            {
+
+                                Color RGB = file.GetPixel(x, y);
+
+                                sums[x, y] += Models.ColorTranslator.RBG_to_power(RGB.R, RGB.G, RGB.B);
+
+                                if( sums[x, y]> 0)
+                                {
+                                    sums[x, y] = sums[x, y];
+                                }
+
+                                //  RBGArray = RGBFromImageBitmap(file, pixel);
+
+                                //  sum += Models.ColorTranslator.RBG_to_power(RBGArray[0], RBGArray[1], RBGArray[2]);
+
+                            }
+
+                            catch (Exception ex)
+                            {
+
+                                Console.WriteLine(ex);
+
+                                continue;
+
+                                //  return; /* Fix me before we handle the project - continue.. */
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+                catch (Exception ex)
+                {
+
+                    Console.WriteLine(ex);
+
+                    continue;
+
+                    //  return; /* Fix me before we handle the project - continue.. */
+
+                }
+
+
+
+            }
+
+
+
+
+
+
+
+            exportArrayToDB(sums, name);
+
+            return sums;
+
+
+
+        }
+
+
 
 
 
@@ -281,7 +470,10 @@ namespace MobileServiceFinal.ScheduledJobs
 
       public double[,] GetDoubleArray(String fileName)
       {
-
+          if (client == null)
+          {
+              initializeBlobClient();
+          }
             try
             {
                 CloudBlobContainer sampleContainer = client.GetContainerReference(storageNameDaily);

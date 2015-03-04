@@ -17,7 +17,6 @@ using System.IO;
 using System.Drawing;
 using Microsoft.WindowsAzure;
 using MobileServiceFinal.Models;
-//using MobileServiceFinal.Models.PixelsSeriallizer;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Blob;
@@ -74,74 +73,90 @@ namespace MobileServiceFinal.Controllers
             initializeBlobClient();
             Services.Log.Info("Trying to get the amount of rain");
             int max = getMaxIndex();
-          //  int numMinutes = int.Parse(picturesNum);
-
             int numMinutes = DateTime.Now.Minute / 10 + DateTime.Now.Hour * 6;
             int numDays = int.Parse(numDaysString);
             String currentName;
-            //String places = RainApiSerializer.demorun();
-
-         //   bool x = (places.Equals( "<APIRequest xmlns=\"http://schemas.datacontract.org/2004/07/RainMan.DataModels\" xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\"><Pixels><PixelRep><X>101</X><Y>101</Y></PixelRep><PixelRep><X>101</X><Y>103</Y></PixelRep><PixelRep><X>103</X><Y>103</Y></PixelRep><PixelRep><X>103</X><Y>101</Y></PixelRep></Pixels></APIRequest>"));
-
-   
             List<PixelRep> polygonPoints = RainApiSerializer.DeserializeRequest(places).Pixels;
             Polygon polygon_from_user = new Polygon(polygonPoints.Count, polygonPoints);
             List<PixelRep> placesList = PolygonPixels.getAllPointsInsidePolygon(polygon_from_user);
-            int[] RBGArray;
+            double[] sum_array = new double[numMinutes];
+
+            /*initialize the array*/
+            for (int i = 0; i < numMinutes; i++)
+            {
+                sum_array[i] = 0.0;
+            }
 
 
             //threads....
-           Parallel.For(0, numMinutes, i =>
-        //    for (int i = 0; i < num ; i++)
+            Parallel.For(0, numMinutes, i =>
             {
                 currentName = String.Format("{0}.jpg", (max - i));
-                //byte[] file = GetByteImage(currentName);
-                Bitmap file = new Bitmap(GetStreamImage(currentName));
-
-                /* bug in the picture */
-                if (file.Height == 1 )
+                try
                 {
-                //    continue;
+                    Bitmap file = new Bitmap(GetStreamImage(currentName));
+
+                    /* bug in the picture */
+                    if (file.Height == 1)
+                    {
+                        return;
+
+                    }
+                    foreach (PixelRep pixel in placesList)
+                    {
+                        try
+                        {
+                            Color RGB = file.GetPixel(pixel.X, pixel.Y);
+                            sum_array[i] += Models.ColorTranslator.RBG_to_power(RGB.R, RGB.G, RGB.B);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex);
+                            return; 
+                        }
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
                     return;
-                    
                 }
-                foreach (PixelRep pixel in placesList)
-                {
-                    try
-                    {
-                        Color RGB = file.GetPixel(pixel.X, pixel.Y);
-                        sum += Models.ColorTranslator.RBG_to_power(RGB.R, RGB.G, RGB.B);
-                      //  RBGArray = RGBFromImageBitmap(file, pixel);
-                      //  sum += Models.ColorTranslator.RBG_to_power(RBGArray[0], RBGArray[1], RBGArray[2]);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex);
-                        return  ; /* Fix me before we handle the project - continue.. */
-                    }
-                }
+            }); 
 
-       //     }
-            }); // Parallel.For
+            /*adding all the thread results */
+            for (int i = 0; i < numMinutes; i++)
+            {
+                sum += sum_array[i];
+            }
+            if (numDays - 1 == -1)
+            {
+                return sum.ToString();
+            }
 
 
+            /* getting the day result */
            currentName = String.Format("{0}.jpg", numDays-1);
            UpdateDailyRainJob job = new UpdateDailyRainJob();
            double[,] sumDays = job.GetDoubleArray(currentName);
            foreach (PixelRep pixel in placesList)
-          {
+           {
               try
               {
-
                   sum += sumDays[pixel.X, pixel.Y];
-                  //  RBGArray = RGBFromImageBitmap(file, pixel);
-                  //  sum += Models.ColorTranslator.RBG_to_power(RBGArray[0], RBGArray[1], RBGArray[2]);
+                  if(sumDays[pixel.X, pixel.Y]!=0)
+                  {
+                      sumDays[pixel.X, pixel.Y] = sumDays[pixel.X, pixel.Y];
+                  }
+
               }
               catch (Exception ex)
               {
                   Console.WriteLine(ex);
               }
             }
+
+
 
             return sum.ToString();
 
@@ -158,20 +173,6 @@ namespace MobileServiceFinal.Controllers
             result[2] = RGB.B;
             return result;
         }
-        /*
-        private int[] RGBFromImageByteArray(byte[] buffer,PixelRep pixel)
-        {
-            int initial_offset = 0;
-            int[] result = new int[3];
-            initial_offset += pixel.X * image_size_x * 4;
-            int y = pixel.Y * 4;
-            initial_offset = x+y;
-            result[0] = buffer[initial_offset];
-            result[1] = buffer[initial_offset+1];
-            result[2] = buffer[initial_offset+2];
-            return result;
-        }
-        */
 
 
         private int getMaxIndex()
@@ -189,8 +190,7 @@ namespace MobileServiceFinal.Controllers
                 fileStream.Position = 0;
                 fileStream.Read(intByte, 0, fileByteLength);
 
-                // If the system architecture is little-endian (that is, little end first), 
-                // reverse the byte array :((((((((((((. 
+                // If the system architecture is little-endian (that is, little end first),  
                 if (BitConverter.IsLittleEndian)
                     Array.Reverse(intByte);
                 Array.Copy(intByte, intReverse, fileByteLength);
@@ -218,33 +218,7 @@ namespace MobileServiceFinal.Controllers
             }
             return result;
         }
-        /*
-        // method connects to the blob and downloads the radar image streams
-        private Bitmap GetImageStreamImage(String fileName)
-        {
 
-            try
-            {
-                CloudBlobContainer sampleContainer = client.GetContainerReference(storageName);
-
-                CloudBlockBlob blob = sampleContainer.GetBlockBlobReference(fileName);
-
-                blob.FetchAttributes();
-                long fileByteLength = blob.Properties.Length;
-                Byte[] myByteArray = new Byte[fileByteLength];
-                blob.DownloadToByteArray(myByteArray, 0);
-                return new Bitmap(new MemoryStream(myByteArray));
-
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-            }
-
-            return null;
-        }
-         */
 
         // method connects to the blob and downloads the radar image 
         private Stream GetStreamImage(String fileName)
@@ -262,9 +236,6 @@ namespace MobileServiceFinal.Controllers
                 Stream fileStream = new MemoryStream();
                 blob.DownloadToStream(fileStream);
                 return fileStream;
-                //  fileStream.Position = 0;
-                //  fileStream.Read(myByteArray, 0, fileByteLength);
-                //   return myByteArray;
 
 
             }
