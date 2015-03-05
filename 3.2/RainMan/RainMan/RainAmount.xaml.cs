@@ -89,30 +89,43 @@ namespace RainMan
         /// <see cref="Frame.Navigate(Type, Object)"/> when this page was initially requested and
         /// a dictionary of state preserved by this page during an earlier
         /// session.  The state will be null the first time a page is visited.</param>
-        private void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
+        private async void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
 
             map.Center = RadarMapManager.center;
             map.ZoomLevel = 10D;
-
-
             this.undoAppBar.Visibility = Visibility.Collapsed;
-           // DependencyObject startPin = getBoundPin(this.source);
-            //DependencyObject endPin = getBoundPin(this.destination);
-
-            //this.map.Children.Add(startPin);
-            //this.map.Children.Add(endPin);
 
 
-            // update location of pin(s) on map
-           // MapControl.SetLocation(startPin, this.source);
-           // MapControl.SetNormalizedAnchorPoint(startPin, new Point(0.5, 1));
-           // MapControl.SetLocation(endPin, this.destination);
-           // MapControl.SetNormalizedAnchorPoint(endPin, new Point(0.5, 1));
+            ModalWindow window = new ModalWindow("Updating radar maps...", "This may take a few seconds", "Please do not close the app");
+            window.Dialog.ShowAsync();
+            Boolean error = false;
 
+            try
+            {
+
+                manager = await RadarMapManager.getRadarMapManager();
+
+            }
+            catch
+            {
+                error = true;
+            }
+
+            window.Dialog.Hide();
+
+            if(error)
+            {
+                MessageDialog diag = new MessageDialog("Could not update radar maps, please check your internet connection and try again later");
+                await diag.ShowAsync();
+                Frame.GoBack();
+            }
 
 
         }
+
+
+        private RadarMapManager manager;
 
         /// <summary>
         /// Preserves state associated with this page in case the application is suspended or the
@@ -622,7 +635,7 @@ namespace RainMan
 
             for (int i = 4; i < 4 + future_images ; i++)
             {
-                WriteableBitmap currentMap = RadarMapManager.getRadarMapManager().Maps.ElementAt(i).ReadableImage;
+                WriteableBitmap currentMap = manager.Maps.ElementAt(i).ReadableImage;
                 using (var buffer = currentMap.PixelBuffer.AsStream())
                 {
 

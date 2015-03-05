@@ -72,8 +72,8 @@
 
         </Grid.ColumnDefinitions>
 
+        
 
-       
 
         <Grid Grid.Row="1" x:Name="mapGrid" Grid.Column="0" Grid.ColumnSpan="3" DataContext="{Binding}">
             <Maps:MapControl x:Name="map" MapServiceToken="BaBZ6ETOrg8G3L31STm8dg" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
@@ -278,6 +278,8 @@
             <Button x:Name="btnClose" Content="Close" Grid.Row="2" HorizontalAlignment="Center" Click="btnClose_Click" />
 
         </Grid>
+
+        <local:LoadingDialog x:Name="loadingDiag" Grid.RowSpan="2" Grid.ColumnSpan="3"/>
 
 
     </Grid>

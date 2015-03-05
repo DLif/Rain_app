@@ -116,7 +116,7 @@ namespace RainMan
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
         private RoutePredictionArgs arguments = null;
         private RouteGroupAnnotator predictor;
-          
+        private RadarMapManager radarMapManager;  
 
         // path related information
         private List<Double> estimatedPathLength = new List<Double>();
@@ -126,7 +126,7 @@ namespace RainMan
         public RoutePredictions()
         {
             this.InitializeComponent();
-            this.LayoutRoot.Children.Add(this.loadingDiag);
+           
             this.loadingDiag.OnClick = this.GoBackButton_Click;
             this.BottomAppBar.Visibility = Visibility.Collapsed;
             loadingDiag.SetValue(Grid.RowSpanProperty, 2);
@@ -160,7 +160,7 @@ namespace RainMan
         }
 
 
-        private LoadingDialog loadingDiag = new LoadingDialog();
+       
         private string errorMessage;
 #region
         private MapRoute createRoute(List<Geopoint> path)
@@ -234,8 +234,7 @@ namespace RainMan
         private async Task updateContentView(Boolean setBounds)
         {
 
-            RadarMapManager manager = RadarMapManager.getRadarMapManager();
-
+  
             // set path info
             PathInfo pathInfo = new PathInfo();
             pathInfo.PathName = arguments.RouteNames == null ? null : arguments.RouteNames.ElementAt(predictor.CurrentRouteIndex);
@@ -244,9 +243,9 @@ namespace RainMan
             pathInfo.AvgRain = this.predictor.routeAnnotations.ElementAt(predictor.CurrentRouteIndex).Averages[predictor.CurrentTimeIndex];
             this.colorSlider.RainAvg = this.predictor.routeAnnotations.ElementAt(predictor.CurrentRouteIndex).Averages[predictor.CurrentTimeIndex];
 
-            pathInfo.EndTime = manager.Maps.ElementAt(RadarMapManager.totalNumMaps - 1).Time;                
-            pathInfo.StartTime = manager.Maps.ElementAt(RadarMapManager.totalOldMaps).Time;
-            pathInfo.PathTime = manager.Maps.ElementAt(predictor.CurrentTimeIndex + RadarMapManager.totalOldMaps).Time;
+            pathInfo.EndTime = this.radarMapManager.Maps.ElementAt(RadarMapManager.totalNumMaps - 1).Time;                
+            pathInfo.StartTime = this.radarMapManager.Maps.ElementAt(RadarMapManager.totalOldMaps).Time;
+            pathInfo.PathTime = this.radarMapManager.Maps.ElementAt(predictor.CurrentTimeIndex + RadarMapManager.totalOldMaps).Time;
 
             this.defaultViewModel["PathInfo"] = pathInfo;
 
@@ -279,7 +278,7 @@ namespace RainMan
             arguments = e.NavigationParameter as RoutePredictionArgs;
             this.loadingDiag.PathNames = arguments.RouteNames;
 
-            RadarMapManager manager = RadarMapManager.getRadarMapManager();
+            
             MapService.ServiceToken = "BaBZ6ETOrg8G3L31STm8dg";
             
             // get arguments passed to page
@@ -291,6 +290,17 @@ namespace RainMan
             int numTimeSlots = arguments.NumTimeSlots;
             List<MapRoute> routes = new List<MapRoute>();
 
+            try
+            {
+
+                this.radarMapManager = await RadarMapManager.getRadarMapManager();
+            }
+            catch
+            {
+
+                this.loadingDiag.ShowError("Oops, connection with the server has timed out");
+                return;
+            }
             // create an actual path for each collection of waypoints in the given group
             for (int i = 0; i < arguments.RouteCollection.Count; ++ i )
             {
@@ -310,7 +320,7 @@ namespace RainMan
             predictor = new RouteGroupAnnotator(routes, map);
 
             // init prediction
-            await this.predictor.InitRouteGroupsPredictions(arguments.Transportation, numTimeSlots, this.loadingDiag, this.pushpinImage, arguments.MaxStallingTime);
+            await this.predictor.InitRouteGroupsPredictions(arguments.Transportation, numTimeSlots, this.loadingDiag, this.pushpinImage, arguments.MaxStallingTime, radarMapManager);
 
             
             if (predictor.ErrorOccured)
@@ -321,7 +331,7 @@ namespace RainMan
 
             // put time and path name
             string pathName = arguments.RouteNames == null ? null : arguments.RouteNames.ElementAt(predictor.CurrentRouteIndex);
-            suggestion.TimeSuggestion = manager.Maps.ElementAt(predictor.CurrentTimeIndex + RadarMapManager.totalOldMaps).Time;
+            suggestion.TimeSuggestion = this.radarMapManager.Maps.ElementAt(predictor.CurrentTimeIndex + RadarMapManager.totalOldMaps).Time;
             suggestion.PathNameSuggestion = pathName;
 
             // put suggestion

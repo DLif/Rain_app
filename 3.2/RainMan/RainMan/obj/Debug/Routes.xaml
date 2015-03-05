@@ -179,6 +179,18 @@
             </PivotItem>
             <PivotItem x:Name="GroupPivot" Header="my routes" DataContext="{Binding PathGroups}">
                 <Grid DataContext="{Binding}" HorizontalAlignment="Stretch">
+                    
+                    <Grid.Resources>
+                        
+                        <Storyboard x:Name="fadeInList">
+                            <DoubleAnimation From="0" To="1" Duration="0:0:0.5" Storyboard.TargetName="groupList" Storyboard.TargetProperty="Opacity"/>
+
+                        </Storyboard>
+
+                       
+
+                    </Grid.Resources>
+                    
                     <ListView x:ConnectionId='18' x:Name="groupList"
 						AutomationProperties.AutomationId="PathGroupItem"
 						AutomationProperties.Name="Paths in path group"
@@ -187,6 +199,7 @@
                         Margin="0, 0, 0, 50"
                         VerticalAlignment="Stretch"
 						ItemsSource="{Binding}"
+                        Opacity="0"
 						ItemTemplate="{StaticResource StandardTripleLineItemTemplate}"
 						HorizontalAlignment="Stretch"
 						ContinuumNavigationTransitionInfo.ExitElementContainer="True"                                                                              >

@@ -38,6 +38,7 @@
             <RowDefinition Height="1*"/>
             <RowDefinition Height="1.3*"/>
             <RowDefinition Height="1*"/>
+            <RowDefinition Height="50"/>
 
         </Grid.RowDefinitions>
 
@@ -45,7 +46,16 @@
         <!--TODO: Content should be placed within the following grid-->
         <Grid  x:Name="ContentRoot" Grid.Row="0" Grid.RowSpan="3" Margin="5,10,5,0" DataContext="{Binding}">
 
-            <Grid DataContext="{Binding ''}">
+            <Grid DataContext="{Binding}">
+                
+                <Grid.Resources>
+                    
+                    <Storyboard x:Name="fadeInList">
+                        
+                        <DoubleAnimation From="0" To="1" Duration="0:0:0.5" Storyboard.TargetName="pathList" Storyboard.TargetProperty="Opacity"></DoubleAnimation>
+                    </Storyboard>
+                    
+                </Grid.Resources>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="1.8*"/>
@@ -58,9 +68,9 @@
 
 
                 <!-- my path listview-->
-                <StackPanel Orientation="Vertical" Grid.Row="2" DataContext="{Binding}">
-                    <TextBlock Text="MY PATHS" Foreground="White" Style="{ThemeResource TitleTextBlockStyle}" Margin="19,12,0,0"/>
-                    <ListView x:ConnectionId='8' Margin="19, 19, 19, 19" x:Name="pathList"  ItemsSource="{Binding Paths}" SelectionMode="Single" IsItemClickEnabled="True"                                                        >
+                
+                    <TextBlock Text="MY PATHS" Grid.Row="2" Foreground="White" Style="{ThemeResource TitleTextBlockStyle}" Margin="19,12,0,0"/>
+                    <ListView x:ConnectionId='8' Margin="19, 40, 19, 19" Grid.Row="2" x:Name="pathList"  ItemsSource="{Binding Paths}" SelectionMode="Single" IsItemClickEnabled="True"                                                         ScrollViewer.VerticalScrollBarVisibility="Visible">
 
 
                         <ListView.ItemTemplate>
@@ -73,15 +83,24 @@
 
 
                     </ListView>
-                </StackPanel>
+                
 
                 <TextBlock Grid.Row="2" x:Name="errorText" Text="Downloading paths ..." HorizontalAlignment="Center" FontSize="15" Foreground="White" VerticalAlignment="Top" Margin="0, 20 ,0 , 0"></TextBlock>
                 <ProgressRing IsActive="True" VerticalAlignment="Center" HorizontalAlignment="Center" Background="Transparent" Grid.Row="2" x:Name="progress"></ProgressRing>
 
                 <!-- map control -->
 
-                <Maps:MapControl x:ConnectionId='7' MapServiceToken="BaBZ6ETOrg8G3L31STm8dg" x:Name="map" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"                     />
-                <Grid x:Name="Filler" Visibility="Collapsed"  Background="Transparent" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
+                <Maps:MapControl x:ConnectionId='9' MapServiceToken="BaBZ6ETOrg8G3L31STm8dg" x:Name="map" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"                     />
+                <Grid x:Name="Filler" Visibility="Collapsed"  Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" >
+                    
+                    <Grid.Background>
+                        <SolidColorBrush Color="Black" Opacity="0.8"/>
+
+                    </Grid.Background>
+                    
+                    <ProgressRing IsActive="False"  x:Name="loadingMapRing" Background="Transparent" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+
+                </Grid>
 
 
 
@@ -91,7 +110,7 @@
 
         </Grid>
 
-        <Grid Grid.Row="0" Visibility="Collapsed" Grid.RowSpan="3" x:Name="GeneralInformationGrid" DataContext="{Binding}">
+        <Grid Grid.Row="0" Opacity="0" Visibility="Collapsed" Grid.RowSpan="4" x:Name="GeneralInformationGrid" DataContext="{Binding}">
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="1*"/>
@@ -110,7 +129,7 @@
                         <DoubleAnimation From="0" To="1" Duration="0:0:0.5" Storyboard.TargetName="GeneralInformationGrid" Storyboard.TargetProperty="Opacity"/>
                     </Storyboard>
                     <Storyboard x:ConnectionId='5' x:Name="fadeOutStory"                                   >
-                        <DoubleAnimation From="1" To="1" Duration="0:0:0.5" Storyboard.TargetName="GeneralInformationGrid" Storyboard.TargetProperty="Opacity"/>
+                        <DoubleAnimation From="1" To="0" Duration="0:0:0.5" Storyboard.TargetName="GeneralInformationGrid" Storyboard.TargetProperty="Opacity"/>
                     </Storyboard>
 
                 </Grid.Resources>
@@ -151,8 +170,8 @@
                 </StackPanel>
                 
                
-                <Button x:ConnectionId='6' Grid.Row="3" x:Name="SaveButton" Content="Save" Grid.ColumnSpan="2" Grid.Column="0" Margin="0, 5, 0, 0" HorizontalAlignment="Center"                         />
-
+                <Button x:ConnectionId='6' Grid.Row="3"  x:Name="SaveButton" Content="Save"  Grid.Column="0" Margin="0, 5, 5, 0" HorizontalAlignment="Right"                          />
+                <Button x:ConnectionId='7' Grid.Row="3" x:Name="closeButton" Content="Close" Grid.Column="1" Margin="5, 5, 0, 0"                           ></Button>
             </Grid>
         </Grid>
     </Grid>

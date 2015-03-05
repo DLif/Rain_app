@@ -94,6 +94,9 @@
     <Compile Include="DataModels\PathGroup.cs" />
     <Compile Include="DataModels\PixelSerializer.cs" />
     <Compile Include="DataTimeConverter.cs" />
+    <Compile Include="Entrance.xaml.cs">
+      <DependentUpon>Entrance.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GroupBuilder.xaml.cs">
       <DependentUpon>GroupBuilder.xaml</DependentUpon>
     </Compile>
@@ -176,6 +179,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Page Include="ColorSlider.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Entrance.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

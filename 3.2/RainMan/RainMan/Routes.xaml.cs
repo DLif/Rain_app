@@ -188,6 +188,8 @@ namespace RainMan
         {
 
 
+            this.defaultViewModel["PathGroups"] = new List<PathGroupWrapper>();
+
             this.predictAppBarGroup.Visibility = Visibility.Collapsed;
             this.manageGroupAppBar.Visibility = Visibility.Collapsed;
            
@@ -248,6 +250,7 @@ namespace RainMan
                 else
                 {
                     loadingErrorMessage.Visibility = Visibility.Collapsed;
+                    fadeInList.Begin();
                    
                 }
                

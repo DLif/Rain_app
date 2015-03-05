@@ -66,11 +66,11 @@ namespace RainMan.Tasks
             return all;
         }
 
-        public async Task InitRouteGroupsPredictions(RouteKind kind, int timeSlots, LoadingDialog loadingScreen, ImageBrush pushpinImage, int maxStallTime)
+        public async Task InitRouteGroupsPredictions(RouteKind kind, int timeSlots, LoadingDialog loadingScreen, ImageBrush pushpinImage, int maxStallTime, RadarMapManager manager)
         {
 
             List<RadarMap> Maps = new List<RadarMap>();
-            RadarMapManager manager = RadarMapManager.getRadarMapManager();
+           
 
             // save only the relevant maps
             for (int i = RadarMapManager.totalOldMaps; i < RadarMapManager.totalNumMaps; ++i)

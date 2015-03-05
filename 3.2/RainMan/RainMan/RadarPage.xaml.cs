@@ -88,34 +88,36 @@ namespace RainMan
         private async void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
 
-            // get the singleton
-            this.mapManager = RadarMapManager.getRadarMapManager();
-
+      
             ModalWindow temporaryDialog = new ModalWindow();
             ContentDialog dialog = temporaryDialog.Dialog;
             dialog.ShowAsync();
 
+            Boolean error = false;
+
             try
             {
-                await this.mapManager.updateRadarMaps(true);
+                this.mapManager = await RadarMapManager.getRadarMapManager();
 
             }
             catch
             {
+    
+                error = true;
+                hideBar.Begin();  
 
-                dialog.Hide();
-                MessageDialog diag = new MessageDialog("Oops, our servers are down! please try again later", "Oops");
-                hideBar.Begin();
-                diag.ShowAsync();
-
-                return;
-                // TODO:
-                // navigate back to main page (?)
             }
 
             dialog.Hide();
-            // set view data
-            //this.defaultViewModel["RadarMaps"] = mapManager.Maps;
+
+            if(error)
+            {
+                MessageDialog diag = new MessageDialog("Oops, our servers are down! please try again later", "Oops");
+                await diag.ShowAsync();
+                Frame.GoBack();
+            }
+
+
             attachRadarMapsToMap(mapManager.Maps);
             this.defaultViewModel["oldestTime"] = mapManager.Maps.ElementAt(0).Time;
             this.defaultViewModel["newestTime"] = mapManager.Maps.ElementAt(mapManager.Maps.Count-1).Time;
@@ -132,16 +134,22 @@ namespace RainMan
             foreach(RadarMap map in maps)
             {
                 Image image = new Image();
-                image.Visibility = map.Visibile;
-                image.Height = map.Height;
-                image.Width = map.Width;
+                image.Visibility = Visibility.Collapsed;
+                
+                image.Height = 512;
+                image.Width = 512;
                 image.Source = map.ImageSrc;
 
                 MapControl.SetLocation(image, map.Point);
-                MapControl.SetNormalizedAnchorPoint(image, map.AnchorPoint);
+                MapControl.SetNormalizedAnchorPoint(image, new Point(0.5, 0.5));
                 this.map.Children.Add(image);
                 
             }
+
+            // show current map
+            Image currentMapImage = this.map.Children.ElementAt(RadarMapManager.totalOldMaps) as Image;
+            currentMapImage.Visibility = Visibility.Visible;
+
         }
 
          //<Image Source="{Binding ImageSrc}" Height="{Binding Height}" Width="{Binding Width}"
@@ -623,6 +631,9 @@ namespace RainMan
         private void map_ZoomLevelChanged(MapControl sender, object args)
         {
 
+
+            if (this.mapManager == null)
+                return;
             var maps = this.mapManager.Maps;
 
             if (maps.Count > 0)
@@ -778,37 +789,8 @@ namespace RainMan
 
         }
 
-        private Boolean flag = false;
-        private async void map_MapTapped(MapControl sender, MapInputEventArgs args)
-        {
 
-         //   if (flag)
-        //    {
-        //        this.mapManager.Maps.ElementAt(currentMapIndex).setVisible(true);
-         //       return;
-
-         //   }
-
-         //   PredictionIconDataSource.CurrentLocation = args.Location;
-         //   int locationPixel = PointTranslation.locationToPixel(args.Location.Position.Latitude, args.Location.Position.Longitude);
-         //   int x_pixel = locationPixel % 512;
-         //   int y_pixel = (locationPixel - x_pixel) / 512;
-         //   MessageDialog diaga = new MessageDialog(String.Format("[ {0} , {1} ]", x_pixel, y_pixel));
-          //  await diaga.ShowAsync();
-          //  flag = true;
-
-        }
-
-        private void map_Tapped(object sender, TappedRoutedEventArgs e)
-        {
-
-            if (this.mapManager.Maps.ElementAt(currentMapIndex).Visibile == Visibility.Visible)
-            {
-               // this.mapManager.Maps.ElementAt(currentMapIndex).setVisible(false);
-              //  flag = false;
-               // return;
-            }
-        }
+     
 
         private void bottomPanel_PointerEntered(object sender, PointerRoutedEventArgs e)
         {

@@ -128,36 +128,38 @@ namespace RainMan
                 Frame.BackStack.Clear();
             }
 
-            // create radar map manager
-            this.mapManager = RadarMapManager.getRadarMapManager();
+            
 
             ModalWindow temporaryDialog = new ModalWindow();
             ContentDialog diag = temporaryDialog.Dialog;
-            Boolean dialogShown = false;
+            Boolean error = false;
 
+            diag.ShowAsync();
 
-            if (this.mapManager.NeedToUpdate())
-            {
+           
 
-                // download new radar maps, update prediction icons
-                diag.ShowAsync();
-                dialogShown = true;
+           try
+           {
+                    // create radar map manager
+                    this.mapManager = await RadarMapManager.getRadarMapManager();
+            }
 
-                try
-                {
-                    await mapManager.updateRadarMaps(false);
-                }
-                catch
-                {
+           catch
+           {
 
-                    diag.Hide();
-                    MessageDialog errorDialog = new MessageDialog("could not connect to server, try again later", "Oops");
-                    errorDialog.ShowAsync();
-                    return;
-                }
+                error = true;
+                   
+           }
+
+           if(error)
+           {
+                diag.Hide();
+                    // handle error
+
 
             }
 
+          
             if (PredictionIconDataSource.NeedToUpdate)
             {
                 //if(!dialogShown)
@@ -189,11 +191,8 @@ namespace RainMan
                 
             }
 
-           
-            
-         
-            if (dialogShown)
-                diag.Hide();
+
+           diag.Hide();
 
 
 

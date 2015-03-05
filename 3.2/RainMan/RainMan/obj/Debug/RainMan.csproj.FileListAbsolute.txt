@@ -167,7 +167,11 @@ C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\obj\Debug\C
 C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\obj\Debug\ColorSlider.g.cs
 C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\obj\Debug\ColorSlider.xaml
 C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\obj\Debug\ColorSlider.xbf
-C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\obj\Debug\RainMan.csprojResolveAssemblyReference.cache
+C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\bin\Debug\Entrance.xbf
+C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\obj\Debug\Entrance.g.i.cs
+C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\obj\Debug\Entrance.g.cs
+C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\obj\Debug\Entrance.xaml
+C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\obj\Debug\Entrance.xbf
 C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\obj\Debug\Microsoft.Data.Edm\layout.resfiles
 C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\obj\Debug\Microsoft.Data.Edm\layout.resfiles.intermediate
 C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\obj\Debug\Microsoft.Data.Edm\Resources.resfiles

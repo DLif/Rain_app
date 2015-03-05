@@ -137,6 +137,7 @@ namespace RainMan
         private void appBarDetails_Click(object sender, RoutedEventArgs e)
         {
             this.BottomAppBar.Visibility = Visibility.Collapsed;
+            this.GeneralInformationGrid.Visibility = Visibility.Visible;
             this.fadeInStory.Begin();
         }
 
@@ -156,6 +157,12 @@ namespace RainMan
                 await this.pathTable.DeleteAsync(selectedPath);
                 this.selectedPath = null;
                 this.appBarDeletePath.Visibility = Visibility.Collapsed;
+
+                for (int i = this.map.Children.Count - 1; i >= 2; --i)
+                {
+                    map.Children.RemoveAt(i);
+                }
+
             }
             catch
             {
@@ -206,10 +213,11 @@ namespace RainMan
                 
             }
 
-            this.fadeOutStory.Begin();
+            
             
             MessageDialog dialog = new MessageDialog(message);
             await dialog.ShowAsync();
+            this.fadeOutStory.Begin();
 
         }
 
@@ -217,6 +225,7 @@ namespace RainMan
         private async Task refreshPaths()
         {
 
+            this.defaultViewModel["Paths"] = new List<DataModels.Path>();
             errorText.Visibility = Visibility.Visible;
             progress.Visibility = Visibility.Visible;
             errorText.Text = "Downloading paths ...";
@@ -237,6 +246,7 @@ namespace RainMan
                 else
                 {
                     errorText.Visibility = Visibility.Collapsed;
+                    fadeInList.Begin();
                 }
             }
             catch
@@ -253,7 +263,6 @@ namespace RainMan
         {
 
             this.GeneralInformationGrid.Visibility = Visibility.Collapsed;
-
             Frame.Navigate(typeof(RouteBuilder), this.group);
 
         }
@@ -267,7 +276,16 @@ namespace RainMan
 
         private async void pathList_ItemClick(object sender, ItemClickEventArgs e)
         {
-            this.selectedPath = e.ClickedItem as DataModels.Path;
+            
+            var temp = e.ClickedItem as DataModels.Path;
+
+            if (temp == selectedPath)
+                return;
+
+            //this.Filler.Visibility = Visibility.Visible;
+            //this.progress.IsActive = true;
+
+            this.selectedPath = temp;
             this.appBarDeletePath.Visibility = Visibility.Visible;
 
             List<Geopoint> wayPoints = PathSerializer.ByteArrayToObject(selectedPath.PathClass);
@@ -275,7 +293,7 @@ namespace RainMan
             wayPoints.RemoveAt(wayPoints.Count - 1);
 
             // remove start and destination
-            for(int i = 2; i < this.map.Children.Count; ++i)
+            for(int i = this.map.Children.Count - 1; i >= 2; --i)
             {
                 this.map.Children.RemoveAt(i);
             }
@@ -293,6 +311,8 @@ namespace RainMan
             basicPositions.Add(startPoint.Position);
             basicPositions.Add(endPoint.Position);
 
+            Boolean error = false;
+
             // try to set view
             try
             {
@@ -301,12 +321,11 @@ namespace RainMan
 
                 if (!result)
                 {
-                    MessageDialog errorDialog = new MessageDialog("Sorry, something went wrong with the mapping service!", "Oops");
-                    await errorDialog.ShowAsync();
+                    error = true;
                 }
                 else
                 {
-                    map.ZoomLevel -= 0.1;
+                    map.ZoomLevel -= 0.3;
 
 
                 }
@@ -314,9 +333,17 @@ namespace RainMan
             }
             catch
             {
-                MessageDialog errorDialog = new MessageDialog("Sorry, something went wrong with the mapping service!", "Oops");
-                errorDialog.ShowAsync();
+                error = true;
             }
+
+            if(error)
+            {
+                MessageDialog errorDialog = new MessageDialog("Sorry, something went wrong with the mapping service!", "Oops");
+                await errorDialog.ShowAsync();
+            }
+
+          //  this.Filler.Visibility = Visibility.Collapsed;
+           // this.progress.IsActive = false;
           
 
         }
@@ -330,11 +357,7 @@ namespace RainMan
                 {
                     await this.groupsTable.DeleteAsync(this.group);
 
-                    for(int i = 2; i < this.map.Children.Count; ++i)
-                    {
-                        map.Children.RemoveAt(i);
-                    }
-
+                   
 
                 }
 
@@ -370,6 +393,9 @@ namespace RainMan
 
         private async void map_Loaded(object sender, RoutedEventArgs e)
         {
+
+           
+
             // get start and end points
             List<BasicGeoposition> basicPositions = new List<BasicGeoposition>();
             startPoint = GeopointSerializer.ByteArrayToObject(this.group.SourcePoint);
@@ -395,7 +421,7 @@ namespace RainMan
                 }
                 else
                 {
-                    map.ZoomLevel -= 0.1;
+                    map.ZoomLevel -= 0.3;
 
                     
                 }
@@ -407,6 +433,14 @@ namespace RainMan
                 errorDialog.ShowAsync();
 
             }
+
+            //this.Filler.Visibility = Visibility.Collapsed;
+            //this.progress.IsActive = false;
+        }
+
+        private void closeButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.fadeOutStory.Begin();
         }
 
     

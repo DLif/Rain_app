@@ -8,6 +8,7 @@ using Windows.Devices.Geolocation;
 using Windows.Foundation;
 using Windows.Storage.Streams;
 using Windows.UI;
+using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Maps;
@@ -95,9 +96,19 @@ namespace RainMan.Tasks
             {
                 myRectangle.SetValue(Grid.RowProperty, 1);
                 myRectangle.SetValue(Grid.ColumnProperty, 0);
-                var textblock = new TextBlock() { Text = optionalText,Foreground = new SolidColorBrush(Colors.Red), FontSize = 15, HorizontalAlignment = HorizontalAlignment.Center };
-                textblock.SetValue(Grid.RowProperty, 0);
-                myGrid.Children.Add(textblock);
+                var stackPanel = new StackPanel();
+                stackPanel.Background = new SolidColorBrush(Colors.Black);
+                var textblock = new TextBlock() { Margin = new Thickness(5), Text = optionalText,Foreground = new SolidColorBrush(Colors.White), FontSize = 20, FontWeight = FontWeights.Bold, HorizontalAlignment = HorizontalAlignment.Center };
+                stackPanel.Children.Add(textblock);
+
+                //textblock.SetValue(Grid.RowProperty, 0);
+
+                //myGrid.Children.Add(textblock);
+
+                myGrid.Children.Add(stackPanel);
+                stackPanel.SetValue(Grid.RowProperty, 0);
+                stackPanel.Margin  = new Thickness(5);
+
             }
             else
             {
