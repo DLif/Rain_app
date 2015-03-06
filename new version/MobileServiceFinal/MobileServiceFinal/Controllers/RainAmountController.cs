@@ -69,13 +69,14 @@ namespace MobileServiceFinal.Controllers
         // GET api/Default
         public string GetRainAmount(String places,String numDaysString)
         {
+            double a;
             double sum = 0;
             initializeBlobClient();
             Services.Log.Info("Trying to get the amount of rain");
             int max = getMaxIndex();
             int numMinutes = DateTime.Now.Minute / 10 + DateTime.Now.Hour * 6;
             int numDays = int.Parse(numDaysString);
-            String currentName;
+           // String currentName;
             List<PixelRep> polygonPoints = RainApiSerializer.DeserializeRequest(places).Pixels;
             Polygon polygon_from_user = new Polygon(polygonPoints.Count, polygonPoints);
             List<PixelRep> placesList = PolygonPixels.getAllPointsInsidePolygon(polygon_from_user);
@@ -91,7 +92,7 @@ namespace MobileServiceFinal.Controllers
             //threads....
             Parallel.For(0, numMinutes, i =>
             {
-                currentName = String.Format("{0}.jpg", (max - i));
+               String currentName = String.Format("{0}.jpg", (max - i));
                 try
                 {
                     Bitmap file = new Bitmap(GetStreamImage(currentName));
@@ -107,7 +108,14 @@ namespace MobileServiceFinal.Controllers
                         try
                         {
                             Color RGB = file.GetPixel(pixel.X, pixel.Y);
-                            sum_array[i] += Models.ColorTranslator.RBG_to_power(RGB.R, RGB.G, RGB.B);
+                            sum_array[i] += Models.ColorTranslator.RGB_array_power(RGB.R, RGB.G, RGB.B);
+                            /*
+                            if((Models.ColorTranslator.RGB_array_power(RGB.R, RGB.G, RGB.B) >16))
+                            {
+                                a = Models.ColorTranslator.RGB_array_power(RGB.R, RGB.G, RGB.B);
+                            }
+                             * */
+                            
                         }
                         catch (Exception ex)
                         {
@@ -136,19 +144,14 @@ namespace MobileServiceFinal.Controllers
 
 
             /* getting the day result */
-           currentName = String.Format("{0}.jpg", numDays-1);
+           String currentNameDay = String.Format("{0}.jpg", numDays-1);
            UpdateDailyRainJob job = new UpdateDailyRainJob();
-           double[,] sumDays = job.GetDoubleArray(currentName);
+           double[,] sumDays = job.GetDoubleArray(currentNameDay);
            foreach (PixelRep pixel in placesList)
            {
               try
               {
                   sum += sumDays[pixel.X, pixel.Y];
-                  if(sumDays[pixel.X, pixel.Y]!=0)
-                  {
-                      sumDays[pixel.X, pixel.Y] = sumDays[pixel.X, pixel.Y];
-                  }
-
               }
               catch (Exception ex)
               {

@@ -60,10 +60,10 @@ namespace MobileServiceFinal.ScheduledJobs
 
             }
 
-            /* just for check 
+            // just for check 
             double[,] previousum = new double[image_size_x, image_size_y]; /*represents the sum over all pixels*/
 
-            /*initialize array  
+            //initialize array  
 
             for (x = 0; x < image_size_x; x++)
             {
@@ -90,7 +90,7 @@ namespace MobileServiceFinal.ScheduledJobs
 
                 name = String.Format("{0}.jpg", i);
 
-                previousum = newArray(6042 - (24 * 6 * (i)), 6042 - (24 * 6 * (i + 1)), name, previousum);
+                previousum = newArray(6475 - (24 * 6 * (i)), 6475 - (24 * 6 * (i + 1)), name, previousum);
 
             }
 
@@ -101,7 +101,7 @@ namespace MobileServiceFinal.ScheduledJobs
 
 
 
-            check*/
+           // check*/
 
             initializeBlobClient();
 
@@ -131,7 +131,7 @@ namespace MobileServiceFinal.ScheduledJobs
                             try
                             {
                                 Color RGB = file.GetPixel(x, y);
-                                sums[x, y] += Models.ColorTranslator.RBG_to_power(RGB.R, RGB.G, RGB.B);
+                                sums[x, y] += Models.ColorTranslator.RGB_array_power(RGB.R, RGB.G, RGB.B);
                             }
                             catch (Exception ex)
                             {
@@ -162,7 +162,7 @@ namespace MobileServiceFinal.ScheduledJobs
 
 
 
-
+            double a;
             double[,] sums = new double[image_size_x, image_size_y]; /*represents the sum over all pixels*/
 
             double sum = 0;
@@ -239,14 +239,21 @@ namespace MobileServiceFinal.ScheduledJobs
                             try
                             {
 
+
                                 Color RGB = file.GetPixel(x, y);
-
-                                sums[x, y] += Models.ColorTranslator.RBG_to_power(RGB.R, RGB.G, RGB.B);
-
+                                /*
+                                if (x == 2 && y == 170 && Models.ColorTranslator.RGB_array_power(RGB.R, RGB.G, RGB.B) > 0)
+                                {
+                                    a = Models.ColorTranslator.RGB_array_power(RGB.R, RGB.G, RGB.B);
+                                }
+                                 */
+                                sums[x, y] += Models.ColorTranslator.RGB_array_power(RGB.R, RGB.G, RGB.B);
+/*
                                 if( sums[x, y]> 0)
                                 {
                                     sums[x, y] = sums[x, y];
                                 }
+ * */
 
                                 //  RBGArray = RGBFromImageBitmap(file, pixel);
 
