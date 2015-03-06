@@ -117,7 +117,19 @@ namespace MobileServiceFinal.ScheduledJobs
                 try
                 {
                     Bitmap file = new Bitmap(GetStreamImage(currentName));
-
+                    byte[] image_array = new byte[4 * file.Width * file.Height];
+                    for (int j = 0; j < file.Height; j++)
+                    {
+                        for (int k = 0; k < file.Height; k++)
+                        {
+                            int index = ((k * file.Width) + j) * 4;
+                            Color t = file.GetPixel(j, k);
+                            image_array[index] = t.B;
+                            image_array[index + 1] = t.G;
+                            image_array[index + 2] = t.R;
+                            image_array[index + 2] = t.A;
+                        }
+                    }
                     /* bug in the picture */
                     if (file.Height == 1)
                     {
@@ -131,7 +143,7 @@ namespace MobileServiceFinal.ScheduledJobs
                             try
                             {
                                 Color RGB = file.GetPixel(x, y);
-                                sums[x, y] += Models.ColorTranslator.RGB_array_power(RGB.R, RGB.G, RGB.B);
+                                sums[x, y] += Models.ColorTranslator.median_power(image_array, x, y, 3, file.Width);
                             }
                             catch (Exception ex)
                             {
@@ -214,20 +226,26 @@ namespace MobileServiceFinal.ScheduledJobs
                     Bitmap file = new Bitmap(GetStreamImage(currentName));
 
 
-
+                    byte[] image_array = new byte[4 * file.Width * file.Height];
+                    for (int j = 0; j < file.Height; j++)
+                    {
+                        for (int k = 0; k < file.Height; k++)
+                        {
+                            int index = ((k * file.Width) + j) * 4;
+                            Color t = file.GetPixel(j, k);
+                            image_array[index] = t.B;
+                            image_array[index + 1] = t.G;
+                            image_array[index + 2] = t.R;
+                            image_array[index + 2] = t.A;
+                        }
+                    }
 
 
                     /* bug in the picture */
 
                     if (file.Height == 1)
                     {
-
                         continue;
-
-                        //     return;
-
-
-
                     }
 
                     for (x = 0; x < image_size_x; x++)
@@ -238,16 +256,13 @@ namespace MobileServiceFinal.ScheduledJobs
 
                             try
                             {
-
-
-                                Color RGB = file.GetPixel(x, y);
                                 /*
-                                if (x == 2 && y == 170 && Models.ColorTranslator.RGB_array_power(RGB.R, RGB.G, RGB.B) > 0)
+                                if (x == 2 && y == 170 && Models.ColorTranslator.median_power(RGB.R, RGB.G, RGB.B) > 0)
                                 {
-                                    a = Models.ColorTranslator.RGB_array_power(RGB.R, RGB.G, RGB.B);
+                                    a = Models.ColorTranslator.median_power(RGB.R, RGB.G, RGB.B);
                                 }
                                  */
-                                sums[x, y] += Models.ColorTranslator.RGB_array_power(RGB.R, RGB.G, RGB.B);
+                                sums[x, y] += Models.ColorTranslator.median_power(image_array, x, y, 3, file.Width);
 /*
                                 if( sums[x, y]> 0)
                                 {

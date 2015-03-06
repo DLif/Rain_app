@@ -96,7 +96,21 @@ namespace MobileServiceFinal.Controllers
                 try
                 {
                     Bitmap file = new Bitmap(GetStreamImage(currentName));
-
+                    //ImageConverter converter = new ImageConverter();
+                    //var res = (byte[])converter.ConvertTo(file, typeof(byte[]));
+                    byte[] image_array = new byte[4 * file.Width*file.Height];
+                    for (int j = 0; j < file.Height;j++ )
+                    {
+                        for (int k = 0; k < file.Height; k++)
+                        {
+                            int index = ((j * file.Width) + k) * 4;
+                            Color t = file.GetPixel(j, k);
+                            image_array[index] = t.B;
+                            image_array[index+1] = t.G;
+                            image_array[index + 2] = t.R;
+                            image_array[index + 3] = t.A;
+                        }
+                    }
                     /* bug in the picture */
                     if (file.Height == 1)
                     {
@@ -107,12 +121,11 @@ namespace MobileServiceFinal.Controllers
                     {
                         try
                         {
-                            Color RGB = file.GetPixel(pixel.X, pixel.Y);
-                            sum_array[i] += Models.ColorTranslator.RGB_array_power(RGB.R, RGB.G, RGB.B);
+                            sum_array[i] += Models.ColorTranslator.median_power(image_array, pixel.X, pixel.Y, 3, file.Width);
                             /*
-                            if((Models.ColorTranslator.RGB_array_power(RGB.R, RGB.G, RGB.B) >16))
+                            if((Models.ColorTranslator.median_power(RGB.R, RGB.G, RGB.B) >16))
                             {
-                                a = Models.ColorTranslator.RGB_array_power(RGB.R, RGB.G, RGB.B);
+                                a = Models.ColorTranslator.median_power(RGB.R, RGB.G, RGB.B);
                             }
                              * */
                             

@@ -86,6 +86,41 @@ namespace MobileServiceFinal.Models
             return power_sum / num_pixels_in_radius;
         }
 
+        public static double median_power(Byte[] pixels, int x_pixel, int y_pixel, int pixelRadius, int width)
+        {
+            List<double> powers_list = new List<double>();
+
+            //itterate on radius-run on x
+            for (int x = x_pixel - pixelRadius; x <= x_pixel + pixelRadius; x++)
+            {
+                //if this pixels location out of bounds-don't try to add it to calculations
+                if (x > image_size_x || x < 0) continue;
+
+                //itterate on radius-run on y
+                for (int y = y_pixel - pixelRadius; y <= y_pixel + pixelRadius; y++)
+                {
+                    //if this pixels location out of bounds-don't try to add it to calculations
+                    if (y > image_size_y || y < 0) continue;
+
+                    //index is the pixel's trio(RBG) location in the array
+                    int index = ((y * width) + x) * 4;
+
+                    Byte b = pixels[index + 0];
+                    Byte g = pixels[index + 1];
+                    Byte r = pixels[index + 2];
+
+                    double power;
+                    //for black pixel- give 
+                    if (r == 0 && g == 0 && b == 0) power = 0;
+                    else power = ColorTranslator.RGB_array_power(r, g, b);
+
+                    powers_list.Add(power);
+                }
+            }
+            double median = powers_list.ElementAt((int)Math.Floor((double)powers_list.Count / 2.0));
+            return median;
+        }
+
         public static double RGB_array_power(int R, int G, int B)
         {
             int min_index = -1;
