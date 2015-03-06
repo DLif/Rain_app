@@ -121,7 +121,7 @@ namespace MobileServiceFinal.Controllers
                     {
                         try
                         {
-                            sum_array[i] += Models.ColorTranslator.median_power(image_array, pixel.X, pixel.Y, 3, file.Width);
+                            sum_array[i] += Models.ColorTranslator.median_power(image_array, pixel.X, pixel.Y, 1, file.Width);
                             /*
                             if((Models.ColorTranslator.median_power(RGB.R, RGB.G, RGB.B) >16))
                             {
