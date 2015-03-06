@@ -8,7 +8,7 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid x:Name="LayoutRoot">
+    <Grid x:Name="LayoutRoot" Background="White">
 
         <Grid.ChildrenTransitions>
             <TransitionCollection>
@@ -17,19 +17,41 @@
         </Grid.ChildrenTransitions>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="3*"/>
+            <RowDefinition Height="2*"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Title Panel -->
-        <StackPanel Grid.Row="0" Margin="19,0,0,0">
-            <TextBlock Text="MY APPLICATION" Style="{ThemeResource TitleTextBlockStyle}" Margin="0,12,0,0"/>
-            <TextBlock Text="page title" Margin="0,-6.5,0,26.5" Style="{ThemeResource HeaderTextBlockStyle}" CharacterSpacing="{ThemeResource PivotHeaderItemCharacterSpacing}"/>
-        </StackPanel>
+        <Image Grid.Row="1" Source="Assets/icons/logo.jpg"/>
 
         <!--TODO: Content should be placed within the following grid-->
-        <Grid Grid.Row="1" x:Name="ContentRoot" Margin="19,9.5,19,0">
+        <Grid Grid.Row="2" x:Name="ContentRoot">
+            
+            <Grid>
+                <Grid.Resources>
+                    
+                    <Storyboard x:ConnectionId='1' x:Name="fadeOutText"                                  >
+                        <DoubleAnimation From="1" To="0" Storyboard.TargetName="Error" Storyboard.TargetProperty="Opacity" Duration="0:0:0.5"/>
 
+                    </Storyboard>
+                    <Storyboard x:Name="fadeInText">
+                        <DoubleAnimation From="0" To="1" Storyboard.TargetName="Error" Storyboard.TargetProperty="Opacity" Duration="0:0:0.5"/>
+
+                    </Storyboard>
+                    
+                </Grid.Resources>
+                <Grid.RowDefinitions>
+
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" FontSize="15" TextWrapping="WrapWholeWords" HorizontalAlignment="Center" Foreground="Black" Text="Please wait while we download the required data " />
+                <TextBlock TextWrapping="WrapWholeWords" x:Name="Error" Grid.Row="1" FontSize="15" Margin="0, 15, 0, 0" HorizontalAlignment="Center" Foreground="Black" Text="This may take a few seconds ..."/>
+                <ProgressRing x:Name="Progress" IsActive="True" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="2" Background="Transparent"/>
+            </Grid>
         </Grid>
     </Grid>
 </Page>

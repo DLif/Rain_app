@@ -139,6 +139,9 @@
     <AppxPackagedFile Include="C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\Assets\bg6.jpg">
       <PackagePath>Assets\bg6.jpg</PackagePath>
     </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\Assets\icons\logo.jpg">
+      <PackagePath>Assets\icons\logo.jpg</PackagePath>
+    </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Denis\documents\visual studio 2013\Projects\RainMan\RainMan\Assets\icons\bike.png">
       <PackagePath>Assets\icons\bike.png</PackagePath>
     </AppxPackagedFile>

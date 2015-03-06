@@ -1,12 +1,15 @@
 ﻿using RainMan.Common;
+using RainMan.Tasks;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Graphics.Display;
+using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -65,8 +68,91 @@ namespace RainMan
         /// <see cref="Frame.Navigate(Type, Object)"/> when this page was initially requested and
         /// a dictionary of state preserved by this page during an earlier
         /// session.  The state will be null the first time a page is visited.</param>
-        private void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
+        private async void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
+
+            RadarMapManager manager = null;
+            int numTries = 2;
+            Boolean error = false;
+            for (int i = 0; i < numTries; ++i)
+            {
+
+
+
+                try
+                {
+                    // just update the radar manager
+                    manager = await RadarMapManager.getRadarMapManager();
+
+                }
+                catch
+                {
+
+                    error = true;
+                }
+
+                if(error && i == 0)
+                {
+                    // first try, wait a second before trying again
+                    await Task.Delay(1000);
+                    error = false;
+                }
+                else if (!error)
+                {
+                    break;
+                }
+      
+            }
+
+            
+            // error on second try aswel
+            if (error)
+            {
+                this.Progress.IsActive = false;
+
+                this.fadeOutText.Begin();
+
+                
+            }
+            else
+            {
+
+                // calculate the prediction icon set aswell
+                var screenBounds = Window.Current.Bounds;
+                var heightResizeFactor = 130.0 / 666.666;
+                var widthResizeFactor = 170.0 / 400;
+                try
+                {
+
+                    var icons = await PredictionIconDataSource.getData(manager);
+                    foreach (var icon in icons.PredictionIcons)
+                    {
+                        icon.ItemHeight = heightResizeFactor * screenBounds.Height;
+                        icon.ItemWidth = widthResizeFactor * screenBounds.Width;
+                    }
+
+                    Frame.Navigate(typeof(Main), icons);
+                }
+                catch
+                {
+                    error = true;
+                }
+
+                if(error)
+                {
+                    this.Progress.IsActive = false;
+
+                    this.fadeOutText.Begin();
+                    return;
+
+                }
+
+                
+            }
+
+
+
+
         }
 
         /// <summary>
@@ -107,5 +193,11 @@ namespace RainMan
         }
 
         #endregion
+
+        private void fadeOutText_Completed(object sender, object e)
+        {
+            this.Error.Text = "It seems our services are temporary unavailable, please try again later";
+            this.fadeInText.Begin();
+        }
     }
 }

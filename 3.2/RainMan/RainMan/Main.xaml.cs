@@ -159,6 +159,14 @@ namespace RainMan
 
             }
 
+            if(e.NavigationParameter != null)
+            {
+                var icons = e.NavigationParameter as PredictionCollection;
+                this.defaultViewModel["IconCollection"] = icons;
+                this.defaultViewModel["Selection"] = icons.PredictionIcons.ElementAt(0);
+                this.waterRec.Height = RainToHeight.rainToHeight(icons.PredictionIcons.ElementAt(0).Avg);
+            }
+
           
             if (PredictionIconDataSource.NeedToUpdate)
             {

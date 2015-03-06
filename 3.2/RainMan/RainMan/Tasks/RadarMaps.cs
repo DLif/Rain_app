@@ -160,17 +160,17 @@ namespace RainMan.Tasks
             {
                 var lastUpdateMinute = lastUpdate.Minute % 10;
                 var currentMinute = current.Minute % 10;
-                if(lastUpdateMinute < 3)
+                if(lastUpdateMinute < 4)
                 {
-                    // may need to update if we passed 3
+                    // may need to update if we passed 4
                     
-                    if(currentMinute >= 3 || (current.Minute / 10 != lastUpdate.Minute / 10))
+                    if(currentMinute >= 4 || (current.Minute / 10 != lastUpdate.Minute / 10))
                     {
                         needToUpdate = true;
                     }
                 }
                 
-                else if (currentMinute >=3 && (current.Minute / 10 != lastUpdate.Minute / 10))
+                else if (currentMinute >= 4 && (current.Minute / 10 != lastUpdate.Minute / 10))
                 {
                     needToUpdate = true;
                 }
@@ -280,6 +280,13 @@ namespace RainMan.Tasks
 
 
                     DateTime time = DateTime.Now;
+
+                    if(time.Minute % 10 < 4)
+                    {
+                        // images were not updated yet
+                        time = time.AddMinutes(-10);
+                    }
+                    
                     time = time.AddMinutes((-1) * (time.Minute % 10));
 
                     if (i > currentRadarMapIndex)

@@ -53,7 +53,7 @@ namespace RainMan
 
             TimeSpan span = TimeSpan.FromMinutes(minutes);
 
-            return string.Format("Estimated time: {0}:{1} hours", span.Hours, span.Minutes == 0 ? "00" : span.Minutes.ToString() );
+            return string.Format("Estimated time: {0}:{1} hours", span.Hours, span.Minutes  < 10 ? "0" + span.Minutes.ToString() : span.Minutes.ToString() );
 
         }
 

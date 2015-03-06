@@ -494,12 +494,20 @@ namespace RainMan
             {
                 return;
             }
+            this.ResultText.Visibility = Visibility.Collapsed;
             DateTime time = date.Date.LocalDateTime;
             TimeSpan diff = DateTime.Now - time;
 
-            if (diff.TotalDays > 20)
+            if (diff.TotalDays > 30 )
             {
-                MessageDialog diag = new MessageDialog("Date is too old! Requests are limited to 20 days back");
+                MessageDialog diag = new MessageDialog("Date is too old! Requests are limited to 30 days back");
+                await diag.ShowAsync();
+                return;
+            }
+
+            else if(diff.TotalDays < 0)
+            {
+                MessageDialog diag = new MessageDialog("Invalid date! Please choose a day from the past (or today)");
                 await diag.ShowAsync();
                 return;
             }
@@ -512,6 +520,15 @@ namespace RainMan
 
             // first, get all points
             List<PixelRep> pixels = findAllPixels();
+
+
+            if(pixels.Count > 25)
+            {
+                MessageDialog diag = new MessageDialog("Too many locations were chosen, the maximum supported limit is 25");
+                await diag.ShowAsync();
+                return;
+            }
+
 
             // build the polygon
             var poly = new CustomPolygon(pixels.Count, pixels);
@@ -528,30 +545,29 @@ namespace RainMan
 
             try
             {
-                string result = await App.mobileClient.InvokeApiAsync<string>("RainAmount", System.Net.Http.HttpMethod.Get, dict);
-
-
-
-                double res = ((Double.Parse(result) * (1 / 6.0)) / 1000) / (inside_points.Count + pixels.Count); 
-                //double res = 0.23;
-                if(this.usePredictions.IsOn)
+                double result = Double.Parse( await App.mobileClient.InvokeApiAsync<string>("RainAmount", System.Net.Http.HttpMethod.Get, dict));
+                if (this.usePredictions.IsOn)
                 {
                     // add precitions data
-                    // use:
                     var x = this.numPredictionImages;
 
                     pixels.AddRange(inside_points);
-                    res += future_calc(x, pixels);
+                    result += future_calc(x, pixels);
 
 
                 }
+
+
+                double res = ( result * (1 / 6.0)) / (inside_points.Count + pixels.Count); 
+               
+                
 
 
                 this.progress.IsActive = false;
                 progress.Visibility = Visibility.Collapsed;
 
                 this.ResultText.Visibility = Visibility.Visible;
-                this.ResultText.Text = string.Format("Total: {0:0.000} Meters average", res);
+                this.ResultText.Text = string.Format("Total: {0:0.000} MM average", res);
 
 
             }
@@ -638,12 +654,11 @@ namespace RainMan
                 WriteableBitmap currentMap = manager.Maps.ElementAt(i).ReadableImage;
                 using (var buffer = currentMap.PixelBuffer.AsStream())
                 {
-
+                    Byte[] pixels = new Byte[4 * image_size_x * image_size_y];
+                    buffer.Read(pixels, 0, pixels.Length);
                     foreach (PixelRep j in polygon_points)
                     {
 
-                        Byte[] pixels = new Byte[4 * image_size_x * image_size_y];
-                        buffer.Read(pixels, 0, pixels.Length);
                         power += ColorTranslator.power_to_radius(pixels, j.X,j.Y, 0, currentMap.PixelWidth);
                         
                     }

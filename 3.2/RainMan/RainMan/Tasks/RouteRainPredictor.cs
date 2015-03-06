@@ -362,7 +362,7 @@ namespace RainMan.Tasks
             int i, k = 0;
 
             // how many points in a slot
-            int slotSize = (path.Path.Positions.Count / numTimeSlots);
+            int slotSize = (int)Math.Ceiling(((path.Path.Positions.Count - 1) / (double)numTimeSlots) + 1);
 
 
             Stopwatch sw = new Stopwatch();
@@ -484,6 +484,10 @@ namespace RainMan.Tasks
                 double factor = 1;
                 if (kind == RouteKind.BIKE)
                     factor = toBikeFixFactor(estimatedLength, estimatedTime);
+                if(Double.IsNaN(factor))
+                {
+                    factor = 0;
+                }
 
 
                 for ( k = 0; k <= RadarMapManager.totalOldMaps; ++k)

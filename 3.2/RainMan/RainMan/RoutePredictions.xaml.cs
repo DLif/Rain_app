@@ -515,6 +515,11 @@ namespace RainMan
             return;
         }
 
+        private void map_Loaded(object sender, RoutedEventArgs e)
+        {
+          
+        }
+
        
      
     }

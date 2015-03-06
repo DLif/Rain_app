@@ -128,7 +128,6 @@
     <Compile Include="Routes.xaml.cs">
       <DependentUpon>Routes.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Tasks\Behavior.cs" />
     <Compile Include="Tasks\LocationsToEstimations.cs" />
     <Compile Include="Tasks\PolygonComputations.cs" />
     <Compile Include="Tasks\PredictionLoadingScreen.cs" />
@@ -154,6 +153,7 @@
     <Content Include="Assets\icons\car.png" />
     <Content Include="Assets\icons\icon1.png" />
     <Content Include="Assets\icons\icon2.png" />
+    <Content Include="Assets\icons\logo.jpg" />
     <Content Include="Assets\icons\walking.png" />
     <Content Include="Assets\Logo.scale-240.png" />
     <Content Include="Assets\radar\baseRange.png" />
