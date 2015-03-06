@@ -11,7 +11,6 @@
     <RootPropertyPathName Name="ImagePath" />
     <RootPropertyPathName Name="Title" />
     <RootPropertyPathName Name="IconCollection" />
-    <RootPropertyPathName Name="PredictionIcons" />
     <RootPropertyPathName Name="Selection" />
     <RootPropertyPathName Name="AvgInfo" />
     <RootPropertyPathName Name="Avg" />

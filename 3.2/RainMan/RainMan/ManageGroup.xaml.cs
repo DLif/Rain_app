@@ -325,7 +325,7 @@ namespace RainMan
                 }
                 else
                 {
-                    map.ZoomLevel -= 0.3;
+                    map.ZoomLevel -= 0.4;
 
 
                 }
@@ -403,6 +403,8 @@ namespace RainMan
             basicPositions.Add(startPoint.Position);
             basicPositions.Add(endPoint.Position);
 
+            Boolean error = false;
+
             try
             {
 
@@ -416,12 +418,11 @@ namespace RainMan
 
                 if (!result)
                 {
-                    MessageDialog errorDialog = new MessageDialog("Sorry, something went wrong with the mapping service!", "Oops");
-                    await errorDialog.ShowAsync();
+                    error = true;
                 }
                 else
                 {
-                    map.ZoomLevel -= 0.3;
+                    map.ZoomLevel -= 0.4;
 
                     
                 }
@@ -429,9 +430,14 @@ namespace RainMan
             catch
             {
 
-                MessageDialog errorDialog = new MessageDialog("Sorry, something went wrong with the mapping service!", "Oops");
-                errorDialog.ShowAsync();
+                error = true;
 
+            }
+
+            if(error)
+            {
+                MessageDialog errorDialog = new MessageDialog("Sorry, something went wrong with the mapping service!", "Oops");
+                await errorDialog.ShowAsync();
             }
 
             //this.Filler.Visibility = Visibility.Collapsed;

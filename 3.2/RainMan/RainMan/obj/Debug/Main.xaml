@@ -173,7 +173,7 @@
 
             <GridView x:ConnectionId='7' x:Name="predictionGrid" VerticalAlignment="Center" HorizontalAlignment="Left"
                       
-				ItemsSource="{Binding PredictionIcons}"
+				ItemsSource="{Binding}"
 				AutomationProperties.AutomationId="ItemGridView"
 				AutomationProperties.Name="Items In Group"
 				ItemTemplate="{StaticResource IconTemplate}"

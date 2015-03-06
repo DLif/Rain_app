@@ -203,56 +203,6 @@ namespace RainMan
 
 
 
-
-        public static GeoboundingBox GetBounds(/*this*/ MapControl map)
-        {
-            Geopoint topLeft = null;
-
-            try
-            {
-                map.GetLocationFromOffset(new Windows.Foundation.Point(0, 0), out topLeft);
-            }
-            catch
-            {
-                var topOfMap = new Geopoint(new BasicGeoposition()
-                {
-                    Latitude = 85,
-                    Longitude = 0
-                });
-
-                Windows.Foundation.Point topPoint;
-                map.GetOffsetFromLocation(topOfMap, out topPoint);
-                map.GetLocationFromOffset(new Windows.Foundation.Point(0, topPoint.Y), out topLeft);
-            }
-
-            Geopoint bottomRight = null;
-            try
-            {
-                map.GetLocationFromOffset(new Windows.Foundation.Point(map.ActualWidth, map.ActualHeight), out bottomRight);
-            }
-            catch
-            {
-                var bottomOfMap = new Geopoint(new BasicGeoposition()
-                {
-                    Latitude = -85,
-                    Longitude = 0
-                });
-
-                Windows.Foundation.Point bottomPoint;
-                map.GetOffsetFromLocation(bottomOfMap, out bottomPoint);
-                map.GetLocationFromOffset(new Windows.Foundation.Point(0, bottomPoint.Y), out bottomRight);
-            }
-
-            if (topLeft != null && bottomRight != null)
-            {
-                return new GeoboundingBox(topLeft.Position, bottomRight.Position);
-            }
-
-            return null;
-        }
-
-      
-
         private void location_GotFocus(object sender, RoutedEventArgs e)
         {
             ((TextBox)sender).Text = "";
@@ -321,7 +271,6 @@ namespace RainMan
 
         private async void AppBarButton_Click(object sender, RoutedEventArgs e)
         {
-
 
 
 
@@ -418,7 +367,7 @@ namespace RainMan
             if (errorOccured)
             {
                 MessageDialog dialog = new MessageDialog(error);
-                dialog.ShowAsync();
+                await dialog.ShowAsync();
             }
 
         }
@@ -748,8 +697,9 @@ namespace RainMan
 
             catch (System.UnauthorizedAccessException)
             {
-                // todo: critical error
-                // remember to implement this
+                this.errorText.Text = "Please enable location services";
+                this.errorText.Visibility = Visibility.Visible;
+                locationFindBar.Visibility = Visibility.Collapsed;
             }
             catch (TaskCanceledException)
             {

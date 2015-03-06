@@ -452,8 +452,7 @@ namespace RainMan
 
             catch (System.UnauthorizedAccessException)
             {
-                // todo: critical error
-                // remember to implement this
+                errorText = "Please authorize map services !";
             }
             catch (TaskCanceledException)
             {
@@ -463,7 +462,7 @@ namespace RainMan
             if (errorText != "")
             {
                 MessageDialog diag = new MessageDialog(errorText);
-                diag.ShowAsync();
+                await diag.ShowAsync();
             }
 
 
@@ -542,6 +541,8 @@ namespace RainMan
             var dict = new Dictionary<String, String>();
             dict.Add("places", encodedRequest);
             dict.Add("numDaysString", diff.Days.ToString());
+            Boolean error = false;
+
 
             try
             {
@@ -571,13 +572,18 @@ namespace RainMan
 
 
             }
-            catch (Exception ex)
+            catch
+            {
+                error = true;
+                
+            }
+
+            if(error)
             {
                 MessageDialog diag = new MessageDialog("Server error while processing request");
-                diag.ShowAsync();
+                await diag.ShowAsync();
                 this.progress.IsActive = false;
                 progress.Visibility = Visibility.Collapsed;
-                
             }
 
         }

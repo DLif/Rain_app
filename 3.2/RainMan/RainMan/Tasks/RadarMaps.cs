@@ -206,8 +206,9 @@ namespace RainMan.Tasks
         public async Task updateRadarMaps()
         {
 
-           
-   
+
+            Maps.Clear();
+
             // may need to update the maps every now and  then
             RadarMap[] files = await fetchMaps();
             // the order of the images is such that  the oldest one if first, newest one is last

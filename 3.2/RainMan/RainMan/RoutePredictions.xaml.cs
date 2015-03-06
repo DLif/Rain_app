@@ -252,9 +252,11 @@ namespace RainMan
             // update slider
             this.exitTimeSlider.Value = this.predictor.CurrentTimeIndex * 10 + 5;
 
-            if(setBounds)
-            // update route
-                await map.TrySetViewBoundsAsync(this.boxes.ElementAt(predictor.CurrentRouteIndex), null, MapAnimationKind.None);
+
+                if (setBounds)
+                    // update route
+                    await map.TrySetViewBoundsAsync(this.boxes.ElementAt(predictor.CurrentRouteIndex), null, MapAnimationKind.None);
+   
 
         }
 
@@ -338,8 +340,18 @@ namespace RainMan
             this.defaultViewModel["Suggestion"] = suggestion;
             this.SuggestionGrid.Visibility = Visibility.Visible;
 
-            // update content view
-            await updateContentView(true);
+
+            try
+            {
+
+                // update content view
+                await updateContentView(true);
+            }
+            catch
+            {
+                this.loadingDiag.ShowError("Map services failed, please try again later");
+                return;
+            }
 
             this.loadingDiag.CurrentStepNum = 4;
             await this.loadingDiag.WaitHide();
@@ -489,10 +501,25 @@ namespace RainMan
 
 
             this.predictor.changeRoute(index);
-
-            // update content view
-            await updateContentView(true);
+            Boolean error = false;
+            try
+            {
+                // update content view
+                await updateContentView(true);
+            }
+            catch
+            {
+                error = true;
+                
+                
+            }
           
+            if(error == true)
+            {
+                MessageDialog dialog = new MessageDialog("Something went wrong with the mapping services", "Oops");
+                await dialog.ShowAsync();
+            }
+
             this.fadeOutPaths.Begin();
 
         }

@@ -237,6 +237,8 @@ namespace RainMan
             basicPositions.Add(source.Position);
             basicPositions.Add(RadarMapManager.center.Position);
             basicPositions.Add(destination.Position);
+            Boolean error = false;
+
 
             try
             {
@@ -245,16 +247,22 @@ namespace RainMan
 
                 if (!result)
                 {
-                    MessageDialog errorDialog = new MessageDialog("Sorry, something went wrong with the mapping service!", "Oops");
-                    errorDialog.ShowAsync();
+                    error = true;
+                   
                 }
             }
             catch
             {
 
-                MessageDialog errorDialog = new MessageDialog("Sorry, something went wrong with the mapping service!", "Oops");
-                errorDialog.ShowAsync();
+                error = true;
 
+            }
+
+            if(error)
+            {
+                MessageDialog errorDialog = new MessageDialog("Sorry, something went wrong with the mapping service! You will be redirected to the previous page", "Oops");
+                await errorDialog.ShowAsync();
+                Frame.GoBack();
             }
         }
 
@@ -341,10 +349,26 @@ namespace RainMan
 
             ModalWindow window = new ModalWindow("Uploading path to cloud", "Please wait ... ", "");
             window.Dialog.ShowAsync();
+            bool error = false;
 
-            await pathTable.InsertAsync(pt);
+            try
+            {
+                await pathTable.InsertAsync(pt);
+            }
+            catch
+            {
+                error = true;
+            }
 
             window.Dialog.Hide();
+
+            if(error)
+            {
+                MessageDialog diag = new MessageDialog("Something went wrong, please try again later", "Oops");
+                await diag.ShowAsync();
+            }
+
+            
 
 
         }
@@ -392,8 +416,7 @@ namespace RainMan
 
             catch (System.UnauthorizedAccessException)
             {
-                // todo: critical error
-                // remember to implement this
+                errorText = "Please enable location services";
             }
             catch (TaskCanceledException)
             {
@@ -403,7 +426,7 @@ namespace RainMan
             if (errorText != "")
             {
                 MessageDialog diag = new MessageDialog(errorText);
-                diag.ShowAsync();
+                await diag.ShowAsync();
             }
 
 

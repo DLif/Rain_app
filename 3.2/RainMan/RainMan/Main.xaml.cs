@@ -162,7 +162,7 @@ namespace RainMan
             if(e.NavigationParameter != null)
             {
                 var icons = e.NavigationParameter as PredictionCollection;
-                this.defaultViewModel["IconCollection"] = icons;
+                this.defaultViewModel["IconCollection"] = icons.PredictionIcons;
                 this.defaultViewModel["Selection"] = icons.PredictionIcons.ElementAt(0);
                 this.waterRec.Height = RainToHeight.rainToHeight(icons.PredictionIcons.ElementAt(0).Avg);
             }
@@ -181,12 +181,19 @@ namespace RainMan
                 var widthResizeFactor = 170.0 / 400;
 
                 var icons = await PredictionIconDataSource.getData(this.mapManager);
+
+                if(icons == null)
+                {
+                    MessageDialog msg = new MessageDialog("Sorry, an unexpected error occured, please try again later");
+                    await msg.ShowAsync();
+                }
+
                 foreach(var icon in icons.PredictionIcons)
                 {
                     icon.ItemHeight = heightResizeFactor * screenBounds.Height;
                     icon.ItemWidth = widthResizeFactor * screenBounds.Width;
                 }
-                this.defaultViewModel["IconCollection"] = icons;
+                this.defaultViewModel["IconCollection"] = icons.PredictionIcons;
 
                
                 //this.defaultViewModel["FirstItem"] = icons.PredictionIcons.ElementAt(0);

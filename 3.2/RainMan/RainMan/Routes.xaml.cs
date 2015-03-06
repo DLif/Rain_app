@@ -328,7 +328,7 @@ namespace RainMan
             List<BasicGeoposition> basicPositions = new List<BasicGeoposition>();
             basicPositions.Add(quickRouteHubOptions.Points.ElementAt(0).Location.Position);
             basicPositions.Add(quickRouteHubOptions.Points.ElementAt(1).Location.Position);
-
+            Boolean error = false;
             try
             {
 
@@ -336,8 +336,7 @@ namespace RainMan
 
                 if (!result)
                 {
-                    MessageDialog errorDialog = new MessageDialog("Sorry, something went wrong with the mapping service!", "Oops");
-                    await errorDialog.ShowAsync();
+                    error = true;
                 }
                 else
                 {
@@ -346,10 +345,15 @@ namespace RainMan
             }
             catch
             {
+                error = true;
+               
 
+            }
+
+            if (error)
+            {
                 MessageDialog errorDialog = new MessageDialog("Sorry, something went wrong with the mapping service!", "Oops");
-                errorDialog.ShowAsync();
-
+                await errorDialog.ShowAsync();
             }
 
         }
@@ -611,7 +615,7 @@ namespace RainMan
             Geopoint groupDestPoint = GeopointSerializer.ByteArrayToObject(this.selectedGroup.DestinationPoint);
 
             // fetch routes from cloud
-
+            bool error = false;
             try
             {
 
@@ -638,9 +642,15 @@ namespace RainMan
             catch
             {
 
+                error = true;
                 // error occured
+                
+            }
+
+            if(error)
+            {
                 MessageDialog diagg = new MessageDialog("Oops, connection with server was lost. Please try again later");
-                diagg.ShowAsync();
+                await diagg.ShowAsync();
             }
 
             
