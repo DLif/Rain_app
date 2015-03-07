@@ -103,7 +103,8 @@ namespace MobileServiceFinal.Models
                     if (y > image_size_y || y < 0) continue;
 
                     //index is the pixel's trio(RBG) location in the array
-                    int index = ((y * width) + x) * 4;
+                    int index = ((y * width) + x) * 3;
+               //     int index = ((y * width) + x) * 3;
 
                     Byte b = pixels[index + 0];
                     Byte g = pixels[index + 1];

@@ -90,7 +90,9 @@ namespace MobileServiceFinal.ScheduledJobs
 
                 name = String.Format("{0}.jpg", i);
 
-                previousum = newArray(6475 - (24 * 6 * (i)), 6475 - (24 * 6 * (i + 1)), name, previousum);
+         //       previousum = newArray(6475 - ( 6 * (i)), 6475 - ( 6 * (i + 1)), name, previousum);
+
+                previousum = newArray(6613 - (24 * 6 * (i)), 6613 - (24 * 6 * (i + 1)), name, previousum);
 
             }
 
@@ -171,9 +173,6 @@ namespace MobileServiceFinal.ScheduledJobs
         double[,] newArray(int first, int last, string name, double[,] previoussum)
         {
 
-
-
-
             double a;
             double[,] sums = new double[image_size_x, image_size_y]; /*represents the sum over all pixels*/
 
@@ -189,27 +188,16 @@ namespace MobileServiceFinal.ScheduledJobs
 
             String currentName;
 
-
-
             /*initialize array */
 
             for (x = 0; x < image_size_x; x++)
             {
-
                 for (y = 0; y < image_size_y; y++)
                 {
 
                     sums[x, y] = previoussum[x, y];
-
                 }
-
-
-
             }
-
-
-
-
 
             //threads....
 
@@ -225,20 +213,20 @@ namespace MobileServiceFinal.ScheduledJobs
 
                     Bitmap file = new Bitmap(GetStreamImage(currentName));
 
+                    Rectangle rect = new Rectangle(0, 0, file.Width, file.Height);
+                    System.Drawing.Imaging.BitmapData bmpData =
+                    file.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadWrite, file.PixelFormat);
 
-                    byte[] image_array = new byte[4 * file.Width * file.Height];
-                    for (int j = 0; j < file.Height; j++)
-                    {
-                        for (int k = 0; k < file.Height; k++)
-                        {
-                            int index = ((k * file.Width) + j) * 4;
-                            Color t = file.GetPixel(j, k);
-                            image_array[index] = t.B;
-                            image_array[index + 1] = t.G;
-                            image_array[index + 2] = t.R;
-                            image_array[index + 2] = t.A;
-                        }
-                    }
+                    // Get the address of the first line.
+                    IntPtr ptr = bmpData.Scan0;
+
+                    // Declare an array to hold the bytes of the bitmap. 
+                    int bytes = Math.Abs(bmpData.Stride) * file.Height;
+                    byte[] rgbValues = new byte[bytes];
+
+                    // Copy the RGB values into the array.
+                    System.Runtime.InteropServices.Marshal.Copy(ptr, rgbValues, 0, bytes);
+                     
 
 
                     /* bug in the picture */
@@ -253,43 +241,13 @@ namespace MobileServiceFinal.ScheduledJobs
 
                         for (y = 0; y < image_size_y; y++)
                         {
-
-                            try
-                            {
-                                /*
-                                if (x == 2 && y == 170 && Models.ColorTranslator.median_power(RGB.R, RGB.G, RGB.B) > 0)
-                                {
-                                    a = Models.ColorTranslator.median_power(RGB.R, RGB.G, RGB.B);
-                                }
-                                 */
-                                sums[x, y] += Models.ColorTranslator.median_power(image_array, x, y, 3, file.Width);
-/*
-                                if( sums[x, y]> 0)
-                                {
-                                    sums[x, y] = sums[x, y];
-                                }
- * */
-
-                                //  RBGArray = RGBFromImageBitmap(file, pixel);
-
-                                //  sum += Models.ColorTranslator.RBG_to_power(RBGArray[0], RBGArray[1], RBGArray[2]);
-
-                            }
-
-                            catch (Exception ex)
-                            {
-
-                                Console.WriteLine(ex);
-
-                                continue;
-
-                                //  return; /* Fix me before we handle the project - continue.. */
-
-                            }
-
+                            sums[x, y] += Models.ColorTranslator.median_power(rgbValues, x, y, 1, file.Width);
                         }
-
                     }
+
+                        
+
+              
 
                 }
 
@@ -307,9 +265,6 @@ namespace MobileServiceFinal.ScheduledJobs
 
 
             }
-
-
-
 
 
 
@@ -525,6 +480,23 @@ namespace MobileServiceFinal.ScheduledJobs
 
             return null;
         }
+      public static double GetMedian(double[] sourceNumbers)
+      {
+          //Framework 2.0 version of this method. there is an easier way in F4        
+          if (sourceNumbers == null || sourceNumbers.Length == 0)
+              return 0D;
+
+          //make sure the list is sorted, but use a new array
+          double[] sortedPNumbers = (double[])sourceNumbers.Clone();
+          sourceNumbers.CopyTo(sortedPNumbers, 0);
+          Array.Sort(sortedPNumbers);
+
+          //get the median
+          int size = sortedPNumbers.Length;
+          int mid = size / 2;
+          double median = (size % 2 != 0) ? (double)sortedPNumbers[mid] : ((double)sortedPNumbers[mid] + (double)sortedPNumbers[mid - 1]) / 2;
+          return median;
+      }
     }
     
 

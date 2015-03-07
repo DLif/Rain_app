@@ -36,6 +36,8 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using RainMan.DataModels;
 using MobileServiceFinal.ScheduledJobs;
+using System.Runtime.InteropServices;
+using System.Drawing.Imaging;
 
 namespace MobileServiceFinal.Controllers
 {
@@ -75,6 +77,7 @@ namespace MobileServiceFinal.Controllers
             Services.Log.Info("Trying to get the amount of rain");
             int max = getMaxIndex();
             int numMinutes = DateTime.Now.Minute / 10 + DateTime.Now.Hour * 6;
+          //  int numMinutes = 1;
             int numDays = int.Parse(numDaysString);
            // String currentName;
             List<PixelRep> polygonPoints = RainApiSerializer.DeserializeRequest(places).Pixels;
@@ -96,9 +99,28 @@ namespace MobileServiceFinal.Controllers
                 try
                 {
                     Bitmap file = new Bitmap(GetStreamImage(currentName));
-                    //ImageConverter converter = new ImageConverter();
-                    //var res = (byte[])converter.ConvertTo(file, typeof(byte[]));
+                    Rectangle rect = new Rectangle(0, 0, file.Width, file.Height);
+                    System.Drawing.Imaging.BitmapData bmpData =
+                    file.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadWrite,  file.PixelFormat);
+
+                    // Get the address of the first line.
+                    IntPtr ptr = bmpData.Scan0;
+
+                    // Declare an array to hold the bytes of the bitmap. 
+                    int bytes = Math.Abs(bmpData.Stride) * file.Height;
+                     byte[] rgbValues = new byte[bytes];
+
+                    // Copy the RGB values into the array.
+                    System.Runtime.InteropServices.Marshal.Copy(ptr, rgbValues, 0, bytes);
+
+
+
+
+
+     /*
+                   
                     byte[] image_array = new byte[4 * file.Width*file.Height];
+                    
                     for (int j = 0; j < file.Height;j++ )
                     {
                         for (int k = 0; k < file.Height; k++)
@@ -111,6 +133,10 @@ namespace MobileServiceFinal.Controllers
                             image_array[index + 3] = t.A;
                         }
                     }
+      
+                     
+      * 
+ 
                     /* bug in the picture */
                     if (file.Height == 1)
                     {
@@ -121,14 +147,16 @@ namespace MobileServiceFinal.Controllers
                     {
                         try
                         {
-                            sum_array[i] += Models.ColorTranslator.median_power(image_array, pixel.X, pixel.Y, 1, file.Width);
-                            /*
-                            if((Models.ColorTranslator.median_power(RGB.R, RGB.G, RGB.B) >16))
+                            sum_array[i] += Models.ColorTranslator.median_power(rgbValues, pixel.X, pixel.Y, 1, file.Width);
+                       //     sum_array[i] += Models.ColorTranslator.median_power(rgbValues, pixel.X, pixel.Y, 1, file.Width);
+                         /*
+                            if((Models.ColorTranslator.median_power(rgbValues, pixel.X, pixel.Y, 1, file.Width) >0))
                             {
-                                a = Models.ColorTranslator.median_power(RGB.R, RGB.G, RGB.B);
+                                a = Models.ColorTranslator.median_power(rgbValues, pixel.X, pixel.Y, 1, file.Width);
                             }
-                             * */
+                          * */
                             
+
                         }
                         catch (Exception ex)
                         {
