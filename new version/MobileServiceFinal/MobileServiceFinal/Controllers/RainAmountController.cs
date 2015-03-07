@@ -113,30 +113,6 @@ namespace MobileServiceFinal.Controllers
                     // Copy the RGB values into the array.
                     System.Runtime.InteropServices.Marshal.Copy(ptr, rgbValues, 0, bytes);
 
-
-
-
-
-     /*
-                   
-                    byte[] image_array = new byte[4 * file.Width*file.Height];
-                    
-                    for (int j = 0; j < file.Height;j++ )
-                    {
-                        for (int k = 0; k < file.Height; k++)
-                        {
-                            int index = ((j * file.Width) + k) * 4;
-                            Color t = file.GetPixel(j, k);
-                            image_array[index] = t.B;
-                            image_array[index+1] = t.G;
-                            image_array[index + 2] = t.R;
-                            image_array[index + 3] = t.A;
-                        }
-                    }
-      
-                     
-      * 
- 
                     /* bug in the picture */
                     if (file.Height == 1)
                     {
@@ -147,7 +123,7 @@ namespace MobileServiceFinal.Controllers
                     {
                         try
                         {
-                            sum_array[i] += Models.ColorTranslator.median_power(rgbValues, pixel.X, pixel.Y, 1, file.Width);
+                            sum_array[i] += Models.ColorTranslator.median_power(rgbValues, pixel.X, pixel.Y, 3, file.Width);
                        //     sum_array[i] += Models.ColorTranslator.median_power(rgbValues, pixel.X, pixel.Y, 1, file.Width);
                          /*
                             if((Models.ColorTranslator.median_power(rgbValues, pixel.X, pixel.Y, 1, file.Width) >0))
