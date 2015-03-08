@@ -1,465 +1,525 @@
 ﻿using RainMan.Navigation;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Geolocation;
 using Windows.Foundation;
 using Windows.Services.Maps;
+using Windows.Storage.Streams;
 using Windows.UI;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Maps;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Shapes;
 
 namespace RainMan.Tasks
 {
 
 
-    public class RoutePredictorResult
+
+    // this class is resposible for rain prediction over a group of routes
+    // also provides methods to draw and update a given map control with the routes and annotations
+
+    public class RouteGroupAnnotator
     {
 
-        // holds result for each starting time [0, 10, 20, 30]
-        public List<Color>[] routesPerStartingTime = new List<Color>[4];
+        // annonations/predictions per route in group
+        public List<SingleRouteAnnotations> routeAnnotations = new List<SingleRouteAnnotations>();
 
-        public List<MapRouteView> routesCollection = new List<MapRouteView>();
+        public MapControl Map { get; set; }
 
-        // holds the average rain over route per starting time
-        public double[] averages;
+        public List<MapRoute> Routes { get; set; }
 
-    }
+        public int CurrentRouteIndex { get; set; }
+
+        public int CurrentTimeIndex { get; set; }
+
+        public Boolean ErrorOccured { get; set; }
 
 
-    public class RouteRainPredictor
-    {
-
-     
-        public List<RadarMap> Maps { get; set; }
-
-        // to how many time slots we devide a single path/leg
-        public int NumTimeSlots { get; set; }
-
-        // what type of routing should we use
-        public RouteKind RouteKind { get; set; }
-
-        public RouteRainPredictor(RadarMapManager manager, int numTimeSlots, RouteKind routeKind)
+        public SingleRouteAnnotations getCurrentAnnotation()
         {
+            return this.routeAnnotations.ElementAt(CurrentRouteIndex);
+        }
+
+        public RouteGroupAnnotator(List<MapRoute> routes, MapControl map)
+        {
+            this.Routes = routes;
+            this.Map = map;
+            this.CurrentRouteIndex = -1;
+        }
+
+        public List<Annotation> getAllAnnotations()
+        {
+            List<Annotation> all = new List<Annotation>();
+            foreach(SingleRouteAnnotations single in this.routeAnnotations)
+            {
+                all.AddRange(single.Annotations);
+            }
+            return all;
+        }
+
+        public async Task InitRouteGroupsPredictions(RouteKind kind, int timeSlots, LoadingDialog loadingScreen, ImageBrush pushpinImage, int maxStallTime, RadarMapManager manager)
+        {
+
+            List<RadarMap> Maps = new List<RadarMap>();
            
-            this.NumTimeSlots = numTimeSlots;
-            this.RouteKind = routeKind;
-            this.Maps = new List<RadarMap>();
+
             // save only the relevant maps
-            for(int i = RadarMapManager.totalOldMaps; i < RadarMapManager.totalNumMaps; ++ i)
+            for (int i = RadarMapManager.totalOldMaps; i < RadarMapManager.totalNumMaps; ++i)
             {
                 Maps.Add(manager.Maps.ElementAt(i));
             }
+
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            List<Task> tasks = new List<Task>();
+            int donePaths = 0;
+            // create an annotation and predictions for each route in the group
+            foreach (MapRoute route in Routes)
+            {
+                loadingScreen.updatePredictionProgress(donePaths, Routes.Count);
+
+                SingleRouteAnnotations annotation = new SingleRouteAnnotations();
+                // add to collection
+                routeAnnotations.Add(annotation);
+
+                // initialize predictions and annotations for current route in group
+                await annotation.routeToAnnotations(route, kind, timeSlots, Maps, Routes.Count, loadingScreen, pushpinImage);
+
+                if(annotation.ErrorOccured)
+                {
+                    ErrorOccured = true;
+                    return;
+                }
+                ++donePaths;
+    
+            }
+            // await Task.WhenAll(tasks);
+            sw.Stop();
+            TimeSpan x = sw.Elapsed;
+
+            // done with predictions
+            loadingScreen.CurrentStepNum = 3;
+
+
+            // load all the routes
+            loadAllPaths(Routes);
+
+            // show the selected path (so far without annotations)
+            int bestPath = this.getBestPathIndex(maxStallTime);
+            showPath(bestPath);
+
+            // annoate the best path from the group with the best possible departure time
+            int bestTimeIndex = this.routeAnnotations.ElementAt(bestPath).BestTime;
+            // finally, set the annotations
+            this.SetRouteAnnotations(bestPath, bestTimeIndex);
+
         }
 
-        public double GeopathToAverageRain(Geopath path, RadarMap predictionMap)
+        private void showPath(int pathIndex)
         {
-            int numPoints = 1;
-            double avg = 0;
 
-            // iterative mean, to prevent overflow
-            foreach (BasicGeoposition position in path.Positions)
+            if (this.CurrentRouteIndex == pathIndex)
+                return;
+
+            if (this.CurrentRouteIndex >= 0)
             {
-                Geopoint geopoint = new Geopoint(position);
-                double curr = predictionMap.getAverageRain(geopoint, 1);
-
-                avg = (((double)numPoints - 1) / numPoints) * avg + (1.0 / numPoints) * curr;
-
-                ++numPoints;
-
+                // hide previous route 
+                this.Map.Routes.ElementAt(CurrentRouteIndex).OutlineColor = Colors.Transparent;
+                this.Map.Routes.ElementAt(CurrentRouteIndex).RouteColor = Colors.Transparent;
             }
-            return avg;
+
+
+            // now, show current
+            MapRouteView curr = this.Map.Routes.ElementAt(pathIndex);
+            curr.OutlineColor = Colors.Blue;
+            curr.RouteColor = Colors.Blue;
+
         }
 
-        public double GeopathToAverageRain(Geopath path, RadarMap predictionMap, int startIndex, int endIndex)
+        // method loads all the rounds onto the map
+        private void loadAllPaths(List<MapRoute> routes)
         {
-            int numPoints = 1;
-            double avg = 0;
-
-            // iterative mean, to prevent overflow
-            for (int i = startIndex; i <= endIndex; ++i)
+            foreach (var path in routes)
             {
-                BasicGeoposition position = path.Positions.ElementAt(i);
-                Geopoint geopoint = new Geopoint(position);
-                double curr = predictionMap.getAverageRain(geopoint, 1);
-
-                avg = (((double)numPoints - 1) / numPoints) * avg + (1.0 / numPoints) * curr;
-
-                ++numPoints;
+                MapRouteView view = new MapRouteView(path);
+                view.OutlineColor = Colors.Transparent;
+                view.RouteColor = Colors.Transparent;
+                this.Map.Routes.Add(view);
 
             }
-            return avg;
+            
+            // load all object onto the map
+
+            foreach(SingleRouteAnnotations single in this.routeAnnotations)
+            {
+                foreach(Annotation annot in single.Annotations)
+                {
+                    Map.Children.Add(annot.Pin);
+                    annot.Pin.SetValue(Grid.VisibilityProperty, Visibility.Collapsed);
+                    MapControl.SetLocation(annot.Pin, annot.Location);
+                    MapControl.SetNormalizedAnchorPoint(annot.Pin, new Point(0.5, 1.0));
+                    
+                   // var pin = new MapIcon()
+                   // {
+                    //    Location = annot.Location,
+                       // Title = "testing",
+                       // NormalizedAnchorPoint = new Point(0.0, 1.0),
+                       // Visible = true,
+                     //   Image = RandomAccessStreamReference.CreateFromUri(new Uri("ms-appx:///Assets/radar/mappin.png"))
+                        
+                    //};
+                    //Map.MapElements.Add(pin);
+                   
+                }
+            }
+
+        }
+        public void changeTimeIndex(int timeIndex)
+        {
+            // need only to change the annotations
+            this.SetRouteAnnotations(this.CurrentRouteIndex, timeIndex);
+        }
+
+        public void changeRoute(int routeIndex)
+        {
+            if (routeIndex == this.CurrentRouteIndex)
+                return;
+
+            // first, show the correct path on the map [and hide previous]
+            this.showPath(routeIndex);
+
+            // need to fetch the best time index for selected route
+            int timeIndex = this.routeAnnotations.ElementAt(routeIndex).BestTime;
+
+            // second, hide previous annotations and set current
+            this.SetRouteAnnotations(routeIndex, timeIndex);
+
+        }
+
+      
+     
+        // set the annotation object for given path and given departure time
+        private void SetRouteAnnotations(int pathIndex, int timeIndex)
+        {
+
+
+            this.CurrentTimeIndex = timeIndex;
+
+            SingleRouteAnnotations result = this.routeAnnotations.ElementAt(pathIndex);
+
+            // update colors according to starting time
+            result.setRouteAtTime(timeIndex);
+
+            if (this.CurrentRouteIndex == pathIndex)
+                // if so, we already updated the colors
+                return;
+
+            if (CurrentRouteIndex >= 0)
+            {
+                // hide previous pushpins
+                SingleRouteAnnotations prev = this.routeAnnotations.ElementAt(CurrentRouteIndex);
+                foreach(Annotation annotation in prev.Annotations)
+                {
+                    annotation.Pin.SetValue(Grid.VisibilityProperty, Visibility.Collapsed);
+                }
+            }
+
+            // add current pushpins
+            foreach(Annotation annotation in result.Annotations)
+            {
+                annotation.Pin.SetValue(Grid.VisibilityProperty, Visibility.Visible);            
+                
+            }
+
+            this.CurrentRouteIndex = pathIndex;
+
+        }
+
+        // get the index of the group with the minimal rain damage
+        public int getBestPathIndex(int maxStallTime)
+        {
+            int minIndex = 0;
+            double minAvg = this.routeAnnotations.ElementAt(0).Averages[this.routeAnnotations.ElementAt(0).BestTime];
+            for (int i = 1; i < this.routeAnnotations.Count && i <= maxStallTime; ++i)
+            {
+                double currAvg = this.routeAnnotations.ElementAt(i).Averages[this.routeAnnotations.ElementAt(i).BestTime];
+                if (currAvg < minAvg)
+                {
+                    minAvg = currAvg;
+                    minIndex = i;
+                }
+
+            }
+            return minIndex;
         }
 
 
-        // in case the travelling time is small, map can be determined by the starting time only
-        // time is given in minutes
-        public int startingTimeToMapIndex(double startTime)
+
+    }
+
+    public class SingleRouteAnnotations
+    {
+
+        // average per starting point
+        public List<Color>[] Colors = new List<Color>[4];
+
+        // total average per starting point
+        public double[] Averages = new double[4];
+
+        // list of leg annotations
+        public List<Annotation> Annotations = new List<Annotation>();
+
+        private int bestTime;
+
+        // best time to leave (minimal rain average)
+        public int BestTime { get { return this.bestTime; } }
+
+        // traversal estimation in MINUTES
+        public double EstimatedTimeMinutes { get; set; }
+
+        private int currentTimeIndex;
+
+        public SingleRouteAnnotations()
+        {
+            // initialize data structures
+            for (int i = 0; i < 4; ++i)
+            {
+                Colors[i] = new List<Color>();
+            }
+
+            currentTimeIndex = -1;
+        }
+
+      
+
+
+        // sets the annotations' colors according to the chosen route and the chosen starting time
+        public void setRouteAtTime(int timeIndex)
         {
 
+            if (currentTimeIndex == timeIndex)
+                return;
 
-            if (startTime < 10.0)
+            currentTimeIndex = timeIndex;
+            List<Color> currentColors = this.Colors[timeIndex];
+            int k = 0;
+            foreach (Annotation anno in Annotations)
             {
-
-                return 0;
-
+                // update the annotation color
+                anno.ColorCircle.SetValue(Rectangle.FillProperty, new SolidColorBrush(currentColors.ElementAt(k)));
+                ++k;
             }
-            if (startTime < 20.0)
-            {
-                return 1;
-            }
-            if (startTime < 30.0)
-            {
-                return 2;
-            }
-
-            // minutes >= 30.0
-            return 3;
-
 
         }
-        private double currentLegAvgRain = 0;
 
-
-        public async Task<RoutePredictorResult> predictionsForLeg(MapRouteLeg leg, double startingMinute)
+        // how many times the average speed of vehicle is larger than a bikes
+        // used to convert time estimations
+        private double toBikeFixFactor(double lengthInMeters, double totalHours)
         {
-            // prediction for each starting time offset
-            List<Color>[] result = new List<Color>[4];
-            double[] averages = new double[4];
-            List<MapRouteView> routes = new List<MapRouteView>();
+            var avgDrivingSpeed = (lengthInMeters /1000) / (totalHours / 60); // km/h
+            // 15.5 is the average bike speed
+            return avgDrivingSpeed / 15.5;
+        }
 
-            for(int j = 0; j < result.Length; ++j)
+
+        // calculate prediction for the given route and fill the data (colors and averages)
+        public async Task routeToAnnotations(MapRoute route, RouteKind routeKind, int numTimeSlots, List<RadarMap> maps, int numRoutes, LoadingDialog loadingScreen, ImageBrush pushpinImage)
+        {
+
+            await predictionsForPath(route, 0, numTimeSlots, routeKind, maps, numRoutes, loadingScreen, pushpinImage);
+
+            if (ErrorOccured)
+                return;
+
+            // find best time to leave
+            int minIndex = 0;
+            for (int i = 0; i < 4; ++i)
             {
-                result[j] = new List<Color>();
-                averages[j] = 0;
+                if (this.Averages[i] < this.Averages[minIndex])
+                    minIndex = i;
             }
 
+            this.bestTime = minIndex;
+
+        }
+
+        public Boolean ErrorOccured { get; set; }
+
+        public async Task predictionsForPath(MapRoute path, double startingMinute, int numTimeSlots, RouteKind kind, List<RadarMap> Maps, int numRoutes, LoadingDialog loadingScreen, ImageBrush pushpinImage)
+        {
 
             int numPaths = 1;
-            int i = 0;
+            int i, k = 0;
 
             // how many points in a slot
-            int slotSize = (leg.Path.Positions.Count / this.NumTimeSlots);
+            int slotSize = (int)Math.Ceiling(((path.Path.Positions.Count - 1) / (double)numTimeSlots) + 1);
 
-            currentLegAvgRain = 0;
 
-            // speed fix for bikes
-            int factor = 1;
-            if (this.RouteKind == RouteKind.BIKE)
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
+
+           
+      
+
+
+            int numIterations = (int)Math.Ceiling((path.Path.Positions.Count -1) / (double)(slotSize -1));
+            double[][] results = new double[numIterations][];
+
+           // int threadsEachRound = 2;
+           // int numRounds = numIterations / threadsEachRound;
+
+           // numRounds = Math.Max(numRounds, 1);
+
+            //for (int round = 0; round < numRounds - 1; round++)
+            //{
+
+            //    var seq = Enumerable.Range(round * threadsEachRound, threadsEachRound);
+            //    var tasks = seq.Select(async j =>
+            //    {
+            //        i = 1 + (slotSize - 1) * j;
+            //        int startIndex = i - 1;
+            //        int lastIndex = Math.Min(i + slotSize - 2, path.Path.Positions.Count - 1);
+            //        Geopoint startPoint = new Geopoint(path.Path.Positions.ElementAt(startIndex));
+            //        Geopoint endPoint = new Geopoint(path.Path.Positions.ElementAt(lastIndex));
+
+            //        results[j] = await LocationsToEstimations.getTimeAndDistance(startPoint, endPoint, kind);
+            //        //awaitingTask.Wait();
+            //        //results[j] = awaitingTask.Result;
+            //    });
+            //    await Task.WhenAll(tasks);
+
+            //}
+
+
+            try
             {
-                var drivingSpeed = (leg.LengthInMeters / 1000.0) / leg.EstimatedDuration.TotalHours; // km/h
-                // 15.5 is the average bike speed
-                factor = (int)(drivingSpeed / 15.5);
+
+     
+                var seq = Enumerable.Range(0, numIterations);
+                var tasks = seq.Select(async j =>
+                {
+                    i = 1 + (slotSize - 1) * j;
+                    int startIndex = i - 1;
+                    int lastIndex = Math.Min(i + slotSize - 2, path.Path.Positions.Count - 1);
+                    Geopoint startPoint = new Geopoint(path.Path.Positions.ElementAt(startIndex));
+                    Geopoint endPoint = new Geopoint(path.Path.Positions.ElementAt(lastIndex));
+
+                    results[j] = await LocationsToEstimations.getTimeAndDistance(startPoint, endPoint, kind);
+                    if(results[j] == null)
+                    {
+                        this.ErrorOccured = true;
+                    }
+                    //awaitingTask.Wait();
+                    //results[j] = awaitingTask.Result;
+                });
+                await Task.WhenAll(tasks);
 
             }
-
-          
-            for (i = 1; i < leg.Path.Positions.Count; i = i + slotSize - 1)
+            catch(Exception e)
             {
-                Geopoint startPoint = new Geopoint(leg.Path.Positions.ElementAt(i - 1));
-                Geopoint endPoint = new Geopoint(leg.Path.Positions.ElementAt(Math.Min(i + slotSize - 2, leg.Path.Positions.Count - 1)));
+                loadingScreen.ShowError("Connection with server timed-out: " + e.Message);
+                ErrorOccured = true;
+                return;
+            }
 
-                // Get the route between the points.
-                MapRouteFinderResult routeResult = null;
+            if(this.ErrorOccured)
+            {
+                loadingScreen.ShowError("Connection with server timed-out");    
+                return;
+            }
+            //var finalSeq = Enumerable.Range((numRounds - 1) * threadsEachRound, numIterations - (numRounds - 1) * threadsEachRound);
+            //var finalTasks = finalSeq.Select(async j =>
+            //{
+            //    i = 1 + (slotSize - 1) * j;
+            //    int startIndex = i - 1;
+            //    int lastIndex = Math.Min(i + slotSize - 2, path.Path.Positions.Count - 1);
+            //    Geopoint startPoint = new Geopoint(path.Path.Positions.ElementAt(startIndex));
+            //    Geopoint endPoint = new Geopoint(path.Path.Positions.ElementAt(lastIndex));
 
-               
-                    if (this.RouteKind == RouteKind.DRIVE)
-                    {
-                        // no restirctions
-                        routeResult =
-                            await MapRouteFinder.GetDrivingRouteAsync(startPoint, endPoint,
-                            MapRouteOptimization.Time,
-                            MapRouteRestrictions.None);
-                    }
+            //    results[j] = await LocationsToEstimations.getTimeAndDistance(startPoint, endPoint, kind);
+            //    //awaitingTask.Wait();
+            //    //results[j] = awaitingTask.Result;
+            //});
 
-                    else if (this.RouteKind == RouteKind.BIKE)
-                    {
+            //await Task.WhenAll(finalTasks);
 
-                        // avoid highways
-                        routeResult =
-                            await MapRouteFinder.GetDrivingRouteAsync(startPoint, endPoint,
+  
+     
+           
+            sw.Stop();
+            var x = sw.Elapsed;
+            int index;
+            for (i = 1, index = 0; i < path.Path.Positions.Count; i = i + slotSize - 1, ++index)
+            {
 
-                            MapRouteOptimization.Time,
-                            MapRouteRestrictions.Highways);
+                int startIndex = i - 1;
+                int lastIndex = Math.Min(i + slotSize - 2, path.Path.Positions.Count -1);
 
-                    }
-                    else if (this.RouteKind == RouteKind.WALK)
-                    {
-                        // walking 
-                        routeResult = await MapRouteFinder.GetWalkingRouteAsync(startPoint, endPoint);
-                    }
+                Annotation annot = new Annotation(new Geopoint(path.Path.Positions.ElementAt((int)(0.5 * startIndex + 0.5 * lastIndex))),pushpinImage);
+                this.Annotations.Add(annot);
 
-
-                    if (routeResult.Status != MapRouteFinderStatus.Success)
-                        continue;
-
-                routes.Add(new MapRouteView(routeResult.Route));
                 
+               // Geopoint startPoint = new Geopoint(path.Path.Positions.ElementAt(startIndex));
+               // Geopoint endPoint = new Geopoint(path.Path.Positions.ElementAt(lastIndex));
 
-                for (int k = 0; k <= RadarMapManager.totalOldMaps; ++k)
+               // double[] estimations  = await LocationsToEstimations.getTimeAndDistance(startPoint, endPoint, kind);
+
+                double[] estimations = results[index];
+                
+                double estimatedTime = estimations[1];
+                double estimatedLength = estimations[0];
+
+
+                double factor = 1;
+                if (kind == RouteKind.BIKE)
+                    factor = toBikeFixFactor(estimatedLength, estimatedTime);
+                if(Double.IsNaN(factor))
+                {
+                    factor = 0;
+                }
+
+
+                for ( k = 0; k <= RadarMapManager.totalOldMaps; ++k)
                 {
 
 
-
-                    int predictionMapIndex = minutesToMapIndex(startingMinute + 10 * k, routeResult.Route.EstimatedDuration.TotalMinutes * factor);
+                    int predictionMapIndex = minutesToMapIndex(startingMinute + 10 * k, estimatedTime * factor);
 
                     // get average rain over path
-                    double curr = GeopathToAverageRain(leg.Path, this.Maps[predictionMapIndex], i - 1, Math.Min(i + slotSize - 2, leg.Path.Positions.Count - 1));
-                    //double curr = GeopathToAverageRain(routes[index].Path, this.Maps[predictionMapIndex]);
-                    
+                    double curr = GeopathToAverageRain(path.Path, Maps[predictionMapIndex], i - 1, Math.Min(i + slotSize - 2, path.Path.Positions.Count - 1));
+
                     // get avg color
                     Color color = ColorTranslator.rainToColor(curr);
 
-                    result[k].Add(color);
-                    averages[k] = (((double)numPaths - 1) / numPaths) * averages[k] + (1.0 / numPaths) * curr;
+                    this.Colors[k].Add(color);
+                    this.Averages[k] = (((double)numPaths - 1) / numPaths) * this.Averages[k] + (1.0 / numPaths) * curr;
                 }
 
-                // advance time
-                startingMinute += routeResult.Route.EstimatedDuration.TotalMinutes * factor;
-
-                numPaths++;
-               
-            }
-
-            RoutePredictorResult rpr = new RoutePredictorResult();
-            rpr.routesPerStartingTime = result;
-            rpr.averages = averages;
-            rpr.routesCollection = routes;
-            return rpr;
-        }
-
-
-        public async Task<List<MapRouteView>> LegToSubRoutes(MapRouteLeg leg, double startingMinute)
-        {
-
-            List<MapRouteView> result = new List<MapRouteView>();
-            int numPaths = 1;
-            int i = 0;
-
-            int slotSize = (leg.Path.Positions.Count / this.NumTimeSlots);
-
-            currentLegAvgRain = 0;
-
-            int factor = 1;
-            if (this.RouteKind == RouteKind.BIKE)
-            {
-                var drivingSpeed = (leg.LengthInMeters/1000.0) / leg.EstimatedDuration.TotalHours; // km/h
-                // 15.5 is the average bike speed
-                factor = (int)(drivingSpeed / 15.5);
-
-            }
-
-            for (i = 1; i < leg.Path.Positions.Count; i = i + slotSize - 1)
-            {
                 
 
-                Geopoint startPoint = new Geopoint(leg.Path.Positions.ElementAt(i - 1));
-                Geopoint endPoint = new Geopoint(leg.Path.Positions.ElementAt(Math.Min(i + slotSize - 2, leg.Path.Positions.Count - 1)));
-
-                // Get the route between the points.
-                MapRouteFinderResult routeResult = null;
-
-
-                if (this.RouteKind == RouteKind.DRIVE)
-                {
-                    // no restirctions
-                    routeResult =
-                        await MapRouteFinder.GetDrivingRouteAsync(startPoint, endPoint,
-                        MapRouteOptimization.Time,
-                        MapRouteRestrictions.None);
-                }
-
-                else if (this.RouteKind == RouteKind.BIKE)
-                {
-
-                    // avoid highways
-                    routeResult =
-                        await MapRouteFinder.GetDrivingRouteAsync(startPoint, endPoint,
-                       
-                        MapRouteOptimization.Time,
-                        MapRouteRestrictions.Highways);
-
-                }
-                else if (this.RouteKind == RouteKind.WALK)
-                {
-                    // walking 
-                    routeResult = await MapRouteFinder.GetWalkingRouteAsync(startPoint, endPoint);
-                }
-
-                // get map index from current starting minute
-                //int predictionMapIndex = startingTimeToMapIndex(startingMinute);
-
-
-                int predictionMapIndex = minutesToMapIndex(startingMinute, routeResult.Route.EstimatedDuration.Minutes * factor);
-
-                // get average rain over path
-                double curr = GeopathToAverageRain(leg.Path, this.Maps[predictionMapIndex], i - 1, Math.Min(i + slotSize - 2, leg.Path.Positions.Count - 1));
-
-                // get avg color
-                Color color = ColorTranslator.rainToColor(curr);
-
-                MapRouteView newView = new MapRouteView(routeResult.Route);
-                newView.OutlineColor = color;
-                newView.RouteColor = color;
-                result.Add(newView);
-
                 // advance time
-                startingMinute += routeResult.Route.EstimatedDuration.Minutes;
-
-                currentLegAvgRain = (((double)numPaths - 1) / numPaths) * currentLegAvgRain + (1.0 / numPaths) * curr;
+                startingMinute += estimatedTime * factor;
+                this.EstimatedTimeMinutes += estimatedTime * factor;
 
                 numPaths++;
 
             }
-            return result;
 
+           
         }
 
-        public double TotalRouteAverage = 0;
-
-        public async Task<List<MapRouteView>> routeToColoredRoutes(MapRoute route, int startingMapIndex)
-        {
-            // this determines the radar map we will be using
-            double minutes = 0;
-            List<MapRouteView> subRoutes = new List<MapRouteView>();
-
-            // vars for calculating the mean
-            double mean = 0;
-            int numLegs = 1;
-
-            double meanTimePerPoint = route.EstimatedDuration.TotalMinutes / route.Path.Positions.Count;
-
-            foreach (MapRouteLeg leg in route.Legs)
-            {
-                TimeSpan legTime = leg.EstimatedDuration;
-
-                List<MapRouteView> result = await LegToSubRoutes(leg, startingMapIndex * 10 + minutes);
-                subRoutes.AddRange(result);
-
-                // advance next leg starting time
-                minutes += legTime.Minutes;
-
-                // advance the mean
-                mean = (((double)numLegs - 1) / numLegs) * mean + (1.0 / numLegs) * currentLegAvgRain;
-
-                ++numLegs;
-            }
-
-            TotalRouteAverage = mean;
-
-            return subRoutes;
-
-
-
-        }
-
-        public async Task<RoutePredictorResult> routeToPredictions(MapRoute route)
-        {
-            // this determines the radar map we will be using
-            double minutes = 0;
-
-            // vars for calculating the mean
-            int numLegs = 1;
-
-            //double meanTimePerPoint = route.EstimatedDuration.TotalMinutes / route.Path.Positions.Count;
-
-            // init result variable
-            RoutePredictorResult res = new RoutePredictorResult();
-            res.averages = new double[4];
-
-            // speed fix for bikes
-            int factor = 1;
-            if (this.RouteKind == RouteKind.BIKE)
-            {
-                var drivingSpeed = (route.LengthInMeters / 1000.0) / route.EstimatedDuration.TotalHours; // km/h
-                // 15.5 is the average bike speed
-                factor = (int)(drivingSpeed / 15.5);
-
-            }
-
-            for (int k = 0; k <= RadarMapManager.totalOldMaps; ++ k )
-            {
-                res.averages[k] = 0;
-                res.routesPerStartingTime[k] = new List<Color>();
-            }
-
-
-            foreach (MapRouteLeg leg in route.Legs)
-            {
-                   
-
-                   RoutePredictorResult current = await predictionsForLeg(leg, minutes);
-
-                   // add sub route itself
-                   res.routesCollection.AddRange(current.routesCollection);
-                   
-                    // merge leg result
-                   for (int k = 0; k <= RadarMapManager.totalOldMaps; ++k)
-                   {
-                       // update average
-                       res.averages[k] = (((double)numLegs - 1) / numLegs) * res.averages[k] + (1.0 / numLegs) * current.averages[k];
-                       // add sub route colors
-                       res.routesPerStartingTime[k].AddRange(current.routesPerStartingTime[k]);
-                      
-                   }
-
-
-                   TimeSpan legTime = leg.EstimatedDuration;
-                    // advance next leg starting time
-                    minutes += legTime.TotalMinutes * factor;
-       
-                    ++numLegs;
-            }
-
-            return res;
-        }
-        
-
-        public double MapRouteToEstimations(MapRoute mapRoute, out List<LegAnnotation> annotations, int startingMapIndex)
-        {
-
-            // this determines the radar map we will be using
-            double minutes = 0;
-            annotations = new List<LegAnnotation>();
-
-
-
-            // vars for calculating the mean
-            double mean = 0;
-            int numLegs = 1;
-
-            foreach (MapRouteLeg leg in mapRoute.Legs)
-            {
-                TimeSpan legTime = leg.EstimatedDuration;
-                int predictionMapIndex = minutesToMapIndex(minutes, legTime.Minutes);
-
-                predictionMapIndex = startingMapIndex + predictionMapIndex > 3 ? 3 : startingMapIndex + predictionMapIndex;
-
-                double legAvgRain = GeopathToAverageRain(leg.Path, this.Maps[predictionMapIndex]);
-
-                // get middle point of leg
-                BasicGeoposition position = leg.Path.Positions.ElementAt(leg.Path.Positions.Count / 2);
-                Geopoint middlePoint = new Geopoint(position);
-
-                // create the annotation
-                annotations.Add(new LegAnnotation(middlePoint, legAvgRain));
-
-                // advance next leg starting time
-                minutes += legTime.Minutes;
-
-                // advance the mean
-                mean = (((double)numLegs - 1) / numLegs) * mean + (1.0 / numLegs) * legAvgRain;
-
-                ++numLegs;
-            }
-
-            return mean;
-
-        }
-
-        private int minutesToMapIndex(double minutes, double estimatedDuration)
+        private static int minutesToMapIndex(double minutes, double estimatedDuration)
         {
 
             double absStart;
@@ -514,39 +574,81 @@ namespace RainMan.Tasks
 
         }
 
+
+
+
+        #region
+        public static double GeopathToAverageRain(Geopath path, RadarMap predictionMap)
+        {
+            int numPoints = 1;
+            double avg = 0;
+
+            // iterative mean, to prevent overflow
+            foreach (BasicGeoposition position in path.Positions)
+            {
+                Geopoint geopoint = new Geopoint(position);
+                double curr = predictionMap.getAverageRain(geopoint, 1);
+
+                avg = (((double)numPoints - 1) / numPoints) * avg + (1.0 / numPoints) * curr;
+
+                ++numPoints;
+
+            }
+            return avg;
+        }
+
+        public static double GeopathToAverageRain(Geopath path, RadarMap predictionMap, int startIndex, int endIndex)
+        {
+            int numPoints = 1;
+            double avg = 0;
+
+            // iterative mean, to prevent overflow
+            for (int i = startIndex; i <= endIndex; ++i)
+            {
+                BasicGeoposition position = path.Positions.ElementAt(i);
+                Geopoint geopoint = new Geopoint(position);
+                double curr = predictionMap.getAverageRain(geopoint, 1);
+
+                avg = (((double)numPoints - 1) / numPoints) * avg + (1.0 / numPoints) * curr;
+
+                ++numPoints;
+
+            }
+            return avg;
+        }
+        #endregion
+
+
     }
 
-
-
-
-    public class LegAnnotation
+    // represents a pin on the map
+    #region
+    public class Annotation
     {
-        // should be the middle point on the route, where to draw the pushpin
+
+
+        // location of the annotation
         public Geopoint Location { get; set; }
 
-        // holds the average rain over leg in a route
-        public double AverageOverLeg { get; set; }
+        // anchor point
+       //.// public Point AnchorPoint { get; set; }
 
-        // map pushpin
-        public DependencyObject Pushpin { get; set; }
+        public Ellipse ColorCircle { get; set; }
 
-        public LegAnnotation(Geopoint location, double averageRain)
+        public DependencyObject Pin { get; set; }
+
+        public Annotation(Geopoint location, ImageBrush pushpinImage)
         {
             this.Location = location;
-            this.AverageOverLeg = averageRain;
+            //this.AnchorPoint = new Point(0.0, 1.0);
+            Ellipse colorCircle;
+            Pin = MapUtils.getRouteRainPushPin(0, out colorCircle, pushpinImage);
+            this.ColorCircle = colorCircle;
 
-            // initialize the pushpin
-            this.Pushpin = MapUtils.getRouteRainPushPin(averageRain);
 
         }
-
-        public void addToMapControl(MapControl control)
-        {
-            MapControl.SetLocation(this.Pushpin, this.Location);
-            MapControl.SetNormalizedAnchorPoint(this.Pushpin, new Point(0.0, 1.0));
-            control.Children.Add(this.Pushpin);
-        }
-
-
     }
+
+
+    #endregion
 }

@@ -6,7 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Geolocation;
 using Windows.Foundation;
+using Windows.Storage.Streams;
 using Windows.UI;
+using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Maps;
@@ -69,7 +71,7 @@ namespace RainMan.Tasks
         }
 
         // color options: Colors.red, Colors.blue
-        public static DependencyObject getMapPin(Geopoint point, Color color)
+        public static DependencyObject getMapPin(Geopoint point, Color color, string optionalText)
         {
 
             //Creating a Grid element.
@@ -89,8 +91,30 @@ namespace RainMan.Tasks
 
             //Creating a Rectangle
             var myRectangle = new Rectangle { Fill = imgBrush, Height = 35, Width = 20 };
-            myRectangle.SetValue(Grid.RowProperty, 0);
-            myRectangle.SetValue(Grid.ColumnProperty, 0);
+
+            if (optionalText != null)
+            {
+                myRectangle.SetValue(Grid.RowProperty, 1);
+                myRectangle.SetValue(Grid.ColumnProperty, 0);
+                var stackPanel = new StackPanel();
+                stackPanel.Background = new SolidColorBrush(Colors.Black);
+                var textblock = new TextBlock() { Margin = new Thickness(5), Text = optionalText,Foreground = new SolidColorBrush(Colors.White), FontSize = 20, FontWeight = FontWeights.Bold, HorizontalAlignment = HorizontalAlignment.Center };
+                stackPanel.Children.Add(textblock);
+
+                //textblock.SetValue(Grid.RowProperty, 0);
+
+                //myGrid.Children.Add(textblock);
+
+                myGrid.Children.Add(stackPanel);
+                stackPanel.SetValue(Grid.RowProperty, 0);
+                stackPanel.Margin  = new Thickness(5);
+
+            }
+            else
+            {
+                myRectangle.SetValue(Grid.RowProperty, 0);
+                myRectangle.SetValue(Grid.ColumnProperty, 0);
+            }
 
             //Adding the Rectangle to the Grid
             myGrid.Children.Add(myRectangle);
@@ -101,7 +125,81 @@ namespace RainMan.Tasks
 
 
         // create a color push pin for a route leg, according to the given average rain 
-        public static DependencyObject getRouteRainPushPin(double averageRain)
+        // also returns the rectangle that holds the colour brush
+        public static DependencyObject getRouteRainPushPin(double averageRain, out Ellipse colorCircle, ImageBrush imageBrush)
+        {
+
+             RandomAccessStreamReference image = RandomAccessStreamReference.CreateFromUri(new Uri("ms-appx:///Assets/icons/icon1.png"));
+
+
+            //Creating a Grid element.
+            var myGrid = new Grid();
+
+            myGrid.Background = imageBrush;
+            myGrid.Width = 50;
+            myGrid.Height = 50;
+
+            Ellipse colorFill = new Ellipse() { Fill = new SolidColorBrush(ColorTranslator.rainToColor(averageRain)),
+                                                Width = 27, Height = 26,
+                                                };
+            colorFill.SetValue(Grid.RowProperty, 0);
+            colorFill.SetValue(Grid.ColumnProperty, 0);
+            colorFill.HorizontalAlignment = HorizontalAlignment.Center;
+            colorFill.VerticalAlignment = VerticalAlignment.Top;
+            colorFill.Margin = new Thickness(0, 6, 0, 0);
+            myGrid.Children.Add(colorFill);
+
+            colorCircle = colorFill;
+            
+            // y == 18 center
+            // y == 5 top
+            // size is probably 25, x offset 12, y offset 5
+
+            return myGrid;
+            
+
+        }
+
+        //  // create a color push pin for a route leg, according to the given average rain 
+        //// also returns the rectangle that holds the colour brush
+        //public static DependencyObject getRouteRainPushPin(double averageRain, out Rectangle colorRect)
+        //{
+        //    //Creating a Grid element.
+        //    var myGrid = new Grid();
+        //    myGrid.RowDefinitions.Add(new RowDefinition());
+        //    myGrid.RowDefinitions.Add(new RowDefinition());
+        //    myGrid.Background = new SolidColorBrush(Colors.Transparent);
+
+        //    // get color object from average rain
+        //    Color color = ColorTranslator.rainToColor(averageRain);
+
+        //    //Creating a Rectangle
+        //    var myRectangle = new Rectangle { Fill = new SolidColorBrush(color), Height = 20, Width = 20 };
+        //    myRectangle.SetValue(Grid.RowProperty, 0);
+        //    myRectangle.SetValue(Grid.ColumnProperty, 0);
+
+        //    //Adding the Rectangle to the Grid
+        //    myGrid.Children.Add(myRectangle);
+
+        //    //Creating a Polygon
+        //    var myPolygon = new Polygon()
+        //    {
+        //        Points = new PointCollection() { new Point(2, 0), new Point(22, 0), new Point(2, 40) },
+        //        Stroke = new SolidColorBrush(Colors.Black),
+        //        Fill = new SolidColorBrush(Colors.Black)
+        //    };
+        //    myPolygon.SetValue(Grid.RowProperty, 1);
+        //    myPolygon.SetValue(Grid.ColumnProperty, 0);
+
+        //    myGrid.Children.Add(myPolygon);
+        //    colorRect = myRectangle;
+        //    return myGrid;
+
+        //     Image = RandomAccessStreamReference.CreateFromUri(new Uri("ms-appx:///Assets/pin.png
+
+        //}
+
+        public static DependencyObject getTimeAnnotation(int timeMark)
         {
             //Creating a Grid element.
             var myGrid = new Grid();
@@ -110,15 +208,23 @@ namespace RainMan.Tasks
             myGrid.Background = new SolidColorBrush(Colors.Transparent);
 
             // get color object from average rain
-            Color color = ColorTranslator.rainToColor(averageRain);
+           // Color color = ColorTranslator.rainToColor(averageRain);
 
+
+            //Creating a textblock
+
+            var myText = new TextBlock { Text = string.Format("{0} minutes", timeMark * 10), FontSize = 20 };
+            myText.SetValue(Grid.RowProperty, 0);
+            myText.SetValue(Grid.ColumnProperty, 0);
+
+            
             //Creating a Rectangle
-            var myRectangle = new Rectangle { Fill = new SolidColorBrush(color), Height = 20, Width = 20 };
-            myRectangle.SetValue(Grid.RowProperty, 0);
-            myRectangle.SetValue(Grid.ColumnProperty, 0);
+           // var myRectangle = new Rectangle { Fill = new SolidColorBrush(color), Height = 20, Width = 20 };
+            //myRectangle.SetValue(Grid.RowProperty, 0);
+           // myRectangle.SetValue(Grid.ColumnProperty, 0);
 
             //Adding the Rectangle to the Grid
-            myGrid.Children.Add(myRectangle);
+            myGrid.Children.Add(myText);
 
             //Creating a Polygon
             var myPolygon = new Polygon()
@@ -131,8 +237,8 @@ namespace RainMan.Tasks
             myPolygon.SetValue(Grid.ColumnProperty, 0);
 
             myGrid.Children.Add(myPolygon);
+            
             return myGrid;
-
         }
 
         public static void addPinToMap(MapControl map, DependencyObject pin, Geopoint location)

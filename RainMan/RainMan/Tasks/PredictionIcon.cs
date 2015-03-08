@@ -18,6 +18,8 @@ namespace RainMan.Tasks
         public String ImagePath { get; set; }
         public String AvgInfo { get; set; }
         public Double Avg { set; get; }
+        public Double ItemWidth { get; set; }
+        public Double ItemHeight { get; set; }
 
 
         public PredictionIcon(double averageRain, int timeIndex, DateTime time)
@@ -27,6 +29,8 @@ namespace RainMan.Tasks
             AvgInfo = String.Format(" MM/HOUR: {0:0.00}", averageRain);
             InitImagePath(averageRain);
             Avg = averageRain;
+            ItemWidth = 170;
+            ItemHeight = 130;
         }
 
 
@@ -155,6 +159,7 @@ namespace RainMan.Tasks
         {
 
             var res = await __dataSource.getPredictionCollection(radarMapManager);
+            if (res == null) return null;
             NeedToUpdate = false;
             return res;
         }
@@ -162,24 +167,39 @@ namespace RainMan.Tasks
 
         private async Task<PredictionCollection> getPredictionCollection(RadarMapManager radarMapManager)
         {
+
+
+
+
             Geopoint geopoint;
             if (currentLocation == null)
             {
-                // get my current location
-                // locate current location
-                var locator = new Geolocator();
-                locator.DesiredAccuracyInMeters = 50;
 
-                var myPosition = await locator.GetGeopositionAsync(
-                      maximumAge: TimeSpan.FromMinutes(10),
-                     timeout: TimeSpan.FromSeconds(10)
-                );
 
-                geopoint = new Geopoint(new BasicGeoposition
+                try
                 {
-                    Latitude = myPosition.Coordinate.Latitude,
-                    Longitude = myPosition.Coordinate.Longitude
-                });
+
+                    // get my current location
+                    // locate current location
+                    var locator = new Geolocator();
+                    locator.DesiredAccuracyInMeters = 50;
+
+                    var myPosition = await locator.GetGeopositionAsync(
+                          maximumAge: TimeSpan.FromMinutes(10),
+                         timeout: TimeSpan.FromSeconds(10)
+                    );
+
+                    geopoint = new Geopoint(new BasicGeoposition
+                    {
+                        Latitude = myPosition.Coordinate.Latitude,
+                        Longitude = myPosition.Coordinate.Longitude
+                    });
+                }
+
+                catch
+                {
+                    return null;
+                }
 
             }
             else

@@ -82,6 +82,9 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ColorSlider.xaml.cs">
+      <DependentUpon>ColorSlider.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Common\NavigationHelper.cs" />
     <Compile Include="Common\ObservableDictionary.cs" />
     <Compile Include="Common\RelayCommand.cs" />
@@ -89,9 +92,16 @@
     <Compile Include="DataModels\ObjectSerializer.cs" />
     <Compile Include="DataModels\Path.cs" />
     <Compile Include="DataModels\PathGroup.cs" />
+    <Compile Include="DataModels\PixelSerializer.cs" />
     <Compile Include="DataTimeConverter.cs" />
+    <Compile Include="Entrance.xaml.cs">
+      <DependentUpon>Entrance.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GroupBuilder.xaml.cs">
       <DependentUpon>GroupBuilder.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="LoadingDialog.xaml.cs">
+      <DependentUpon>LoadingDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Main.xaml.cs">
       <DependentUpon>Main.xaml</DependentUpon>
@@ -105,6 +115,9 @@
     <Compile Include="RadarPage.xaml.cs">
       <DependentUpon>RadarPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="RainAmount.xaml.cs">
+      <DependentUpon>RainAmount.xaml</DependentUpon>
+    </Compile>
     <Compile Include="RouteBuilder.xaml.cs">
       <DependentUpon>RouteBuilder.xaml</DependentUpon>
     </Compile>
@@ -115,6 +128,9 @@
     <Compile Include="Routes.xaml.cs">
       <DependentUpon>Routes.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tasks\LocationsToEstimations.cs" />
+    <Compile Include="Tasks\PolygonComputations.cs" />
+    <Compile Include="Tasks\PredictionLoadingScreen.cs" />
     <Compile Include="Tasks\RadarMaps.cs" />
     <Compile Include="Tasks\ColorTranslator.cs" />
     <Compile Include="Tasks\DistanceOfEathPoints.cs" />
@@ -135,9 +151,14 @@
     <Content Include="Assets\bg6.jpg" />
     <Content Include="Assets\icons\bike.png" />
     <Content Include="Assets\icons\car.png" />
+    <Content Include="Assets\icons\icon1.png" />
+    <Content Include="Assets\icons\icon2.png" />
+    <Content Include="Assets\icons\logo.jpg" />
     <Content Include="Assets\icons\walking.png" />
     <Content Include="Assets\Logo.scale-240.png" />
+    <Content Include="Assets\radar\baseRange.png" />
     <Content Include="Assets\radar\mappin.png" />
+    <Content Include="Assets\radar\slider.png" />
     <Content Include="Assets\radar\waypointpin.png" />
     <Content Include="Assets\rain\moon.png" />
     <Content Include="Assets\rain\moon_cloud.png" />
@@ -157,7 +178,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="ColorSlider.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Entrance.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="GroupBuilder.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LoadingDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -170,6 +203,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="RadarPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="RainAmount.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -225,6 +262,11 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="RoutePredictorConverter\" />
+  </ItemGroup>
+  <ItemGroup>
+    <SDKReference Include="BehaviorsXamlSDKManaged, Version=12.0">
+      <Name>Behaviors SDK %28XAML%29</Name>
+    </SDKReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>

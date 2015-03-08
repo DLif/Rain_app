@@ -121,7 +121,7 @@ namespace RainMan
                 // When the navigation stack isn't restored navigate to the first page,
                 // configuring the new page by passing required information as a navigation
                 // parameter
-                if (!rootFrame.Navigate(typeof(Main), e.Arguments))
+                if (!rootFrame.Navigate(typeof(Entrance), e.Arguments))
                 {
                     throw new Exception("Failed to create initial page");
                 }

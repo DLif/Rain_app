@@ -43,7 +43,7 @@ namespace RainMan
         private List<Geopoint> wayPoints = new List<Geopoint>();
         private List<DependencyObject> wayPointsPins = new List<DependencyObject>();
         private List<MapPolyline> lineCollection = new List<MapPolyline>();
-
+        private int numPredictionImages = 3;
         
 
       
@@ -89,30 +89,47 @@ namespace RainMan
         /// <see cref="Frame.Navigate(Type, Object)"/> when this page was initially requested and
         /// a dictionary of state preserved by this page during an earlier
         /// session.  The state will be null the first time a page is visited.</param>
-        private void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
+        private async void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
 
             map.Center = RadarMapManager.center;
             map.ZoomLevel = 10D;
-
-
             this.undoAppBar.Visibility = Visibility.Collapsed;
-           // DependencyObject startPin = getBoundPin(this.source);
-            //DependencyObject endPin = getBoundPin(this.destination);
-
-            //this.map.Children.Add(startPin);
-            //this.map.Children.Add(endPin);
 
 
-            // update location of pin(s) on map
-           // MapControl.SetLocation(startPin, this.source);
-           // MapControl.SetNormalizedAnchorPoint(startPin, new Point(0.5, 1));
-           // MapControl.SetLocation(endPin, this.destination);
-           // MapControl.SetNormalizedAnchorPoint(endPin, new Point(0.5, 1));
+            ModalWindow window = new ModalWindow("Updating radar maps...", "This may take a few seconds", "Please do not close the app");
+            window.Dialog.ShowAsync();
+            Boolean error = false;
 
+            try
+            {
+
+                manager = await RadarMapManager.getRadarMapManager();
+                if(manager.error)
+                {
+                    error = true;
+                }
+
+            }
+            catch
+            {
+                error = true;
+            }
+
+            window.Dialog.Hide();
+
+            if(error)
+            {
+                MessageDialog diag = new MessageDialog("Could not update radar maps, please check your internet connection and try again later");
+                await diag.ShowAsync();
+                
+            }
 
 
         }
+
+
+        private RadarMapManager manager;
 
         /// <summary>
         /// Preserves state associated with this page in case the application is suspended or the
@@ -289,7 +306,19 @@ namespace RainMan
             }
         }
 
-        private void map_MapTapped(MapControl sender, MapInputEventArgs args)
+        private bool isPointInBounds(Geopoint point)
+        {
+            var res = PointTranslation.locationToPixel(point.Position.Latitude, point.Position.Longitude);
+            if(res < 0)
+            {
+                return false;
+            }
+            return true;
+
+
+        }
+
+        private async void map_MapTapped(MapControl sender, MapInputEventArgs args)
         {
 
             TipGrid.Visibility = Visibility.Collapsed;
@@ -298,6 +327,14 @@ namespace RainMan
                 return;
 
             Geopoint point = args.Location;
+
+            if(!isPointInBounds(point))
+            {
+                MessageDialog diag = new MessageDialog("Only locations inside of Israel are supported");
+                await diag.ShowAsync();
+                return;
+            }
+
 
             if(this.undoAppBar.Visibility == Visibility.Collapsed)
             {
@@ -351,11 +388,11 @@ namespace RainMan
         }
 
 
-        private Boolean pathGenerated = false;
+        
 
         private MapPolygon polygon = null;
 
-        private async void acceptAppBar_Click(object sender, RoutedEventArgs e)
+        private void acceptAppBar_Click(object sender, RoutedEventArgs e)
         {
 
             if (this.polygon == null)
@@ -395,34 +432,7 @@ namespace RainMan
 
         }
 
-        private async Task createNewPath()
-        {
-            // build path way points
-            List<Geopoint> actualWayPoints = new List<Geopoint>();
-            //actualWayPoints.Add(this.source);
-           // actualWayPoints.AddRange(this.wayPoints);
-           // actualWayPoints.Add(this.destination);
-
-            // now we're going to seriallize EVERYTHING
-            byte[] pathData = PathSerializer.ObjetToByteArray(actualWayPoints);
-
-            // great, now create a new path object
-            DataModels.Path pt = new DataModels.Path();
-            pt.groupId = this.currentGroup.Id;
-            pt.PathClass = pathData;
-           
-            pt.UserId = App.userId;
-
-            ModalWindow window = new ModalWindow("Uploading path to cloud", "Please wait ... ", "");
-            window.Dialog.ShowAsync();
-
-           // await pathTable.InsertAsync(pt);
-
-            window.Dialog.Hide();
-
-
-        }
-
+     
 
         private async void addressTextBox_KeyDown(object sender, KeyRoutedEventArgs e)
         {
@@ -453,6 +463,16 @@ namespace RainMan
                 if (result.Status == MapLocationFinderStatus.Success && result.Locations.Count > 0)
                 {
 
+
+                    Geopoint location = result.Locations[0].Point;
+                    if (!isPointInBounds(location))
+                    {
+                        MessageDialog diag = new MessageDialog("Only locations inside of Israel are supported");
+                        await diag.ShowAsync();
+                        return;
+                    }
+
+
                     addWayPoint(result.Locations[0].Point);
                     await map.TrySetViewAsync(result.Locations[0].Point);
 
@@ -466,8 +486,7 @@ namespace RainMan
 
             catch (System.UnauthorizedAccessException)
             {
-                // todo: critical error
-                // remember to implement this
+                errorText = "Please authorize map services !";
             }
             catch (TaskCanceledException)
             {
@@ -477,7 +496,7 @@ namespace RainMan
             if (errorText != "")
             {
                 MessageDialog diag = new MessageDialog(errorText);
-                diag.ShowAsync();
+                await diag.ShowAsync();
             }
 
 
@@ -504,37 +523,50 @@ namespace RainMan
         private async void GoBtn_Click(object sender, RoutedEventArgs e)
         {
 
-            if(progress.IsActive == true)
+            if (progress.IsActive == true)
             {
                 return;
             }
+            this.ResultText.Visibility = Visibility.Collapsed;
             DateTime time = date.Date.LocalDateTime;
-
             TimeSpan diff = DateTime.Now - time;
 
-            if(diff.TotalDays > 20)
+            if (diff.TotalDays > 30 )
             {
-                MessageDialog diag = new MessageDialog("Date is too old! Requests are limited to 20 days back");
+                MessageDialog diag = new MessageDialog("Date is too old! Requests are limited to 30 days back");
+                await diag.ShowAsync();
+                return;
+            }
+
+            else if(diff.TotalDays < 0)
+            {
+                MessageDialog diag = new MessageDialog("Invalid date! Please choose a day from the past (or today)");
                 await diag.ShowAsync();
                 return;
             }
 
             progress.IsActive = true;
             progress.Visibility = Visibility.Visible;
-            
-     
 
-            // now we need the number of images
-            // each hour should contain 6 images
-            int numImages = diff.Days * 24 * 6;
-            // now add todays images
-            numImages += DateTime.Now.Hour * 6;
+
 
 
             // first, get all points
             List<PixelRep> pixels = findAllPixels();
-            pixels.Clear();
-            pixels.Add(new PixelRep(255, 255));
+
+
+            if(pixels.Count > 25)
+            {
+                MessageDialog diag = new MessageDialog("Too many locations were chosen, the maximum supported limit is 25");
+                await diag.ShowAsync();
+                return;
+            }
+            var pixelCount = pixels.Count;
+
+            // build the polygon
+            var poly = new CustomPolygon(pixels.Count, pixels);
+            List<PixelRep> inside_points = PolygonPixels.getAllPointsInsidePolygon(poly);
+
 
             // finally, build the request!
             APIRequest request = new APIRequest(pixels);
@@ -542,30 +574,50 @@ namespace RainMan
             String encodedRequest = RainApiSerializer.SerializeRequest(request);
             var dict = new Dictionary<String, String>();
             dict.Add("places", encodedRequest);
-            numImages = 31;
-            dict.Add("picturesNum", numImages.ToString());
+            dict.Add("numDaysString", diff.Days.ToString());
+            Boolean error = false;
+
 
             try
             {
-                string result = await App.mobileClient.InvokeApiAsync<string>("RainAmount", System.Net.Http.HttpMethod.Get, dict);
+                double result = Double.Parse( await App.mobileClient.InvokeApiAsync<string>("RainAmount", System.Net.Http.HttpMethod.Get, dict));
+                if (this.usePredictions.IsOn)
+                {
+                    // add precitions data
+                    var x = this.numPredictionImages;
+
+                    pixels.AddRange(inside_points);
+                    result += future_calc(x, pixels);
+
+
+                }
+
+
+                double res = (result * (1 / 6.0)) / (inside_points.Count + pixelCount); 
+               
+                
+
 
                 this.progress.IsActive = false;
                 progress.Visibility = Visibility.Collapsed;
 
-
-                double res = (Double.Parse(result) * (1 / 6.0)) / 1000; // in liters
-
                 this.ResultText.Visibility = Visibility.Visible;
-                //this.ResultText.Text = string.Format("Total: {0} Litres", res);
-                this.ResultText.Text = string.Format("Total: {0} Litres", 0.23);
+                this.ResultText.Text = string.Format("Total: {0:0.000} MM average", res);
 
 
             }
             catch
             {
+                error = true;
+                
+            }
+
+            if(error)
+            {
                 MessageDialog diag = new MessageDialog("Server error while processing request");
-                diag.ShowAsync();
-                return;
+                await diag.ShowAsync();
+                this.progress.IsActive = false;
+                progress.Visibility = Visibility.Collapsed;
             }
 
         }
@@ -585,11 +637,78 @@ namespace RainMan
                 shapePixels.Add(new PixelRep(x_pixel, y_pixel));
             }
 
-            var poly = new CustomPolygon(shapePixels.Count, shapePixels);
-            return PolygonPixels.getAllPointsInsidePolygon(poly);
+            //var poly = new CustomPolygon(shapePixels.Count, shapePixels);
+            //return PolygonPixels.getAllPointsInsidePolygon(poly);
+            return shapePixels;
 
 
         }
+
+
+
+        private void usePredictions_Toggled(object sender, RoutedEventArgs e)
+        {
+            if(usePredictions.IsOn)
+            {
+                this.predictionNumBtn.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                this.predictionNumBtn.Visibility = Visibility.Collapsed;
+            }
+        }
+
+       
+
+        private void prediction30_Click(object sender, RoutedEventArgs e)
+        {
+            this.numPredictionImages = 3;
+            predictionNumBtn.Content = "Minutes: 30";
+            
+        }
+
+        private void prediction20_Click(object sender, RoutedEventArgs e)
+        {
+            this.numPredictionImages = 2;
+            predictionNumBtn.Content = "Minutes: 20";
+        }
+
+        private void prediction10_Click(object sender, RoutedEventArgs e)
+        {
+            this.numPredictionImages = 1;
+            predictionNumBtn.Content = "Minutes: 10";
+        }
+
+
+        private double future_calc(int future_images, List<PixelRep> polygon_points)
+        {
+            double power = 0.0;
+           // var poly = new CustomPolygon(polygon_points.Count, polygon_points);
+           // List<PixelRep> inside_points = PolygonPixels.getAllPointsInsidePolygon(poly);
+
+            int image_size_x = 512;
+            int image_size_y = 512;
+
+            for (int i = 4; i < 4 + future_images ; i++)
+            {
+                WriteableBitmap currentMap = manager.Maps.ElementAt(i).ReadableImage;
+                using (var buffer = currentMap.PixelBuffer.AsStream())
+                {
+                    Byte[] pixels = new Byte[4 * image_size_x * image_size_y];
+                    buffer.Read(pixels, 0, pixels.Length);
+                    foreach (PixelRep j in polygon_points)
+                    {
+
+                        power += ColorTranslator.power_to_radius(pixels, j.X,j.Y, 1, currentMap.PixelWidth);
+                        
+                    }
+                }
+
+            }
+            return power;
+        }
+
+
 
 
     }

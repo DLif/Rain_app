@@ -30,7 +30,7 @@
     <Grid x:Name="LayoutRoot" DataContext="{Binding}" >
         <Grid.Resources>
             <DataTemplate x:Key="StandardTripleLineItemTemplate">
-                <Grid HorizontalAlignment="Stretch">
+                <Grid HorizontalAlignment="Stretch" Margin="10">
                    
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto">
@@ -52,12 +52,12 @@
 
                     <TextBlock Grid.Row="0" Text="{Binding GroupName}" Foreground="{Binding Selected,Converter={StaticResource toColorBrush}}" FontSize="{Binding Selected, Converter={StaticResource toTextSize}}" TextTrimming="CharacterEllipsis"/>
 
-                    <TextBlock Grid.Row="1" Text="From: " FontSize="18" Margin="10, 0, 0, 0"/>
-                    <TextBlock Grid.Row="2" Text="{Binding StartName}" FontSize="18"  Margin="20, 0, 0, 0" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Grid.Row="1" FontWeight="Medium" Text="From: " FontSize="18" Margin="10, 0, 0, 0"/>
+                    <TextBlock Grid.Row="2" Text="{Binding StartName}" FontSize="18"  Margin="25, 0, 0, 0" TextTrimming="CharacterEllipsis"/>
 
 
-                    <TextBlock  Grid.Row="3"  Text="To: " FontSize="18" Margin="10, 0, 0, 0"/>
-                    <TextBlock  Grid.Row="4" Text="{Binding FinishName}"  FontSize="18" Margin="20, 0, 0, 0" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock  Grid.Row="3" FontWeight="Medium"  Text="To: " FontSize="18" Margin="10, 0, 0, 0"/>
+                    <TextBlock  Grid.Row="4" Text="{Binding FinishName}"  FontSize="18" Margin="25, 0, 0, 0" TextTrimming="CharacterEllipsis"/>
 
                 </Grid>
 
@@ -80,15 +80,7 @@
                 <Grid DataContext="{Binding QuickRouteOptions}">
                     
                     <Grid.Resources>
-                        <Storyboard x:Name="FadeOutStory" Completed="FadeOutStory_Completed" >
-                            <DoubleAnimation EnableDependentAnimation="True" From="1" To="0" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="transportImagebrush" Duration="0:0:0.3"></DoubleAnimation>
-                            
-                        </Storyboard>
-                        <Storyboard x:Name="FadeInStory" >
-                            <DoubleAnimation EnableDependentAnimation="True" From="0" To="1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="transportImagebrush" Duration="0:0:0.3"></DoubleAnimation>
-
-                        </Storyboard>
-
+                       
                     </Grid.Resources>
                     
                     <Grid.RowDefinitions>
@@ -187,7 +179,19 @@
             </PivotItem>
             <PivotItem x:Name="GroupPivot" Header="my routes" DataContext="{Binding PathGroups}">
                 <Grid DataContext="{Binding}" HorizontalAlignment="Stretch">
-                <ListView x:Name="groupList"
+                    
+                    <Grid.Resources>
+                        
+                        <Storyboard x:Name="fadeInList">
+                            <DoubleAnimation From="0" To="1" Duration="0:0:0.5" Storyboard.TargetName="groupList" Storyboard.TargetProperty="Opacity"/>
+
+                        </Storyboard>
+
+                       
+
+                    </Grid.Resources>
+                    
+                    <ListView x:Name="groupList"
 						AutomationProperties.AutomationId="PathGroupItem"
 						AutomationProperties.Name="Paths in path group"
 						SelectionMode="Single"
@@ -195,12 +199,14 @@
                         Margin="0, 0, 0, 50"
                         VerticalAlignment="Stretch"
 						ItemsSource="{Binding}"
+                        Opacity="0"
 						ItemTemplate="{StaticResource StandardTripleLineItemTemplate}"
 						HorizontalAlignment="Stretch"
 						ContinuumNavigationTransitionInfo.ExitElementContainer="True" SelectionChanged="groupList_SelectionChanged" ItemClick="groupList_ItemClick">
                         
-                </ListView>
-
+                    </ListView>
+                    <ProgressRing x:Name="loadingListProgress" Background="Transparent" Margin="0, 100, 0, 0" IsActive="True" HorizontalAlignment="Center" VerticalAlignment="Center"></ProgressRing>
+                    <TextBlock x:Name="loadingErrorMessage" Text="Downloading groups ..." Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" FontSize="20"></TextBlock>
                 </Grid>
 
             </PivotItem>
@@ -222,6 +228,16 @@
                     <DoubleAnimation EnableDependentAnimation="true" x:Name="hideettingsGrid" From="1" To="0" Duration="0:0:0.5" Storyboard.TargetName="SettingsGrid" Storyboard.TargetProperty="Opacity"/>
 
                 </Storyboard>
+
+                <Storyboard x:Name="FadeOutStory" Completed="FadeOutStory_Completed" >
+                    <DoubleAnimation EnableDependentAnimation="True" From="1" To="0" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="transportImagebrush" Duration="0:0:0.3"></DoubleAnimation>
+
+                </Storyboard>
+                <Storyboard x:Name="FadeInStory" >
+                    <DoubleAnimation EnableDependentAnimation="True" From="0" To="1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="transportImagebrush" Duration="0:0:0.3"></DoubleAnimation>
+
+                </Storyboard>
+
 
             </Grid.Resources>
             <Grid.Background>
@@ -264,7 +280,7 @@
                    
                     <Button Grid.Column="1" x:Name="transportButton" Width="30" Height="50" BorderThickness="0" HorizontalAlignment="Center" VerticalAlignment="top" Margin="0, 20, 0, 0" BorderBrush="White" Foreground="White">
                         <Button.Background>
-                            <ImageBrush x:Name="transportImagebrush"   ImageSource="ms-appx:///Assets/icons/walking.png" Stretch="Uniform" ></ImageBrush>
+                            <ImageBrush x:Name="transportImagebrush"   ImageSource="ms-appx:///Assets/icons/bike.png" Stretch="Uniform" ></ImageBrush>
                         </Button.Background>
                         <Button.Flyout>
 

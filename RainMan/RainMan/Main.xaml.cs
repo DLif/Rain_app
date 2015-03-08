@@ -77,41 +77,104 @@ namespace RainMan
         private async void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
 
+
+//0.1           0,93, 243 ----> 0.07
+//0.2           12, 190, 190 --> 0.72
+//0.7           1, 171, 171 --> 0.72
+//1.2           0, 134, 92 --> 1.35
+//2             3, 155, 54 --> 2.94
+//4             12, 177, 47 --> 3.84
+//6             12, 202, 34 --> 4.54
+//9             27, 217, 33 --> 5.16
+//13            55, 234, 55 --> 5.39
+//18            240, 244, 89 --> 19.52
+//24            246, 218, 56 --> 23.31
+//30            235, 182, 52 --> 26.43
+//40            230, 143, 40 --> 30.2
+           
+
+            //var x = ColorTranslator.RBG_to_power(0, 93, 243); 
+
+            //x = ColorTranslator.RBG_to_power(12, 190, 190); 
+
+            //x = ColorTranslator.RBG_to_power(1, 171, 171); 
+
+            //x = ColorTranslator.RBG_to_power(0, 134, 92); 
+
+            //x = ColorTranslator.RBG_to_power(3, 155, 54); 
+
+            //x = ColorTranslator.RBG_to_power(12, 177, 47); 
+
+            //x = ColorTranslator.RBG_to_power(12, 202, 34); 
+
+            //x = ColorTranslator.RBG_to_power(27, 217, 33); 
+
+            //x = ColorTranslator.RBG_to_power(55, 234, 55); 
+
+            //x = ColorTranslator.RBG_to_power(240, 244, 89); 
+
+            //x = ColorTranslator.RBG_to_power(246, 218, 56); 
+
+            //x = ColorTranslator.RBG_to_power(235, 182, 52); 
+
+            //x = ColorTranslator.RBG_to_power(230, 143, 40); 
+
+            ////  x = ColorTranslator.RBG_to_power(255, 220, 2); // should be 24 really is 23.9
+
+            //// x = ColorTranslator.RBG_to_power(255, 182, 2); // should be 30 really is 27.09
+
             if(Frame.BackStackDepth > 0)
             {
                 Frame.BackStack.Clear();
             }
 
-            // create radar map manager
-            this.mapManager = RadarMapManager.getRadarMapManager();
+            
 
             ModalWindow temporaryDialog = new ModalWindow();
             ContentDialog diag = temporaryDialog.Dialog;
-            Boolean dialogShown = false;
+            Boolean error = false;
 
+            diag.ShowAsync();
 
-            if (this.mapManager.NeedToUpdate())
-            {
+           
 
-                // download new radar maps, update prediction icons
-                diag.ShowAsync();
-                dialogShown = true;
+           try
+           {
+                    // create radar map manager
+                    this.mapManager = await RadarMapManager.getRadarMapManager();
+                    if(mapManager.error)
+                    {
+                        error = true;
+                    }
+            }
 
-                try
-                {
-                    await mapManager.updateRadarMaps(false);
-                }
-                catch
-                {
+           catch
+           {
 
-                    diag.Hide();
-                    MessageDialog errorDialog = new MessageDialog("could not connect to server, try again later", "Oops");
-                    errorDialog.ShowAsync();
-                    return;
-                }
+                error = true;
+                   
+           }
+
+           if(error)
+           {
+                diag.Hide();
+
+                MessageDialog dialog = new MessageDialog("Sorry, we failed to update the app with current data, it seems that the server is temporary down or your system clock is incorrect, or you are not connected to the internet");
+                await dialog.ShowAsync();
+
 
             }
 
+            if(e.NavigationParameter != null && !this.defaultViewModel.ContainsKey("IconCollection"))
+            {
+                // first time only
+                var icons = e.NavigationParameter as PredictionCollection;
+                this.defaultViewModel["IconCollection"] = icons.PredictionIcons;
+                this.defaultViewModel["Selection"] = icons.PredictionIcons.ElementAt(0);
+                this.waterRec.Height = RainToHeight.rainToHeight(icons.PredictionIcons.ElementAt(0).Avg);
+            }
+
+          
             if (PredictionIconDataSource.NeedToUpdate)
             {
                 //if(!dialogShown)
@@ -120,18 +183,38 @@ namespace RainMan
                 //    dialogShown = true;
                 //}
 
+                var screenBounds = Window.Current.Bounds;
+                var heightResizeFactor = 130.0 / 666.666;
+                var widthResizeFactor = 170.0 / 400;
+
                 var icons = await PredictionIconDataSource.getData(this.mapManager);
-                this.defaultViewModel["IconCollection"] = icons;
+
+                if(icons == null)
+                {
+                    MessageDialog msg = new MessageDialog("Sorry, an unexpected error occured, please try again later");
+                    await msg.ShowAsync();
+                }
+
+                foreach(var icon in icons.PredictionIcons)
+                {
+                    icon.ItemHeight = heightResizeFactor * screenBounds.Height;
+                    icon.ItemWidth = widthResizeFactor * screenBounds.Width;
+                }
+                this.defaultViewModel["IconCollection"] = icons.PredictionIcons;
+
+               
+                //this.defaultViewModel["FirstItem"] = icons.PredictionIcons.ElementAt(0);
+                //this.defaultViewModel["SecondItem"] = icons.PredictionIcons.ElementAt(0);
+                //this.defaultViewModel["ThirdItem"] = icons.PredictionIcons.ElementAt(0);
+                //this.defaultViewModel["FourthItem"] = icons.PredictionIcons.ElementAt(0);
+
                 this.defaultViewModel["Selection"] = icons.PredictionIcons.ElementAt(0);
                 this.waterRec.Height = RainToHeight.rainToHeight(icons.PredictionIcons.ElementAt(0).Avg);
                 
             }
 
-            var x = (PredictionCollection)this.defaultViewModel["IconCollection"];
-            
-         
-            if (dialogShown)
-                diag.Hide();
+
+           diag.Hide();
 
 
 
@@ -218,6 +301,16 @@ namespace RainMan
         private void routesAppBar_Click(object sender, RoutedEventArgs e)
         {
             Frame.Navigate(typeof(Routes));
+        }
+
+        private void rainAreas_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(RainAmount));
+        }
+
+        private void commandBar_Opened(object sender, object e)
+        {
+
         }
 
        

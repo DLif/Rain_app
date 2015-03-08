@@ -27,7 +27,7 @@
 
         </DataTemplate>
         <DataTemplate x:Key="IconTemplate">
-            <StackPanel HorizontalAlignment="center" Margin="5,5,5,5" Width="170" Height="130" >
+            <StackPanel HorizontalAlignment="center" Margin="5,5,5,5" Width="{Binding ItemWidth}" Height="{Binding ItemHeight}" >
                 <StackPanel.Background>
                     <SolidColorBrush Color="white" Opacity="0.15" />
                 </StackPanel.Background>
@@ -90,13 +90,13 @@
     </Page.Resources>
 
     <Page.BottomAppBar>
-        <CommandBar x:Name="commandBar" Foreground="Black" Opacity="0" Background="White">
+        <CommandBar x:Name="commandBar" Foreground="Black" Opacity="0" Background="White" Opened="commandBar_Opened">
             <AppBarButton x:Name="mapAppButton" Label="Radar Map" Click="mapAppButton_Click" >
                 <AppBarButton.Icon>
                     <SymbolIcon x:Name="RadarMapButton" Symbol="Map"/>
                 </AppBarButton.Icon>
             </AppBarButton>
-            <AppBarButton x:Name="locationChangeButton" Icon="MapPin" Label="Location" />
+            <AppBarButton x:Name="rainAreas" Icon="MapPin" Label="Areas" Click="rainAreas_Click" />
             <AppBarButton x:Name="routesAppBar" Label="Routes" Click="routesAppBar_Click">
                 <AppBarButton.Icon>
                     <SymbolIcon Height="40" Symbol="Directions" VerticalAlignment="Bottom"/>
@@ -173,7 +173,7 @@
 
             <GridView x:Name="predictionGrid" VerticalAlignment="Center" HorizontalAlignment="Left"
                       
-				ItemsSource="{Binding PredictionIcons}"
+				ItemsSource="{Binding}"
 				AutomationProperties.AutomationId="ItemGridView"
 				AutomationProperties.Name="Items In Group"
 				ItemTemplate="{StaticResource IconTemplate}"
@@ -195,5 +195,10 @@
 
 
         </Grid>
-    </Grid>
+      
+            
+            
+            
+        </Grid>
+    
 </Page>

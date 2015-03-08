@@ -45,15 +45,15 @@ namespace RainMan
 
     public class EstimatedTimeConverter : IValueConverter
     {
-        public static int factor = 1;
+        
 
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            TimeSpan span = (TimeSpan)value;
+            double minutes = (double)value;
 
-            span = TimeSpan.FromTicks(span.Ticks * factor);
+            TimeSpan span = TimeSpan.FromMinutes(minutes);
 
-            return string.Format("Estimated time: {0}:{1} hours", span.Hours, span.Minutes == 0 ? "00" : span.Minutes.ToString() );
+            return string.Format("Estimated time: {0}:{1} hours", span.Hours, span.Minutes  < 10 ? "0" + span.Minutes.ToString() : span.Minutes.ToString() );
 
         }
 
@@ -88,7 +88,7 @@ namespace RainMan
         {
             double avgRain = (double)value;
 
-            return avgRain.ToString() + " MM\\Hour";
+            return String.Format("Average rain: {0:0.00}",avgRain) + " MM\\Hour";
 
         }
 

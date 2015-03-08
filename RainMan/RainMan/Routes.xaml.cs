@@ -141,8 +141,8 @@ namespace RainMan
         private QuickRouteOptions quickRouteHubOptions = new QuickRouteOptions();
 
         // arguments for prediction
-        private int maxStallTime = 30;
-        private RouteKind routeKind = RouteKind.WALK;
+        private int maxStallTime = 3;  //30 minutes forward
+        private RouteKind routeKind = RouteKind.BIKE;
         private int numTimeSlots = 10;
 
         public Routes()
@@ -150,6 +150,7 @@ namespace RainMan
             this.InitializeComponent();
             DisplayInformation.AutoRotationPreferences = DisplayOrientations.Portrait;
             this.NavigationCacheMode = NavigationCacheMode.Required;
+            //this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Disabled;
             this.navigationHelper = new NavigationHelper(this);
             this.navigationHelper.LoadState += this.NavigationHelper_LoadState;
             this.navigationHelper.SaveState += this.NavigationHelper_SaveState;
@@ -186,6 +187,8 @@ namespace RainMan
         private async void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
 
+
+            this.defaultViewModel["PathGroups"] = new List<PathGroupWrapper>();
 
             this.predictAppBarGroup.Visibility = Visibility.Collapsed;
             this.manageGroupAppBar.Visibility = Visibility.Collapsed;
@@ -226,12 +229,41 @@ namespace RainMan
                 }
             }
 
-            // load user specific groups
-            //  var x = await this.groupsTable.ToCollectionAsync<PathGroup>();
-            var x = await this.groupsTable.Where(item => item.UserId == App.userId).ToCollectionAsync<PathGroup>();
 
+            try
+            {
 
-            this.defaultViewModel["PathGroups"] = wrapGroups(x);
+                // load user specific groups
+                loadingErrorMessage.Text = "Downloading user groups ... ";
+                loadingErrorMessage.Visibility = Visibility.Visible;
+                loadingListProgress.Visibility = Visibility.Visible;  
+                var x = await this.groupsTable.Where(item => item.UserId == App.userId).ToCollectionAsync<PathGroup>();
+                this.loadingListProgress.IsActive = false;
+                this.loadingListProgress.Visibility = Visibility.Collapsed;
+
+                this.defaultViewModel["PathGroups"] = wrapGroups(x);
+                if(x.Count == 0)
+                {
+
+                    loadingErrorMessage.Text = "No groups created";
+                }
+                else
+                {
+                    loadingErrorMessage.Visibility = Visibility.Collapsed;
+                    fadeInList.Begin();
+                   
+                }
+               
+            }
+
+            catch
+            {
+                this.loadingListProgress.Visibility = Visibility.Collapsed;
+                loadingErrorMessage.Visibility = Visibility.Visible;
+                loadingErrorMessage.Text = "Oops! server is down";
+
+            }
+           
 
         }
 
@@ -296,7 +328,7 @@ namespace RainMan
             List<BasicGeoposition> basicPositions = new List<BasicGeoposition>();
             basicPositions.Add(quickRouteHubOptions.Points.ElementAt(0).Location.Position);
             basicPositions.Add(quickRouteHubOptions.Points.ElementAt(1).Location.Position);
-
+            Boolean error = false;
             try
             {
 
@@ -304,8 +336,7 @@ namespace RainMan
 
                 if (!result)
                 {
-                    MessageDialog errorDialog = new MessageDialog("Sorry, something went wrong with the mapping service!", "Oops");
-                    errorDialog.ShowAsync();
+                    error = true;
                 }
                 else
                 {
@@ -314,10 +345,15 @@ namespace RainMan
             }
             catch
             {
+                error = true;
+               
 
+            }
+
+            if (error)
+            {
                 MessageDialog errorDialog = new MessageDialog("Sorry, something went wrong with the mapping service!", "Oops");
-                errorDialog.ShowAsync();
-
+                await errorDialog.ShowAsync();
             }
 
         }
@@ -363,25 +399,25 @@ namespace RainMan
 
         private void time0_Click(object sender, RoutedEventArgs e)
         {
-            this.maxStallTime = 0;
+            this.maxStallTime = 0; // how many predictions maps we're willing to use
             timeButton.Content = String.Format("{0} minutes", 0);
         }
 
         private void time10_Click(object sender, RoutedEventArgs e)
         {
-            this.maxStallTime = 10;
+            this.maxStallTime = 1;
             timeButton.Content = String.Format("{0} minutes", 10);
         }
 
         private void time20_Click(object sender, RoutedEventArgs e)
         {
-            this.maxStallTime = 20;
+            this.maxStallTime = 2;
             timeButton.Content = String.Format("{0} minutes", 20);
         }
 
         private void time30_Click(object sender, RoutedEventArgs e)
         {
-            this.maxStallTime = 30;
+            this.maxStallTime = 3;
             timeButton.Content = String.Format("{0} minutes", 30);
         }
 
@@ -579,21 +615,45 @@ namespace RainMan
             Geopoint groupDestPoint = GeopointSerializer.ByteArrayToObject(this.selectedGroup.DestinationPoint);
 
             // fetch routes from cloud
+            bool error = false;
+            try
+            {
 
-            var paths = await pathTable.Where(item => item.UserId == App.userId).ToCollectionAsync<DataModels.Path>();
-            var groupPaths = paths.Where(item => item.groupId == this.selectedGroup.Id).ToList();
+                var paths = await pathTable.Where(item => item.UserId == App.userId).ToCollectionAsync<DataModels.Path>();
+                var groupPaths = paths.Where(item => item.groupId == this.selectedGroup.Id).ToList();
 
-            var decodedPaths = PathGroup.toGeopathList(groupPaths);
-            var names = PathGroup.toNameList(groupPaths);
-           
-            RoutePredictionArgs args = new RoutePredictionArgs(groupStartPoint,
+                if(groupPaths.Count == 0)
+                {
+                    MessageDialog diag = new MessageDialog("Selected group is empty! Please add routes to the group first");
+                    await diag.ShowAsync();
+                    return;
+                }
+
+                var decodedPaths = PathGroup.toGeopathList(groupPaths);
+                var names = PathGroup.toNameList(groupPaths);
+                RoutePredictionArgs args = new RoutePredictionArgs(groupStartPoint,
                                                                groupDestPoint,
                                                                decodedPaths, this.routeKind, this.maxStallTime, this.numTimeSlots, names
                                                                );
-            Frame.Navigate(typeof(RoutePredictions), args);
+                Frame.Navigate(typeof(RoutePredictions), args);
 
+            }
 
+            catch
+            {
 
+                error = true;
+                // error occured
+                
+            }
+
+            if(error)
+            {
+                MessageDialog diagg = new MessageDialog("Oops, connection with server was lost. Please try again later");
+                await diagg.ShowAsync();
+            }
+
+            
 
         }
 
@@ -613,10 +673,10 @@ namespace RainMan
 
             if (selected)
             {
-                return new SolidColorBrush(Colors.DarkCyan);
+                return new SolidColorBrush(Colors.Blue);
             }
             else
-                return new SolidColorBrush(Colors.White);
+                return new SolidColorBrush(Colors.Black);
 
         }
 
@@ -634,7 +694,7 @@ namespace RainMan
 
             if (selected)
             {
-                return 25;
+                return 30;
             }
             else
                 return 20;

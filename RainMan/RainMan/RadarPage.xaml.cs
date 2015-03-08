@@ -24,6 +24,7 @@ using Windows.UI.Xaml.Media.Imaging;
 using RainMan.Tasks;
 using Windows.Services.Maps;
 using System.Threading.Tasks;
+using System.Collections.ObjectModel;
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
 
@@ -87,34 +88,41 @@ namespace RainMan
         private async void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
 
-            // get the singleton
-            this.mapManager = RadarMapManager.getRadarMapManager();
-
+      
             ModalWindow temporaryDialog = new ModalWindow();
             ContentDialog dialog = temporaryDialog.Dialog;
             dialog.ShowAsync();
 
+            Boolean error = false;
+
             try
             {
-                await this.mapManager.updateRadarMaps(true);
-
+                this.mapManager = await RadarMapManager.getRadarMapManager();
+                if(this.mapManager.error)
+                {
+                    error = true;
+                    hideBar.Begin(); 
+                }
             }
             catch
             {
+    
+                error = true;
+                hideBar.Begin();  
 
-                dialog.Hide();
-                MessageDialog diag = new MessageDialog("Oops, our servers are down! please try again later", "Oops");
-                hideBar.Begin();
-                diag.ShowAsync();
-
-                return;
-                // TODO:
-                // navigate back to main page (?)
             }
 
             dialog.Hide();
-            // set view data
-            this.defaultViewModel["RadarMaps"] = mapManager.Maps;
+
+            if(error)
+            {
+                MessageDialog diag = new MessageDialog("Failed to update radar maps, old maps will be used instead. It seems our server is temporary unavailable or your system clock is incorrect, or you are not connected to the internet", "Oops");
+                await diag.ShowAsync();
+                
+            }
+
+
+            attachRadarMapsToMap(mapManager.Maps);
             this.defaultViewModel["oldestTime"] = mapManager.Maps.ElementAt(0).Time;
             this.defaultViewModel["newestTime"] = mapManager.Maps.ElementAt(mapManager.Maps.Count-1).Time;
             this.defaultViewModel["currentTime"] = mapManager.Maps.ElementAt(RadarMapManager.totalOldMaps).Time;
@@ -124,6 +132,37 @@ namespace RainMan
 
 
         }
+
+        private void attachRadarMapsToMap(ObservableCollection<RadarMap> maps)
+        {
+            foreach(RadarMap map in maps)
+            {
+                Image image = new Image();
+                image.Visibility = Visibility.Collapsed;
+                
+                image.Height = 512;
+                image.Width = 512;
+                image.Source = map.ImageSrc;
+
+                MapControl.SetLocation(image, map.Point);
+                MapControl.SetNormalizedAnchorPoint(image, new Point(0.5, 0.5));
+                this.map.Children.Add(image);
+                
+            }
+
+            // show current map
+            Image currentMapImage = this.map.Children.ElementAt(RadarMapManager.totalOldMaps) as Image;
+            currentMapImage.Visibility = Visibility.Visible;
+
+        }
+
+         //<Image Source="{Binding ImageSrc}" Height="{Binding Height}" Width="{Binding Width}"
+         //                  Visibility="{Binding Visibile}"
+         //                  Maps:MapControl.Location="{Binding Point}"
+         //                  Maps:MapControl.NormalizedAnchorPoint="{Binding AnchorPoint}"
+         //                  ImageOpened="Image_ImageOpened">
+
+         //               </Image>
 
         /// <summary>
         /// Preserves state associated with this page in case the application is suspended or the
@@ -167,59 +206,6 @@ namespace RainMan
         #endregion
 
 
-
-
-        public static GeoboundingBox GetBounds(/*this*/ MapControl map)
-        {
-            Geopoint topLeft = null;
-
-            try
-            {
-                map.GetLocationFromOffset(new Windows.Foundation.Point(0, 0), out topLeft);
-            }
-            catch
-            {
-                var topOfMap = new Geopoint(new BasicGeoposition()
-                {
-                    Latitude = 85,
-                    Longitude = 0
-                });
-
-                Windows.Foundation.Point topPoint;
-                map.GetOffsetFromLocation(topOfMap, out topPoint);
-                map.GetLocationFromOffset(new Windows.Foundation.Point(0, topPoint.Y), out topLeft);
-            }
-
-            Geopoint bottomRight = null;
-            try
-            {
-                map.GetLocationFromOffset(new Windows.Foundation.Point(map.ActualWidth, map.ActualHeight), out bottomRight);
-            }
-            catch
-            {
-                var bottomOfMap = new Geopoint(new BasicGeoposition()
-                {
-                    Latitude = -85,
-                    Longitude = 0
-                });
-
-                Windows.Foundation.Point bottomPoint;
-                map.GetOffsetFromLocation(bottomOfMap, out bottomPoint);
-                map.GetLocationFromOffset(new Windows.Foundation.Point(0, bottomPoint.Y), out bottomRight);
-            }
-
-            if (topLeft != null && bottomRight != null)
-            {
-                return new GeoboundingBox(topLeft.Position, bottomRight.Position);
-            }
-
-            return null;
-        }
-
-        private void location_TextChanged(object sender, TextChangedEventArgs e)
-        {
-
-        }
 
         private void location_GotFocus(object sender, RoutedEventArgs e)
         {
@@ -289,7 +275,6 @@ namespace RainMan
 
         private async void AppBarButton_Click(object sender, RoutedEventArgs e)
         {
-
 
 
 
@@ -386,7 +371,7 @@ namespace RainMan
             if (errorOccured)
             {
                 MessageDialog dialog = new MessageDialog(error);
-                dialog.ShowAsync();
+                await dialog.ShowAsync();
             }
 
         }
@@ -581,11 +566,11 @@ namespace RainMan
 
             int val = (int)(((Slider)sender).Value);
             int nextMapIndex = 0;
-            this.mapManager.Maps.ElementAt(currentMapIndex).setVisible(false);
+            this.map.Children.ElementAt(currentMapIndex).SetValue(VisibilityProperty, Visibility.Collapsed);
 
             nextMapIndex = val / 5;
 
-            this.mapManager.Maps.ElementAt(nextMapIndex).setVisible(true);
+            this.map.Children.ElementAt(nextMapIndex).SetValue(VisibilityProperty, Visibility.Visible);
             this.currentMapIndex = nextMapIndex;
 
             // update map time
@@ -599,13 +584,16 @@ namespace RainMan
         private void map_ZoomLevelChanged(MapControl sender, object args)
         {
 
+
+            if (this.mapManager == null)
+                return;
             var maps = this.mapManager.Maps;
 
             if (maps.Count > 0)
             {
                 double currScale = getScale();
                 double resizeParam = this.baseScale / currScale;
-                var currentMap = maps.ElementAt(currentMapIndex);
+                var currentMap = (Image)this.map.Children.ElementAt(currentMapIndex);
 
                 currentMap.Height = 512 * resizeParam;
                 currentMap.Width = 512 * resizeParam;
@@ -614,13 +602,6 @@ namespace RainMan
         }
 
 
-
-        private void Image_ImageOpened(object sender, RoutedEventArgs e)
-        {
-
-
-
-        }
 
         private bool flyoutOpened = false;
 
@@ -674,11 +655,39 @@ namespace RainMan
                         this.errorText.Text = "Oops! failed to navigate to location";
                         this.errorText.Visibility = Visibility.Visible;
                         locationFindBar.Visibility = Visibility.Collapsed;
+                        
 
                     }
                     else
                     {
                         this.Flyout.Hide();
+
+
+                        // handle location pin
+                        // draw a pin on the map
+                        if (this.currentLocationPin == null)
+                        {
+
+
+                            DependencyObject obj = getMyLocationPin();
+                            this.map.Children.Add(obj);
+                            // update location of pin on map
+                            MapControl.SetLocation(obj, point);
+                            MapControl.SetNormalizedAnchorPoint(obj, new Point(0.5, 1));
+
+                            this.currentLocationPin = obj;
+
+
+
+                        }
+                        else
+                        {
+                            // update location of pin on map
+                            MapControl.SetLocation(this.currentLocationPin, point);
+
+                        }
+
+
                     }
 
                 }
@@ -692,8 +701,9 @@ namespace RainMan
 
             catch (System.UnauthorizedAccessException)
             {
-                // todo: critical error
-                // remember to implement this
+                this.errorText.Text = "Please enable location services";
+                this.errorText.Visibility = Visibility.Visible;
+                locationFindBar.Visibility = Visibility.Collapsed;
             }
             catch (TaskCanceledException)
             {
@@ -733,37 +743,8 @@ namespace RainMan
 
         }
 
-        private Boolean flag = false;
-        private async void map_MapTapped(MapControl sender, MapInputEventArgs args)
-        {
 
-            if (flag)
-            {
-                this.mapManager.Maps.ElementAt(currentMapIndex).setVisible(true);
-                return;
-
-            }
-
-            PredictionIconDataSource.CurrentLocation = args.Location;
-            int locationPixel = PointTranslation.locationToPixel(args.Location.Position.Latitude, args.Location.Position.Longitude);
-            int x_pixel = locationPixel % 512;
-            int y_pixel = (locationPixel - x_pixel) / 512;
-            MessageDialog diaga = new MessageDialog(String.Format("[ {0} , {1} ]", x_pixel, y_pixel));
-            await diaga.ShowAsync();
-            flag = true;
-
-        }
-
-        private void map_Tapped(object sender, TappedRoutedEventArgs e)
-        {
-
-            if (this.mapManager.Maps.ElementAt(currentMapIndex).Visibile == Visibility.Visible)
-            {
-                this.mapManager.Maps.ElementAt(currentMapIndex).setVisible(false);
-                flag = false;
-                return;
-            }
-        }
+     
 
         private void bottomPanel_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
@@ -781,6 +762,16 @@ namespace RainMan
             {
                 goButton_Click(sender, null);
             }
+        }
+
+        private void map_PitchChanged(MapControl sender, object args)
+        {
+            sender.DesiredPitch = 0.0;
+        }
+
+        private void map_HeadingChanged(MapControl sender, object args)
+        {
+            sender.Heading = 0.0;
         }
 
 
