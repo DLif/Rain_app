@@ -14,6 +14,7 @@
     <RootPropertyPathName Name="Selection" />
     <RootPropertyPathName Name="AvgInfo" />
     <RootPropertyPathName Name="Avg" />
+    <RootPropertyPathName Name="Location" />
     <RootPropertyPathName Name="Group" />
     <RootPropertyPathName Name="FinishName" />
     <RootPropertyPathName Name="StartName" />
@@ -44,7 +45,6 @@
     <RootPropertyPathName Name="imagePath" />
     <RootPropertyPathName Name="Height" />
     <RootPropertyPathName Name="Width" />
-    <RootPropertyPathName Name="Location" />
     <RootPropertyPathName Name="AnchorPoint" />
   </Roots.PropertyPathNames>
   <Roots.RootTypes>
@@ -127,6 +127,7 @@
       <RootProperty Name="Source" />
       <RootProperty Name="Height" />
       <RootProperty Name="Width" />
+      <RootProperty Name="Margin" />
     </RootType>
     <RootType FullName="RainMan.ColorSlider">
       <RootProperty Name="HorizontalAlignment" />
@@ -280,6 +281,7 @@
     </RootType>
     <RootType FullName="RainMan.testConverter" />
     <RootType FullName="RainMan.toColorConvertor" />
+    <RootType FullName="RainMan.toLocationConvertor" />
     <RootType FullName="Microsoft.Xaml.Tools.DirectUI.ProxyTypes.StaticResourceExtension" />
     <RootType FullName="Windows.UI.Xaml.Controls.GridView">
       <RootProperty Name="VerticalAlignment" />

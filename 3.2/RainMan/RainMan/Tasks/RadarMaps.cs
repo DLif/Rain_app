@@ -202,6 +202,7 @@ namespace RainMan.Tasks
             return __instance;
 
         }
+        public Boolean error = false;
 
         public async Task updateRadarMaps()
         {
@@ -211,6 +212,13 @@ namespace RainMan.Tasks
 
             // may need to update the maps every now and  then
             RadarMap[] files = await fetchMaps();
+
+            if(files == null)
+            {
+                error = true;
+                return;
+            }
+
             // the order of the images is such that  the oldest one if first, newest one is last
             for (int i = 0; i < totalNumMaps; ++i)
             {
@@ -239,7 +247,8 @@ namespace RainMan.Tasks
             CloudBlobContainer predictionsContainer = client.GetContainerReference("predictions");
 
             RadarMap[] files = new RadarMap[totalNumMaps];
-   
+
+            Boolean error = false;
 
             var seq = Enumerable.Range(0, totalNumMaps);
             var tasks = seq.Select(async i =>
@@ -256,9 +265,10 @@ namespace RainMan.Tasks
                     {
                         await blob.DownloadToStreamAsync(ms.AsOutputStream());
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
-                        String msg = e.Message;
+                        error = true;
+                        return;
                     }
                     IRandomAccessStream accessStream = ms.AsRandomAccessStream();
                     accessStream.Seek(0);
@@ -304,8 +314,11 @@ namespace RainMan.Tasks
 
             });
             await Task.WhenAll(tasks);
-            
-            
+
+            if (error)
+                return null;
+
+
             return files;
 
         }

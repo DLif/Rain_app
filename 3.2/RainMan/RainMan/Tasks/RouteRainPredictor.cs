@@ -93,7 +93,7 @@ namespace RainMan.Tasks
                 routeAnnotations.Add(annotation);
 
                 // initialize predictions and annotations for current route in group
-                await annotation.routeToAnnotations(route, kind, timeSlots, Maps, Routes.Count, loadingScreen, pushpinImage);
+                await annotation.routeToAnnotations(route, kind, timeSlots, Maps, Routes.Count, loadingScreen, pushpinImage, maxStallTime);
 
                 if(annotation.ErrorOccured)
                 {
@@ -115,7 +115,7 @@ namespace RainMan.Tasks
             loadAllPaths(Routes);
 
             // show the selected path (so far without annotations)
-            int bestPath = this.getBestPathIndex(maxStallTime);
+            int bestPath = this.getBestPathIndex();
             showPath(bestPath);
 
             // annoate the best path from the group with the best possible departure time
@@ -246,11 +246,11 @@ namespace RainMan.Tasks
         }
 
         // get the index of the group with the minimal rain damage
-        public int getBestPathIndex(int maxStallTime)
+        public int getBestPathIndex()
         {
             int minIndex = 0;
             double minAvg = this.routeAnnotations.ElementAt(0).Averages[this.routeAnnotations.ElementAt(0).BestTime];
-            for (int i = 1; i < this.routeAnnotations.Count && i <= maxStallTime; ++i)
+            for (int i = 1; i < this.routeAnnotations.Count ; ++i)
             {
                 double currAvg = this.routeAnnotations.ElementAt(i).Averages[this.routeAnnotations.ElementAt(i).BestTime];
                 if (currAvg < minAvg)
@@ -333,7 +333,7 @@ namespace RainMan.Tasks
 
 
         // calculate prediction for the given route and fill the data (colors and averages)
-        public async Task routeToAnnotations(MapRoute route, RouteKind routeKind, int numTimeSlots, List<RadarMap> maps, int numRoutes, LoadingDialog loadingScreen, ImageBrush pushpinImage)
+        public async Task routeToAnnotations(MapRoute route, RouteKind routeKind, int numTimeSlots, List<RadarMap> maps, int numRoutes, LoadingDialog loadingScreen, ImageBrush pushpinImage, int maxStallTime)
         {
 
             await predictionsForPath(route, 0, numTimeSlots, routeKind, maps, numRoutes, loadingScreen, pushpinImage);
@@ -343,7 +343,7 @@ namespace RainMan.Tasks
 
             // find best time to leave
             int minIndex = 0;
-            for (int i = 0; i < 4; ++i)
+            for (int i = 0; i <= maxStallTime; ++i)
             {
                 if (this.Averages[i] < this.Averages[minIndex])
                     minIndex = i;
@@ -504,6 +504,40 @@ namespace RainMan.Tasks
 
                     this.Colors[k].Add(color);
                     this.Averages[k] = (((double)numPaths - 1) / numPaths) * this.Averages[k] + (1.0 / numPaths) * curr;
+
+
+                    /// optimization
+                    /// 
+
+                    if (k == 2 && predictionMapIndex == 3)
+                    {
+                        for (k = 3; k <= RadarMapManager.totalOldMaps; ++k)
+                        {
+                            this.Colors[k].Add(color);
+                            this.Averages[k] = (((double)numPaths - 1) / numPaths) * this.Averages[k] + (1.0 / numPaths) * curr;
+                        }
+                        break;
+                    }
+
+                    if(k == 1 && predictionMapIndex == 3)
+                    {
+                        for (k = 2; k <= RadarMapManager.totalOldMaps; ++k)
+                        {
+                            this.Colors[k].Add(color);
+                            this.Averages[k] = (((double)numPaths - 1) / numPaths) * this.Averages[k] + (1.0 / numPaths) * curr;
+                        }
+                        break;
+                    }
+                    
+                    if(k == 0 && predictionMapIndex == 3)
+                    {
+                        for( k = 1; k <= RadarMapManager.totalOldMaps; ++k)
+                        {
+                            this.Colors[k].Add(color);
+                            this.Averages[k] = (((double)numPaths - 1) / numPaths) * this.Averages[k] + (1.0 / numPaths) * curr;
+                        }
+                        break;
+                    }
                 }
 
                 
@@ -578,32 +612,20 @@ namespace RainMan.Tasks
 
 
         #region
-        public static double GeopathToAverageRain(Geopath path, RadarMap predictionMap)
-        {
-            int numPoints = 1;
-            double avg = 0;
-
-            // iterative mean, to prevent overflow
-            foreach (BasicGeoposition position in path.Positions)
-            {
-                Geopoint geopoint = new Geopoint(position);
-                double curr = predictionMap.getAverageRain(geopoint, 1);
-
-                avg = (((double)numPoints - 1) / numPoints) * avg + (1.0 / numPoints) * curr;
-
-                ++numPoints;
-
-            }
-            return avg;
-        }
 
         public static double GeopathToAverageRain(Geopath path, RadarMap predictionMap, int startIndex, int endIndex)
         {
             int numPoints = 1;
             double avg = 0;
 
+            // for performance purposes, limit ourselfs to 50 points only [per annotated subleg]
+            int additiveFactor = endIndex - startIndex + 1;
+            additiveFactor /= 20;
+            additiveFactor = Math.Min(additiveFactor, 1);
+            //int additiveFactor = 1;
+
             // iterative mean, to prevent overflow
-            for (int i = startIndex; i <= endIndex; ++i)
+            for (int i = startIndex; i <= endIndex; i = i + additiveFactor)
             {
                 BasicGeoposition position = path.Positions.ElementAt(i);
                 Geopoint geopoint = new Geopoint(position);

@@ -20,6 +20,7 @@ namespace RainMan.Tasks
         public Double Avg { set; get; }
         public Double ItemWidth { get; set; }
         public Double ItemHeight { get; set; }
+        public String Location { get; set; }
 
 
         public PredictionIcon(double averageRain, int timeIndex, DateTime time)
@@ -31,6 +32,7 @@ namespace RainMan.Tasks
             Avg = averageRain;
             ItemWidth = 170;
             ItemHeight = 130;
+            Location = PredictionIconDataSource.CurrentLocationDescription;
         }
 
 
@@ -106,11 +108,7 @@ namespace RainMan.Tasks
     {
         public ObservableCollection<PredictionIcon> PredictionIcons { get; set; }
 
-        // for debugging purposes (?)
-        public static int _X { get; set; }
-        public static int _Y { get; set; }
 
-        //public static double[] colors = new double[4];
         public PredictionCollection(RadarMapManager mapManager, Geopoint userLocation)
         {
 
@@ -141,6 +139,9 @@ namespace RainMan.Tasks
 
         private static PredictionIconDataSource __dataSource = new PredictionIconDataSource();
         private static Geopoint currentLocation = null;
+        private static String currentLocationDescription = "current"; // user location by default
+       
+
         public static Geopoint CurrentLocation
         {
             get
@@ -153,6 +154,19 @@ namespace RainMan.Tasks
                 currentLocation = value;
             }
 
+        }
+
+        public static String CurrentLocationDescription
+        {
+            get
+            {
+                return currentLocationDescription;
+            }
+            set
+            {
+                NeedToUpdate = true;
+                currentLocationDescription = value;
+            }
         }
         public static Boolean NeedToUpdate { get; set; }
         public static async Task<PredictionCollection> getData(RadarMapManager radarMapManager)
@@ -167,9 +181,6 @@ namespace RainMan.Tasks
 
         private async Task<PredictionCollection> getPredictionCollection(RadarMapManager radarMapManager)
         {
-
-
-
 
             Geopoint geopoint;
             if (currentLocation == null)
@@ -194,6 +205,9 @@ namespace RainMan.Tasks
                         Latitude = myPosition.Coordinate.Latitude,
                         Longitude = myPosition.Coordinate.Longitude
                     });
+
+                   
+                   
                 }
 
                 catch
@@ -205,6 +219,7 @@ namespace RainMan.Tasks
             else
             {
                 geopoint = currentLocation;
+                
             }
 
             PredictionCollection collection = new PredictionCollection(radarMapManager, geopoint);

@@ -14,9 +14,11 @@
 
                 <AppBarButton.Flyout>
                     <Flyout>
-                        <Grid Height="150">
+                        <Grid Height="auto">
+                             
                             <Grid.RowDefinitions>
 
+                                <RowDefinition/>
                                 <RowDefinition/>
                                 <RowDefinition/>
 
@@ -30,8 +32,9 @@
 
 
                             </Grid.ColumnDefinitions>
-                            <TextBox x:ConnectionId='4' Margin="0,20,0,0" Grid.Row="0" Grid.Column="1" x:Name="pathNameText" Text="Enter new path name"                                 ></TextBox>
-                            <Button x:ConnectionId='5' x:Name="uploadButton" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" Content="Save"                            ></Button>
+                            <TextBlock Text="CHOOSE A NAME FOR THE PATH" FontWeight="Medium" Foreground="White" Grid.Column="1" FontSize="20" Margin="20, 10, 20, 0" HorizontalAlignment="Center"  VerticalAlignment="Center"></TextBlock>
+                            <TextBox x:ConnectionId='4' Margin="0,20,0,0" Grid.Row="1" Grid.Column="1" x:Name="pathNameText"                                  ></TextBox>
+                            <Button x:ConnectionId='5' x:Name="uploadButton" Grid.Column="1" Grid.Row="2" HorizontalAlignment="Center" Content="Save"                            ></Button>
                         </Grid>
 
                     </Flyout>
@@ -39,7 +42,7 @@
                 </AppBarButton.Flyout>
             </AppBarButton>
 
-            <AppBarButton x:ConnectionId='2' x:Name="undoAppBar" Icon="Undo" Label="Undo"                         />
+            <AppBarButton x:ConnectionId='2' Visibility="Collapsed" x:Name="undoAppBar" Icon="Undo" Label="Undo"                         />
             <AppBarToggleButton x:ConnectionId='3' x:Name="enableAddress" Icon="Find" Label="Address"                                                                    />
         </CommandBar>
     </Page.BottomAppBar>
@@ -53,7 +56,7 @@
         </Grid.ChildrenTransitions>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
+            
             <RowDefinition Height="*"/>
 
         </Grid.RowDefinitions>
@@ -70,17 +73,13 @@
 
         </Grid.ColumnDefinitions>
 
-        <!-- Title Panel -->
-        <StackPanel Grid.Row="0" Margin="19,0,0,0" Grid.ColumnSpan="3">
-            <TextBlock Text="Path Builder" Style="{ThemeResource TitleTextBlockStyle}" Margin="0,12,0,0"/>
-
-        </StackPanel>
+      
 
 
 
-        <Maps:MapControl x:ConnectionId='6' Grid.Column="0" Grid.ColumnSpan="3" MapServiceToken="BaBZ6ETOrg8G3L31STm8dg" x:Name="map" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"                                              />
+        <Maps:MapControl x:ConnectionId='6' Grid.Column="0" Grid.ColumnSpan="3" MapServiceToken="BaBZ6ETOrg8G3L31STm8dg" x:Name="map" Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"                                              />
 
-        <Grid Grid.Row="1" Margin="0, 0, 0, 80" x:Name="addressGrid" VerticalAlignment="Bottom" Visibility="Collapsed" Opacity="0" Grid.Column="1">
+        <Grid Grid.Row="0" Margin="0, 0, 0, 80" x:Name="addressGrid" VerticalAlignment="Bottom" Visibility="Collapsed" Opacity="0" Grid.Column="1">
             
             <Grid.Resources>
                 
