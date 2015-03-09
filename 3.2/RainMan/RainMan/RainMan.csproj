@@ -148,11 +148,13 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\BadgeLogo.scale-240.png" />
     <Content Include="Assets\bg6.jpg" />
     <Content Include="Assets\icons\bike.png" />
     <Content Include="Assets\icons\car.png" />
     <Content Include="Assets\icons\icon1.png" />
     <Content Include="Assets\icons\icon2.png" />
+    <Content Include="Assets\icons\imslogo.png" />
     <Content Include="Assets\icons\logo.jpg" />
     <Content Include="Assets\icons\walking.png" />
     <Content Include="Assets\Logo.scale-240.png" />

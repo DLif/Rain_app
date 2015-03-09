@@ -142,6 +142,10 @@ namespace RainMan
            {
                     // create radar map manager
                     this.mapManager = await RadarMapManager.getRadarMapManager();
+                    if(mapManager.error)
+                    {
+                        error = true;
+                    }
             }
 
            catch
@@ -154,13 +158,16 @@ namespace RainMan
            if(error)
            {
                 diag.Hide();
-                    // handle error
+
+                MessageDialog dialog = new MessageDialog("Sorry, we failed to update the app with current data, it seems that the server is temporary down or your system clock is incorrect, or you are not connected to the internet");
+                await dialog.ShowAsync();
 
 
             }
 
-            if(e.NavigationParameter != null)
+            if(e.NavigationParameter != null && !this.defaultViewModel.ContainsKey("IconCollection"))
             {
+                // first time only
                 var icons = e.NavigationParameter as PredictionCollection;
                 this.defaultViewModel["IconCollection"] = icons.PredictionIcons;
                 this.defaultViewModel["Selection"] = icons.PredictionIcons.ElementAt(0);
@@ -304,6 +311,26 @@ namespace RainMan
         private void commandBar_Opened(object sender, object e)
         {
 
+        }
+
+      
+
+        private void fadeOutCredits_Completed(object sender, object e)
+        {
+            CreditsGrid.Visibility = Visibility.Collapsed;
+            BottomAppBar.Visibility = Visibility.Visible;
+        }
+
+        private void close_Click(object sender, RoutedEventArgs e)
+        {
+            fadeOutCredits.Begin();
+        }
+
+        private void creditsApp_Click(object sender, RoutedEventArgs e)
+        {
+            CreditsGrid.Visibility = Visibility.Visible;
+            BottomAppBar.Visibility = Visibility.Collapsed;
+            fadeInCredits.Begin();
         }
 
        

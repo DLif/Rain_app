@@ -83,7 +83,11 @@ namespace RainMan
                 {
                     // just update the radar manager
                     manager = await RadarMapManager.getRadarMapManager();
-
+                    
+                    if(manager.error)
+                    {
+                        error = true;
+                    }
                 }
                 catch
                 {
@@ -196,7 +200,8 @@ namespace RainMan
 
         private void fadeOutText_Completed(object sender, object e)
         {
-            this.Error.Text = "It seems our services are temporary unavailable, please try again later";
+            title.Visibility = Visibility.Collapsed;
+            this.Error.Text = "It seems our services are temporary unavailable, please try again later. Also, please make sure you are connected to the internet and that your system clock is correct";
             this.fadeInText.Begin();
         }
     }

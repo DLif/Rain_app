@@ -98,7 +98,11 @@ namespace RainMan
             try
             {
                 this.mapManager = await RadarMapManager.getRadarMapManager();
-
+                if(this.mapManager.error)
+                {
+                    error = true;
+                    hideBar.Begin(); 
+                }
             }
             catch
             {
@@ -112,9 +116,9 @@ namespace RainMan
 
             if(error)
             {
-                MessageDialog diag = new MessageDialog("Oops, our servers are down! please try again later", "Oops");
+                MessageDialog diag = new MessageDialog("Failed to update radar maps, old maps will be used instead. It seems our server is temporary unavailable or your system clock is incorrect, or you are not connected to the internet", "Oops");
                 await diag.ShowAsync();
-                Frame.GoBack();
+                
             }
 
 
@@ -124,10 +128,12 @@ namespace RainMan
             this.defaultViewModel["currentTime"] = mapManager.Maps.ElementAt(RadarMapManager.totalOldMaps).Time;
             this.slider_panel.Visibility = Visibility.Visible;
            
-
+            
 
 
         }
+
+       
 
         private void attachRadarMapsToMap(ObservableCollection<RadarMap> maps)
         {
@@ -315,6 +321,7 @@ namespace RainMan
                 });
 
                 PredictionIconDataSource.CurrentLocation = geopoint;
+                PredictionIconDataSource.CurrentLocationDescription = "current";
 
                 // draw a pin on the map
                 if (this.currentLocationPin == null)
@@ -639,9 +646,6 @@ namespace RainMan
 
                     MapLocation location = result.Locations.ElementAt(0);
                     Geopoint point = location.Point;
-
-                    PredictionIconDataSource.CurrentLocation = point;
-
                     Boolean success = await map.TrySetViewAsync(point, 12D, 0, 0, MapAnimationKind.None);
 
 
@@ -651,11 +655,15 @@ namespace RainMan
                         this.errorText.Text = "Oops! failed to navigate to location";
                         this.errorText.Visibility = Visibility.Visible;
                         locationFindBar.Visibility = Visibility.Collapsed;
-                        
+
+    
 
                     }
                     else
                     {
+                        PredictionIconDataSource.CurrentLocation = point;
+                        PredictionIconDataSource.CurrentLocationDescription = address; // set address
+
                         this.Flyout.Hide();
 
 

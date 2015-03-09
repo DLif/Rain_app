@@ -71,8 +71,11 @@ namespace RainMan
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             double meters = (double)value;
-
-            return meters.ToString() + " meters";
+            if(meters < 1500)
+            {
+                return meters.ToString() + " meters";
+            }
+            return string.Format("{0} km", meters / 1000);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)
@@ -88,7 +91,7 @@ namespace RainMan
         {
             double avgRain = (double)value;
 
-            return String.Format("Average rain: {0:0.00}",avgRain) + " MM\\Hour";
+            return String.Format("Average rain: {0:0.000}",avgRain) + " MM\\Hour";
 
         }
 

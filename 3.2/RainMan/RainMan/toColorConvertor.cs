@@ -24,4 +24,24 @@ namespace RainMan
             throw new NotImplementedException();
         }
     }
+    class toLocationConvertor : IValueConverter
+    {
+
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            if((string)value == "current")
+            {
+                return "AT YOUR CURRENT LOCATION";
+            }
+            else
+            {
+                return string.Format("AT '{0}'", ((string)value).ToUpper());
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

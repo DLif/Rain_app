@@ -201,11 +201,10 @@ namespace RainMan
             {
 
                 Task[] tasks = new Task[2];
-                tasks[0] = Task.Delay(2000);
-
+                
                 var findLocationTast = MapLocationFinder.FindLocationsAsync(address, RadarMapManager.center, 5);
                 tasks[1] = findLocationTast.AsTask<MapLocationFinderResult>();
-
+                tasks[0] = Task.Delay(2000);
                 int res = Task.WaitAny(tasks);
                 if (res == 0)
                 {
@@ -232,8 +231,6 @@ namespace RainMan
 
             catch (System.UnauthorizedAccessException)
             {
-                // todo: critical error
-                // remember to implement this
                 errorText = "Map service is disabled!";
             }
             catch (TaskCanceledException)

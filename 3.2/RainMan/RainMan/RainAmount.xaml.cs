@@ -105,6 +105,10 @@ namespace RainMan
             {
 
                 manager = await RadarMapManager.getRadarMapManager();
+                if(manager.error)
+                {
+                    error = true;
+                }
 
             }
             catch
@@ -118,7 +122,7 @@ namespace RainMan
             {
                 MessageDialog diag = new MessageDialog("Could not update radar maps, please check your internet connection and try again later");
                 await diag.ShowAsync();
-                Frame.GoBack();
+                
             }
 
 
@@ -302,7 +306,19 @@ namespace RainMan
             }
         }
 
-        private void map_MapTapped(MapControl sender, MapInputEventArgs args)
+        private bool isPointInBounds(Geopoint point)
+        {
+            var res = PointTranslation.locationToPixel(point.Position.Latitude, point.Position.Longitude);
+            if(res < 0)
+            {
+                return false;
+            }
+            return true;
+
+
+        }
+
+        private async void map_MapTapped(MapControl sender, MapInputEventArgs args)
         {
 
             TipGrid.Visibility = Visibility.Collapsed;
@@ -311,6 +327,14 @@ namespace RainMan
                 return;
 
             Geopoint point = args.Location;
+
+            if(!isPointInBounds(point))
+            {
+                MessageDialog diag = new MessageDialog("Only locations inside of Israel are supported");
+                await diag.ShowAsync();
+                return;
+            }
+
 
             if(this.undoAppBar.Visibility == Visibility.Collapsed)
             {
@@ -439,6 +463,16 @@ namespace RainMan
                 if (result.Status == MapLocationFinderStatus.Success && result.Locations.Count > 0)
                 {
 
+
+                    Geopoint location = result.Locations[0].Point;
+                    if (!isPointInBounds(location))
+                    {
+                        MessageDialog diag = new MessageDialog("Only locations inside of Israel are supported");
+                        await diag.ShowAsync();
+                        return;
+                    }
+
+
                     addWayPoint(result.Locations[0].Point);
                     await map.TrySetViewAsync(result.Locations[0].Point);
 
@@ -527,7 +561,7 @@ namespace RainMan
                 await diag.ShowAsync();
                 return;
             }
-
+            var pixelCount = pixels.Count;
 
             // build the polygon
             var poly = new CustomPolygon(pixels.Count, pixels);
@@ -559,7 +593,7 @@ namespace RainMan
                 }
 
 
-                double res = ( result * (1 / 6.0)) / (inside_points.Count + pixels.Count); 
+                double res = (result * (1 / 6.0)) / (inside_points.Count + pixelCount); 
                
                 
 
@@ -665,7 +699,7 @@ namespace RainMan
                     foreach (PixelRep j in polygon_points)
                     {
 
-                        power += ColorTranslator.power_to_radius(pixels, j.X,j.Y, 0, currentMap.PixelWidth);
+                        power += ColorTranslator.power_to_radius(pixels, j.X,j.Y, 1, currentMap.PixelWidth);
                         
                     }
                 }

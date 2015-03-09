@@ -168,7 +168,7 @@ namespace RainMan
 
 
 
-            Task timeOutTask = Task.Delay(TimeSpan.FromSeconds(3));
+            Task timeOutTask = Task.Delay(TimeSpan.FromSeconds(10));
             var taskWrapper = new Task[2];
             
             MapRouteFinderResult routeResult = null;
@@ -205,7 +205,7 @@ namespace RainMan
             if(x == 1)
             {
                 task.Cancel();
-                errorMessage = "Could not compute route";
+                errorMessage = "Route computation timed-out, please try again later";
                 return null;
             }
 
@@ -296,11 +296,16 @@ namespace RainMan
             {
 
                 this.radarMapManager = await RadarMapManager.getRadarMapManager();
+                if(this.radarMapManager.error)
+                {
+                    this.loadingDiag.ShowError("Oops, failed to update radar maps");
+                    return;
+                }
             }
             catch
             {
 
-                this.loadingDiag.ShowError("Oops, connection with the server has timed out");
+                this.loadingDiag.ShowError("Oops, failed to update radar maps");
                 return;
             }
             // create an actual path for each collection of waypoints in the given group

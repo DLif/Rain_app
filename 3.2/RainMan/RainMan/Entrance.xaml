@@ -48,8 +48,8 @@
                     <RowDefinition Height="*"/>
 
                 </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" FontSize="15" TextWrapping="WrapWholeWords" HorizontalAlignment="Center" Foreground="Black" Text="Please wait while we download the required data " />
-                <TextBlock TextWrapping="WrapWholeWords" x:Name="Error" Grid.Row="1" FontSize="15" Margin="0, 15, 0, 0" HorizontalAlignment="Center" Foreground="Black" Text="This may take a few seconds ..."/>
+                <TextBlock x:Name="title" Grid.Row="0" FontSize="15" TextWrapping="WrapWholeWords" HorizontalAlignment="Center" Foreground="Black" Text="Please wait while we download the required data " />
+                <TextBlock TextWrapping="WrapWholeWords" x:Name="Error" Grid.Row="1" FontSize="15" Margin="15, 15, 15, 0" HorizontalAlignment="Center" Foreground="Black" Text="This may take a few seconds ..."/>
                 <ProgressRing x:Name="Progress" IsActive="True" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="2" Background="Transparent"/>
             </Grid>
         </Grid>

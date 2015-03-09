@@ -98,8 +98,10 @@ namespace RainMan
             map.Center = RadarMapManager.center;
             map.ZoomLevel = 10D;
 
-            DependencyObject startPin = getBoundPin(this.source);
-            DependencyObject endPin = getBoundPin(this.destination);
+           // DependencyObject startPin = getBoundPin(this.source); 
+            DependencyObject startPin = MapUtils.getMapPin(this.source, Colors.Red, "Start");
+           // DependencyObject endPin = getBoundPin(this.destination);
+            DependencyObject endPin = MapUtils.getMapPin(this.destination, Colors.Red, "Destination");
 
             this.map.Children.Add(startPin);
             this.map.Children.Add(endPin);
@@ -182,50 +184,7 @@ namespace RainMan
         }
 
 
-        private DependencyObject getBoundPin(Geopoint point)
-        {
-
-            //Creating a Grid element.
-            var myGrid = new Grid();
-            myGrid.RowDefinitions.Add(new RowDefinition());
-            myGrid.RowDefinitions.Add(new RowDefinition());
-            myGrid.Background = new SolidColorBrush(Colors.Transparent);
-            ImageBrush imgBrush = new ImageBrush();
-            imgBrush.ImageSource = new BitmapImage(new Uri("ms-appx:///Assets/radar/mappin.png"));
-            //Creating a Rectangle
-            var myRectangle = new Rectangle { Fill = imgBrush, Height = 35, Width = 20 };
-            myRectangle.SetValue(Grid.RowProperty, 0);
-            myRectangle.SetValue(Grid.ColumnProperty, 0);
-
-            //Adding the Rectangle to the Grid
-            myGrid.Children.Add(myRectangle);
-
-            return myGrid;
-
-        }
-
-        private DependencyObject getWayPointPin(Geopoint point)
-        {
-
-            //Creating a Grid element.
-            var myGrid = new Grid();
-            myGrid.RowDefinitions.Add(new RowDefinition());
-            myGrid.RowDefinitions.Add(new RowDefinition());
-            myGrid.Background = new SolidColorBrush(Colors.Transparent);
-            ImageBrush imgBrush = new ImageBrush();
-            imgBrush.ImageSource = new BitmapImage(new Uri("ms-appx:///Assets/radar/waypointpin.png"));
-
-            //Creating a Rectangle
-            var myRectangle = new Rectangle { Fill = imgBrush, Height = 35, Width = 20 };
-            myRectangle.SetValue(Grid.RowProperty, 0);
-            myRectangle.SetValue(Grid.ColumnProperty, 0);
-
-            //Adding the Rectangle to the Grid
-            myGrid.Children.Add(myRectangle);
-
-            return myGrid;
-
-        }
+     
 
         private async void map_Loaded(object sender, RoutedEventArgs e)
         {
@@ -269,18 +228,8 @@ namespace RainMan
         private void undoAppBar_Click(object sender, RoutedEventArgs e)
         {
 
-            if (this.pathGenerated)
-            {
-
-                map.Routes.Clear();
-                return;
-            }
-
-            if (this.wayPoints.Count == 0)
-            {
-                // no items in stack
-                return;
-            }
+           
+            
 
             int lastIndex = this.wayPoints.Count - 1;
 
@@ -292,6 +241,12 @@ namespace RainMan
 
             // remove the pin from the list
             this.wayPointsPins.RemoveAt(lastIndex);
+
+            if (this.wayPoints.Count == 0)
+            {
+                // no items in stack
+                undoAppBar.Visibility = Visibility.Collapsed;
+            }
 
         }
 
@@ -308,7 +263,9 @@ namespace RainMan
         private void addWayPoint(Geopoint point)
         {
             this.wayPoints.Add(point);
-            DependencyObject wayPointPin = getWayPointPin(point);
+            //DependencyObject wayPointPin = getWayPointPin(point);
+
+            DependencyObject wayPointPin = MapUtils.getMapPin(point, Colors.Blue, this.wayPoints.Count.ToString());
             this.wayPointsPins.Add(wayPointPin);
 
             // add pin to map
@@ -316,10 +273,12 @@ namespace RainMan
 
             MapControl.SetLocation(wayPointPin, point);
             MapControl.SetNormalizedAnchorPoint(wayPointPin, new Point(0.5, 1));
+
+            undoAppBar.Visibility = Visibility.Visible;
         }
 
 
-        private Boolean pathGenerated = false;
+       
 
         private async void acceptAppBar_Click(object sender, RoutedEventArgs e)
         {
