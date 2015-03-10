@@ -46,6 +46,7 @@ namespace RainMan
         public App()
         {
             this.InitializeComponent();
+            this.Resuming += new EventHandler<object>(App_Resuming);
             this.Suspending += this.OnSuspending;
             mobileClient = new Microsoft.WindowsAzure.MobileServices.MobileServiceClient(
                "https://rainappfinal.azure-mobile.net/", "iQopzFpXLOcXFNIBVJfkibAAwRNlsH55");
@@ -53,6 +54,19 @@ namespace RainMan
            userId = GetDeviceID();
            MapService.ServiceToken = "BaBZ6ETOrg8G3L31STm8dg";
            
+        }
+
+        private void App_Resuming(object sender, object e)
+        {
+
+            Frame rootFrame = Window.Current.Content as Frame;
+            
+            if (!rootFrame.Navigate(typeof(Entrance), null))
+            {
+                throw new Exception("Failed to create initial page");
+            }
+           
+            
         }
 
         private string GetDeviceID()
@@ -66,6 +80,8 @@ namespace RainMan
             string hashedString = CryptographicBuffer.EncodeToHexString(hashed);
             return hashedString;
         }
+
+        
 
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
@@ -82,8 +98,10 @@ namespace RainMan
             }
 #endif
 
-            Frame rootFrame = Window.Current.Content as Frame;
+            
 
+            Frame rootFrame = Window.Current.Content as Frame;
+          
             // Do not repeat app initialization when the Window already has content,
             // just ensure that the window is active
             if (rootFrame == null)
